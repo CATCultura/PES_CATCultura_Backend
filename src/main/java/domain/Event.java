@@ -1,17 +1,24 @@
 package domain;
 
+import java.util.ArrayList;
+
 public class Event {
     private long codi;
-    private String dataf;
+    private String data_fi;
 
+    private String data_inici;
     private String horari;
 
-    public String getDataf() {
-        return dataf;
+    private String descripcio;
+    private ArrayList<String> tags_ambits;
+    private ArrayList<String> tags_categories;
+
+    public String getData_fi() {
+        return data_fi;
     }
 
-    public void setDataf(String dataf) {
-        this.dataf = dataf;
+    public void setData_fi(String data_fi) {
+        this.data_fi = data_fi;
     }
 
     public long getCodi() {
@@ -28,5 +35,37 @@ public class Event {
 
     public void setHorari(String horari) {
         this.horari = horari;
+    }
+
+    public String getData_inici() {
+        return data_inici;
+    }
+
+    public void setData_inici(String data_inici) {
+        this.data_inici = data_inici;
+    }
+
+    public String getDescripcio() {
+        return descripcio;
+    }
+
+    public void setDescripcio(String descripcio) {
+        this.descripcio = descripcio;
+    }
+
+    public ArrayList<String> getTags_ambits() {
+        return tags_ambits;
+    }
+
+    public void setTags_ambits(ArrayList<String> tags_ambits) {
+        this.tags_ambits = tags_ambits;
+    }
+
+    public ArrayList<String> getTags_categories() {
+        return tags_categories;
+    }
+
+    public void setTags_categories(ArrayList<String> tags_categories) {
+        this.tags_categories = tags_categories;
     }
 }
