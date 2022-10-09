@@ -1,7 +1,6 @@
 package cat.cultura.backend;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.CommandLineRunner;
+import cat.cultura.backend.entity.Event;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
@@ -11,12 +10,10 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 
-@SpringBootApplication(exclude = {DataSourceAutoConfiguration.class })
+@SpringBootApplication()
 @RestController
-public class BackendApplication implements CommandLineRunner {
+public class BackendApplication {
 
-	@Autowired
-	private EventDao esdvDao;
 	public static void main(String[] args) {
 		SpringApplication.run(BackendApplication.class, args);
 	}
@@ -24,18 +21,6 @@ public class BackendApplication implements CommandLineRunner {
 	@PostMapping("/insert")
 	public int insertData(@RequestBody List<Event> events) {
 		return 1;
-	}
-
-	@Override
-	public void run(String... args) throws Exception {
-		Event esdv = getEsdeveniment();
-		esdvDao.createEvent(esdv);
-	}
-
-	private Event getEsdeveniment() {
-		Event esdv = new Event();
-		esdv.setCodi(3333);
-		return esdv;
 	}
 
 }
