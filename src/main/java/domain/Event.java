@@ -1,25 +1,24 @@
 package domain;
 
+import com.fasterxml.jackson.annotation.JsonAutoDetect;
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonProperty;
+
+import javax.ws.rs.core.GenericType;
 import java.util.ArrayList;
+import java.util.List;
 
+@JsonIgnoreProperties(ignoreUnknown=true)
+@JsonAutoDetect(fieldVisibility= JsonAutoDetect.Visibility.ANY)
 public class Event {
+
     private long codi;
-    private String data_fi;
 
-    private String data_inici;
-    private String horari;
 
-    private String descripcio;
-    private ArrayList<String> tags_ambits;
-    private ArrayList<String> tags_categories;
+    private String dataFi;
 
-    public String getData_fi() {
-        return data_fi;
-    }
-
-    public void setData_fi(String data_fi) {
-        this.data_fi = data_fi;
-    }
+   private String dataInici;
 
     public long getCodi() {
         return codi;
@@ -29,43 +28,57 @@ public class Event {
         this.codi = codi;
     }
 
-    public String getHorari() {
-        return horari;
-    }
+    private String dataFiAprox;
 
-    public void setHorari(String horari) {
-        this.horari = horari;
-    }
+   private String denominacio;
 
-    public String getData_inici() {
-        return data_inici;
-    }
+   private String descripcio;
 
-    public void setData_inici(String data_inici) {
-        this.data_inici = data_inici;
-    }
+   private String entrades;
 
-    public String getDescripcio() {
-        return descripcio;
-    }
+   private String horari;
 
-    public void setDescripcio(String descripcio) {
-        this.descripcio = descripcio;
-    }
+   private String subtitol;
 
-    public ArrayList<String> getTags_ambits() {
-        return tags_ambits;
-    }
+   private List<String> tagsAmbits;
 
-    public void setTags_ambits(ArrayList<String> tags_ambits) {
-        this.tags_ambits = tags_ambits;
-    }
+   private List<String> tagsCateg;
 
-    public ArrayList<String> getTags_categories() {
-        return tags_categories;
-    }
+   private List<String> tagsAltresCateg;
 
-    public void setTags_categories(ArrayList<String> tags_categories) {
-        this.tags_categories = tags_categories;
-    }
+   private String links;
+
+   private String documents;
+
+   private String imatges;
+
+   private String videos;
+
+   private String adreca;
+
+   private int codiPostal;
+
+   private String comarcaIMunicipi;
+
+   private String email;
+
+   private String espai;
+
+   private double latitud;
+
+   private String localitat;
+
+   private double longitud;
+
+   private String regioOPais;
+
+   private String telf;
+
+   private String URL;
+
+   private String imgApp;
+
+   private String descripcioHtml;
+
+
 }
