@@ -1,6 +1,7 @@
 package cat.cultura.backend.entity;
 
 import javax.persistence.*;
+import java.util.List;
 
 @Entity
 @Table(name = "Event")
@@ -18,69 +19,77 @@ public class Event {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
     @Column(name="codi")
-    private int codi;
+    private Long codi;
     @Column(name="dataFi")
     private String dataFi;
-//   @Column(name="dataInici")
-//   private String dataInici;
-//   @Column(name="dataFiAprox")
-//   private String dataFiAprox;
-//   @Column(name="denominacio")
-//   private String denominacio;
-//   @Column(name="descripcio")
-//   private String descripcio;
-//   @Column(name="entrades")
-//   private String entrades;
-//   @Column(name="horari")
-//   private String horari;
-//   @Column(name="subtitol")
-//   private String subtitol;
-//   @Column(name="tagsAmbits")
-//   private String tagsAmbits;
-//   @Column(name="tagsCateg")
-//   private String tagsCateg;
-//   @Column(name="tagsAltresCateg")
-//   private String tagsAltresCateg;
-//   @Column(name="links")
-//   private String links;
-//   @Column(name="documents")
-//   private String documents;
-//   @Column(name="imatges")
-//   private String imatges;
-//   @Column(name="videos")
-//   private String videos;
-//   @Column(name="adreca")
-//   private String adreca;
-//   @Column(name="codiPostal")
-//   private int codiPostal;
-//   @Column(name="comarcaIMunicipi")
-//   private String comarcaIMunicipi;
-//   @Column(name="email")
-//   private String email;
-//   @Column(name="espai")
-//   private String espai;
-//   @Column(name="latitud")
-//   private double latitud;
-//   @Column(name="localitat")
-//   private String localitat;
-//   @Column(name="longitud")
-//   private double longitud;
-//   @Column(name="regioOPais")
-//   private String regioOPais;
-//   @Column(name="telf")
-//   private String telf;
-//   @Column(name="URL")
-//   private String URL;
-//   @Column(name="imgApp")
-//   private String imgApp;
-//   @Column(name="descripcioHtml")
-//   private String descripcioHtml;
+   @Column(name="dataInici")
+   private String dataInici;
+   @Column(name="dataFiAprox")
+   private String dataFiAprox;
+   @Column(name="denominacio")
+   private String denominacio;
+   @Column(name="descripcio")
+   private String descripcio;
+   @Column(name="entrades")
+   private String entrades;
+   @Column(name="horari")
+   private String horari;
+   @Column(name="subtitol")
+   private String subtitol;
+   @ElementCollection
+   @CollectionTable(name="tagAmbits", joinColumns=@JoinColumn(name="id"))
+   @Column(name="tagsAmbits")
+   private List<String> tagsAmbits;
+   @ElementCollection
+   @CollectionTable(name="tagsCateg", joinColumns=@JoinColumn(name="id"))
+   @Column(name="tagsCateg")
+   private List<String> tagsCateg;
+   @ElementCollection
+   @CollectionTable(name="tagsAltresCateg", joinColumns=@JoinColumn(name="id"))
+   @Column(name="tagsAltresCateg")
+   private List<String> tagsAltresCateg;
+   @Column(name="links")
+   private String links;
+   @Column(name="documents")
+   private String documents;
+   @Column(name="imatges")
+   private String imatges;
+   @Column(name="videos")
+   private String videos;
+   @Column(name="adreca")
+   private String adreca;
+   @Column(name="codiPostal")
+   private int codiPostal;
+   @Column(name="comarcaIMunicipi")
+   private String comarcaIMunicipi;
+   @Column(name="email")
+   private String email;
+   @Column(name="espai")
+   private String espai;
+   @Column(name="latitud")
+   private double latitud;
+   @Column(name="localitat")
+   private String localitat;
+   @Column(name="longitud")
+   private double longitud;
+   @Column(name="regioOPais")
+   private String regioOPais;
+   @Column(name="telf")
+   private String telf;
+   @Column(name="URL")
+   private String URL;
+   @Column(name="imgApp")
+   private String imgApp;
+   @Column(name="descripcioHtml")
+   private String descripcioHtml;
+   @Column(name="cancelado")
+   private boolean cancelado;
 
-    public int getCodi() {
+    public Long getCodi() {
         return codi;
     }
 
-    public void setCodi(int codi) {
+    public void setCodi(Long codi) {
         this.codi = codi;
     }
 

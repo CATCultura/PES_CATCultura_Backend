@@ -33,7 +33,7 @@ public class EventController {
     }
 
     @GetMapping("/event/{codi}")
-    public Event findEventByCodi(@PathVariable int codi) {
+    public Event findEventByCodi(@PathVariable Long codi) {
         return service.getEventByCodi(codi);
     }
 

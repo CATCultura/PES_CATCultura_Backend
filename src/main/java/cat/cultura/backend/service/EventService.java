@@ -28,7 +28,7 @@ public class EventService {
         return repo.findById(id).orElse(null);
     }
 
-    public Event getEventByCodi(int codi) {
+    public Event getEventByCodi(Long codi) {
         return repo.findByCodi(codi);
     }
 
@@ -39,7 +39,7 @@ public class EventService {
 
     public Event updateEvent(Event ev) {
         Event existingEvent=repo.findById(ev.getId()).orElse(null);
-        existingEvent.setCodi(ev.getCodi());
+        existingEvent.setCodi((long) ev.getCodi());
         existingEvent.setDataFi(ev.getDataFi());
         return repo.save(existingEvent);
     }
