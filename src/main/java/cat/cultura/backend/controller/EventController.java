@@ -37,13 +37,13 @@ public class EventController {
         return service.getEventByCodi(codi);
     }
 
-    @PutMapping("/update")
+    @PutMapping("/updateEvent")
     public Event updateEvent(@RequestBody Event ev) {
         return service.updateEvent(ev);
     }
 
-    @DeleteMapping("/delete/{id}")
-    public String deleteEvent(@PathVariable long id){
+    @DeleteMapping("/deleteEvent/{id}")
+    public String deleteEvent(@PathVariable Long id){
         return service.deleteEvent(id);
     }
 }
