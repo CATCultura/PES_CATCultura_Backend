@@ -1,84 +1,18 @@
 package cat.cultura.backend.entity;
 
+import com.fasterxml.jackson.annotation.JsonAutoDetect;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
 import javax.persistence.*;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 @Entity
-@Table(name = "Event")
+@Table(name = "Event", uniqueConstraints = {
+        @UniqueConstraint(name = "uc_event_codi_datainici", columnNames = {"codi", "dataInici", "denominacio"})
+})
+@JsonIgnoreProperties(ignoreUnknown=true)
+@JsonAutoDetect(fieldVisibility= JsonAutoDetect.Visibility.ANY)
 public class Event {
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    private Long id;
-    @Column(name="codi")
-    private Long codi;
-    @Column(name="dataFi")
-    private String dataFi;
-    @Column(name="dataInici")
-    private String dataInici;
-    @Column(name="dataFiAprox")
-    private String dataFiAprox;
-    @Column(name="denominacio")
-    private String denominacio;
-    @Column(name="descripcio")
-    private String descripcio;
-    @Column(name="entrades")
-    private String entrades;
-    @Column(name="horari")
-    private String horari;
-    @Column(name="subtitol")
-    private String subtitol;
-    @ElementCollection
-    @CollectionTable(name="tagAmbits", joinColumns=@JoinColumn(name="id"))
-    @Column(name="tagsAmbits")
-    private List<String> tagsAmbits = new ArrayList<String>();
-    @ElementCollection
-    @CollectionTable(name="tagsCateg", joinColumns=@JoinColumn(name="id"))
-    @Column(name="tagsCateg")
-    private List<String> tagsCateg = new ArrayList<String>();
-    @ElementCollection
-    @CollectionTable(name="tagsAltresCateg", joinColumns=@JoinColumn(name="id"))
-    @Column(name="tagsAltresCateg")
-    private List<String> tagsAltresCateg = new ArrayList<String>();
-    @Column(name="links")
-    private String links;
-    @Column(name="documents")
-    private String documents;
-    @Column(name="imatges")
-    private String imatges;
-    @Column(name="videos")
-    private String videos;
-    @Column(name="adreca")
-    private String adreca;
-    @Column(name="codiPostal")
-    private int codiPostal;
-    @Column(name="comarcaIMunicipi")
-    private String comarcaIMunicipi;
-    @Column(name="email")
-    private String email;
-    @Column(name="espai")
-    private String espai;
-    @Column(name="latitud")
-    private double latitud;
-    @Column(name="localitat")
-    private String localitat;
-    @Column(name="longitud")
-    private double longitud;
-    @Column(name="regioOPais")
-    private String regioOPais;
-    @Column(name="telf")
-    private String telf;
-    @Column(name="URL")
-    private String URL;
-    @Column(name="imgApp")
-    private String imgApp;
-    @Column(name="descripcioHtml")
-    private String descripcioHtml;
-
-    @Column(name="cancelado")
-    private boolean cancelado;
 
     public Long getId() {
         return id;
@@ -86,6 +20,103 @@ public class Event {
 
     public void setId(Long id) {
         this.id = id;
+    }
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    private Long id;
+    @Column(name = "codi")
+    private Long codi;
+    @Column(name = "dataFi")
+    private String dataFi;
+    @Column(name = "dataInici")
+    private String dataInici;
+    @Column(name = "dataFiAprox")
+    private String dataFiAprox;
+    @Column(name = "denominacio")
+    private String denominacio;
+    @Lob
+    @Column(name = "descripcio")
+    private String descripcio;
+    @Column(name = "entrades", length = 1024)
+    private String entrades;
+    @Column(name = "horari")
+    private String horari;
+    @Column(name = "subtitol")
+    private String subtitol;
+    @ElementCollection
+    @CollectionTable(name = "tagsAmbits", joinColumns = @JoinColumn(name = "id"))
+    @Column(name = "tagsAmbits")
+    private List<String> tagsAmbits;
+    @ElementCollection
+    @CollectionTable(name = "tagsCateg", joinColumns = @JoinColumn(name = "id"))
+    @Column(name = "tagsCateg")
+    private List<String> tagsCateg;
+    @ElementCollection
+    @CollectionTable(name = "tagsAltresCateg", joinColumns = @JoinColumn(name = "id"))
+    @Column(name = "tagsAltresCateg")
+    private List<String> tagsAltresCateg;
+    @Lob
+    @Column(name = "links")
+    private String links;
+    @Column(name = "documents")
+    private String documents;
+    @Column(name = "imatges")
+    private String imatges;
+    @Column(name = "videos")
+    private String videos;
+    @Column(name = "adreca")
+    private String adreca;
+    @Column(name = "codiPostal")
+    private int codiPostal;
+    @Column(name = "comarcaIMunicipi")
+    private String comarcaIMunicipi;
+    @Column(name = "email")
+    private String email;
+    @Column(name = "espai")
+    private String espai;
+    @Column(name = "latitud")
+    private double latitud;
+    @Column(name = "localitat")
+    private String localitat;
+    @Column(name = "longitud")
+    private double longitud;
+    @Column(name = "regioOPais")
+    private String regioOPais;
+    @Column(name = "telf")
+    private String telf;
+    @Column(name = "URL")
+    private String URL;
+    @Column(name = "imgApp")
+    private String imgApp;
+    @Lob
+    @Column(name = "descripcioHtml")
+    private String descripcioHtml;
+    @Column(name = "cancelado")
+    private boolean cancelado;
+
+    public String getImgApp() {
+        return imgApp;
+    }
+
+    public String getImatges() {
+        return imatges;
+    }
+
+    public String getEntrades() {
+        return entrades;
+    }
+
+    public String getLinks() {
+        return links;
+    }
+
+    public String getDescripcioHtml() {
+        return descripcioHtml;
+    }
+
+    public String getDescripcio() {
+        return descripcio;
     }
 
     public Long getCodi() {
@@ -160,27 +191,27 @@ public class Event {
         this.subtitol = subtitol;
     }
 
-    public List<String> getTagsAmbits() {
+    public String getTagsAmbits() {
         return tagsAmbits;
     }
 
-    public void setTagsAmbits(List<String> tagsAmbits) {
+    public void setTagsAmbits(String tagsAmbits) {
         this.tagsAmbits = tagsAmbits;
     }
 
-    public List<String> getTagsCateg() {
+    public String getTagsCateg() {
         return tagsCateg;
     }
 
-    public void setTagsCateg(List<String> tagsCateg) {
+    public void setTagsCateg(String tagsCateg) {
         this.tagsCateg = tagsCateg;
     }
 
-    public List<String> getTagsAltresCateg() {
+    public String getTagsAltresCateg() {
         return tagsAltresCateg;
     }
 
-    public void setTagsAltresCateg(List<String> tagsAltresCateg) {
+    public void setTagsAltresCateg(String tagsAltresCateg) {
         this.tagsAltresCateg = tagsAltresCateg;
     }
 
@@ -318,13 +349,5 @@ public class Event {
 
     public void setDescripcioHtml(String descripcioHtml) {
         this.descripcioHtml = descripcioHtml;
-    }
-
-    public boolean isCancelado() {
-        return cancelado;
-    }
-
-    public void setCancelado(boolean cancelado) {
-        this.cancelado = cancelado;
     }
 }
