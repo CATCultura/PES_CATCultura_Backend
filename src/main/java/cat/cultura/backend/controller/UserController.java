@@ -1,8 +1,8 @@
 package cat.cultura.backend.controller;
 
-import cat.cultura.backend.entity.AddFavouriteCommand;
 import cat.cultura.backend.entity.Event;
 import cat.cultura.backend.entity.User;
+import cat.cultura.backend.repository.UserJpaRepository;
 import cat.cultura.backend.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;

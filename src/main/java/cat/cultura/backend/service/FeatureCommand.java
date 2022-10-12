@@ -1,4 +1,4 @@
-package cat.cultura.backend.entity;
+package cat.cultura.backend.service;
 
 public interface FeatureCommand {
 

@@ -58,9 +58,13 @@ public class FavouritesService {
     }
 
     public void addManyEventsToFavourites(Long userId, List<Long> eventIds) {
-        for(Long eventId : eventIds) {
-            addToFavourites(userId,eventId);
+        User user = repoUser.findById(userId)
+                .orElseThrow(UserNotFoundException::new);
+        List<Event> events = repoEvent.findAllById(eventIds);
+        for (Event e: events) {
+            user.addFavourite(e);
         }
+        repoUser.save(user);
     }
 
     public ResponseEntity<?> removeFromFavourites(Long userId, Long eventId) {
