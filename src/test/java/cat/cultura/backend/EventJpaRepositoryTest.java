@@ -15,21 +15,5 @@ public class EventJpaRepositoryTest {
     @Autowired
     private EventJpaRepository repo;
 
-    @Test
-    public void saveEvent() {
-        Event e1 = new Event();
-        //e1.setCodi(long(123456789));
-        e1.setDataFi("12/01/21");
 
-        Event e2 = new Event();
-        //e2.setCodi(Long(987456123));
-        e2.setDataFi("17/02/21");
-
-        repo.save(e1);
-        repo.save(e2);
-
-        repo.flush();
-
-        assertEquals(2, repo.findAll().size());
-    }
 }
