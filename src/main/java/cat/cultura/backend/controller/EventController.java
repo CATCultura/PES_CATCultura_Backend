@@ -14,7 +14,13 @@ public class EventController {
 
     @PostMapping("/addEvent")
     public Event addEvent(@RequestBody Event ev) {
-        return service.saveEvent(ev);
+        try {
+            return service.saveEvent(ev);
+        }
+        catch (Exception e) {
+            System.out.println("Repeated event:" + ev.getCodi());
+            return new Event();
+        }
     }
 
     @PostMapping("/addEvents")
@@ -31,11 +37,11 @@ public class EventController {
     public Event findEventById(@PathVariable Long id) {
         return service.getEventByID(id);
     }
-
-    @GetMapping("/event/{codi}")
-    public Event findEventByCodi(@PathVariable Long codi) {
-        return service.getEventByCodi(codi);
-    }
+//
+//    @GetMapping("/event/{codi}")
+//    public Event findEventByCodi(@PathVariable Long codi) {
+//        return service.getEventByCodi(codi);
+//    }
 
     @PutMapping("/updateEvent")
     public Event updateEvent(@RequestBody Event ev) {
