@@ -27,12 +27,12 @@ public class EventController {
         return service.getEvents();
     }
 
-    @GetMapping("/event/{id}")
+    @GetMapping("/event/id={id}")
     public Event findEventById(@PathVariable Long id) {
         return service.getEventByID(id);
     }
 
-    @GetMapping("/event/{codi}")
+    @GetMapping("/event/codi={codi}")
     public Event findEventByCodi(@PathVariable Long codi) {
         return service.getEventByCodi(codi);
     }
@@ -42,7 +42,7 @@ public class EventController {
         return service.updateEvent(ev);
     }
 
-    @DeleteMapping("/deleteEvent/{id}")
+    @DeleteMapping("/deleteEvent/id={id}")
     public String deleteEvent(@PathVariable Long id){
         return service.deleteEvent(id);
     }

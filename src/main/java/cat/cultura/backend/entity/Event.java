@@ -160,34 +160,28 @@ public class Event {
         this.subtitol = subtitol;
     }
 
-    public String getTagsAmbits() {
-        String tA = String.join(",",tagsAmbits);
-        return tA;
+    public List<String> getTagsAmbits() {
+        return tagsAmbits;
     }
 
-    public void setTagsAmbits(String tagsAmbits) {
-        List<String> myList = new ArrayList<String>(Arrays.asList(tagsAmbits.split(",")));
-        this.tagsAmbits = myList;
+    public void setTagsAmbits(List<String> tagsAmbits) {
+        this.tagsAmbits = tagsAmbits;
     }
 
-    public String getTagsCateg() {
-        String tC = String.join(",",tagsCateg);
-        return tC;
+    public List<String> getTagsCateg() {
+        return tagsCateg;
     }
 
-    public void setTagsCateg(String tagsCateg) {
-        List<String> myList = new ArrayList<String>(Arrays.asList(tagsCateg.split(",")));
-        this.tagsCateg = myList;
+    public void setTagsCateg(List<String> tagsCateg) {
+        this.tagsCateg = tagsCateg;
     }
 
-    public String getTagsAltresCateg() {
-        String tAC = String.join(",",tagsAltresCateg);
-        return tAC;
+    public List<String> getTagsAltresCateg() {
+        return tagsAltresCateg;
     }
 
-    public void setTagsAltresCateg(String tagsAltresCateg) {
-        List<String> myList = new ArrayList<String>(Arrays.asList(tagsAltresCateg.split(",")));
-        this.tagsAltresCateg = myList;
+    public void setTagsAltresCateg(List<String> tagsAltresCateg) {
+        this.tagsAltresCateg = tagsAltresCateg;
     }
 
     public String getLinks() {

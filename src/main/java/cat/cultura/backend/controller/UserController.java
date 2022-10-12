@@ -1,5 +1,6 @@
 package cat.cultura.backend.controller;
 
+import cat.cultura.backend.entity.Event;
 import cat.cultura.backend.entity.User;
 import cat.cultura.backend.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,14 +13,14 @@ public class UserController {
     @Autowired
     private UserService service;
 
-    @PostMapping("/addUser")
-    public User addUser(@RequestBody User us) {
-        return service.saveUser(us);
+    @PostMapping("/createUser/name={name}")
+    public User addUser(@PathVariable String name) {
+        return service.createUser(name);
     }
 
-    @PostMapping("/addUsers")
-    public List<User> addUser(@RequestBody List<User> users) {
-        return service.saveUsers(users);
+    @PostMapping("/createUsers")
+    public List<User> addUser(@RequestBody List<String> userNames) {
+        return service.createUsers(userNames);
     }
 
     @GetMapping("/users")
@@ -27,14 +28,24 @@ public class UserController {
         return service.getUsers();
     }
 
-    @GetMapping("/user/{id}")
+    @GetMapping("/user/id={id}")
     public User findUserById(@PathVariable Long id) {
         return service.getUserByID(id);
     }
 
-    @GetMapping("/user/{name}")
-    public User findUserByCodi(@PathVariable String name) {
+    @GetMapping("/user/name={name}")
+    public User findUserByName(@PathVariable String name) {
         return service.getUserByName(name);
+    }
+
+    @GetMapping("/user/id={id}/favourites")
+    public List<Event> getFavouritesFromUser(@PathVariable Long id) {
+        return service.getFavouriteEventsByID(id);
+    }
+
+    @GetMapping("/user/name={name}/favourites")
+    public List<Event> getFavouritesFromUser(@PathVariable String name) {
+        return service.getFavouriteEventsByName(name);
     }
 
     @PutMapping("/updateUser")
@@ -42,8 +53,15 @@ public class UserController {
         return service.updateUser(us);
     }
 
-    @DeleteMapping("/deleteUser/{id}")
+    @DeleteMapping("/deleteUser/id={id}")
     public String deleteUser(@PathVariable Long id){
-        return service.deleteUser(id);
+        return service.deleteUserByID(id);
     }
+
+    @DeleteMapping("/deleteUser/name={name}")
+    public String deleteUser(@PathVariable String name){
+        return service.deleteUserByName(name);
+    }
+
+
 }
