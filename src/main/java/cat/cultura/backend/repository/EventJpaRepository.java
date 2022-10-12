@@ -6,5 +6,5 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface EventJpaRepository extends JpaRepository<Event, Long> {
-    //Event findByCodi(Long codi);
+    Event findByCodi(Long codi);
 }

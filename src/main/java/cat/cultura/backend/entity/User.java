@@ -20,7 +20,7 @@ public class User {
     @ElementCollection
     @CollectionTable(name="favourites", joinColumns=@JoinColumn(name="id"))
     @Column(name="favourites")
-    private List<Event> favourites;
+    private List<Event> favourites = new ArrayList<>();
 
     public Long getId() {
         return id;
@@ -52,5 +52,10 @@ public class User {
 
     public void setFavourites(List<Event> favourites) {
         this.favourites = favourites;
+    }
+
+    public void addFavourite(Event e) {
+        if (favourites.contains(e)) throw new AssertionError("Already included");
+        favourites.add(e);
     }
 }

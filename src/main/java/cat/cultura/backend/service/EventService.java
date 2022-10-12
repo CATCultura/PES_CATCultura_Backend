@@ -28,9 +28,9 @@ public class EventService {
         return repo.findById(id).orElse(null);
     }
 
-//    public Event getEventByCodi(Long codi) {
-//        return repo.findByCodi(codi);
-//    }
+    public Event getEventByCodi(Long codi) {
+        return repo.findByCodi(codi);
+    }
 
     public String deleteEvent(Long id) {
         repo.deleteById(id);

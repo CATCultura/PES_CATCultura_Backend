@@ -1,5 +1,6 @@
 package cat.cultura.backend.controller;
 
+import cat.cultura.backend.entity.AddFavouriteCommand;
 import cat.cultura.backend.entity.Event;
 import cat.cultura.backend.entity.User;
 import cat.cultura.backend.service.UserService;
@@ -62,6 +63,7 @@ public class UserController {
     public String deleteUser(@PathVariable String name){
         return service.deleteUserByName(name);
     }
+
 
 
 }
