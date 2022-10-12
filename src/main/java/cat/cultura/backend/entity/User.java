@@ -3,23 +3,24 @@ package cat.cultura.backend.entity;
 import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 
 @Entity
 @Table(name = "User")
 public class User {
-
-
-
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
-    @Column(name="name")
+    @Column(name="name", unique = true)
     private String name;
+
+    @Column(name="creationDate")
+    private String creationDate;
     @ElementCollection
     @CollectionTable(name="favourites", joinColumns=@JoinColumn(name="id"))
     @Column(name="favourites")
-    private List<String> favourites = new ArrayList<String>(); //id of favourite events
+    private List<Event> favourites;
 
     public Long getId() {
         return id;
@@ -37,13 +38,19 @@ public class User {
         this.name = name;
     }
 
-    public String getFavourites() {
-        String fav = String.join(",",favourites);
-        return fav;
+    public List<Event> getFavourites() {
+        return favourites;
     }
 
-    public void setFavourites(String favourites) {
-        List<String> myList = new ArrayList<String>(Arrays.asList(favourites.split(",")));
-        this.favourites = myList;
+    public String getCreationDate() {
+        return creationDate;
+    }
+
+    public void setCreationDate(String creationDate) {
+        this.creationDate = creationDate;
+    }
+
+    public void setFavourites(List<Event> favourites) {
+        this.favourites = favourites;
     }
 }

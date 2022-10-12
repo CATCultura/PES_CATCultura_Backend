@@ -14,13 +14,7 @@ public class EventController {
 
     @PostMapping("/addEvent")
     public Event addEvent(@RequestBody Event ev) {
-        try {
-            return service.saveEvent(ev);
-        }
-        catch (Exception e) {
-            System.out.println("Repeated event:" + ev.getCodi());
-            return new Event();
-        }
+        return service.saveEvent(ev);
     }
 
     @PostMapping("/addEvents")
@@ -33,22 +27,22 @@ public class EventController {
         return service.getEvents();
     }
 
-    @GetMapping("/event/{id}")
+    @GetMapping("/event/id={id}")
     public Event findEventById(@PathVariable Long id) {
         return service.getEventByID(id);
     }
-//
-//    @GetMapping("/event/{codi}")
-//    public Event findEventByCodi(@PathVariable Long codi) {
-//        return service.getEventByCodi(codi);
-//    }
+
+    @GetMapping("/event/codi={codi}")
+    public Event findEventByCodi(@PathVariable Long codi) {
+        return service.getEventByCodi(codi);
+    }
 
     @PutMapping("/updateEvent")
     public Event updateEvent(@RequestBody Event ev) {
         return service.updateEvent(ev);
     }
 
-    @DeleteMapping("/deleteEvent/{id}")
+    @DeleteMapping("/deleteEvent/id={id}")
     public String deleteEvent(@PathVariable Long id){
         return service.deleteEvent(id);
     }
