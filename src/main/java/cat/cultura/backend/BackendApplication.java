@@ -1,6 +1,6 @@
 package cat.cultura.backend;
 
-import domain.Event;
+import cat.cultura.backend.entity.Event;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 
-@SpringBootApplication(exclude = {DataSourceAutoConfiguration.class })
+@SpringBootApplication()
 @RestController
 public class BackendApplication {
 
@@ -20,7 +20,6 @@ public class BackendApplication {
 
 	@PostMapping("/insert")
 	public int insertData(@RequestBody List<Event> events) {
-
 		return 1;
 	}
 
