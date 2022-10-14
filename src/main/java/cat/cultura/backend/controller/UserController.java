@@ -1,8 +1,8 @@
 package cat.cultura.backend.controller;
 
-import cat.cultura.backend.entity.AddFavouriteCommand;
 import cat.cultura.backend.entity.Event;
 import cat.cultura.backend.entity.User;
+import cat.cultura.backend.repository.UserJpaRepository;
 import cat.cultura.backend.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -14,14 +14,15 @@ public class UserController {
     @Autowired
     private UserService service;
 
-    @PostMapping("/createUser/name={name}")
-    public User addUser(@PathVariable String name) {
-        return service.createUser(name);
+    @PostMapping("/addUser")
+    public User addUser(@RequestBody User user) {
+        service.createUser(user);
+        return user;
     }
 
-    @PostMapping("/createUsers")
-    public List<User> addUser(@RequestBody List<String> userNames) {
-        return service.createUsers(userNames);
+    @PostMapping("/addUsers")
+    public List<User> addUser(@RequestBody List<User> users) {
+        return service.createUsers(users);
     }
 
     @GetMapping("/users")

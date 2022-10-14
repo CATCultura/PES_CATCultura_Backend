@@ -22,6 +22,14 @@ public class User {
     @Column(name="favourites")
     private List<Event> favourites = new ArrayList<>();
 
+    public User(String name) {
+        this.name = name;
+    }
+
+    public User(){
+
+    }
+
     public Long getId() {
         return id;
     }
@@ -55,7 +63,12 @@ public class User {
     }
 
     public void addFavourite(Event e) {
-        if (favourites.contains(e)) throw new AssertionError("Already included");
+        if (favourites.contains(e)) throw new AssertionError("Event in favourites");
         favourites.add(e);
+    }
+
+    public void removeFavourite(Event e) {
+        if (!favourites.contains(e)) throw new AssertionError("Event is not in favourites");
+        favourites.remove(e);
     }
 }
