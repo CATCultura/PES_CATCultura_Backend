@@ -15,23 +15,23 @@ public class FavouritesController {
     @Autowired
     private FavouritesService service;
 
-    @PutMapping("user/id={userId}/addToFavourites/event/id={eventId}")
-    public ResponseEntity<?> addToFavourites(@PathVariable Long userId, @PathVariable Long eventId) {
-        return service.addToFavourites(userId, eventId);
+    @PutMapping("/user/id={userId}/addToFavourites/event/id={eventId}")
+    public void addToFavourites(@PathVariable Long userId, @PathVariable Long eventId) {
+        service.addToFavourites(userId, eventId);
     }
 
-    @PutMapping("user/id={userId}/addManyToFavourites/")
+    @PutMapping("/user/id={userId}/addManyToFavourites")
     public void addManyToFavourites(@PathVariable Long userId, @RequestBody List<Long> eventIds) {
         service.addManyEventsToFavourites(userId, eventIds);
     }
 
-    @PutMapping("user/id={userId}/removeFromFavourites/event/id={eventId}")
-    public ResponseEntity<?> removeFromFavourites(@PathVariable Long userId, @PathVariable Long eventId) {
-        return service.addToFavourites(userId, eventId);
+    @PutMapping("/user/id={userId}/removeFromFavourites/event/id={eventId}")
+    public void removeFromFavourites(@PathVariable Long userId, @PathVariable Long eventId) {
+        service.removeFromFavourites(userId, eventId);
     }
 
-    @PutMapping("user/id/{userId}/removeManyFromFavourites/")
+    @PutMapping("/user/id={userId}/removeManyFromFavourites")
     public void removeFromFavourites(@PathVariable Long userId, @RequestBody List<Long> eventIds) {
-        service.addManyEventsToFavourites(userId, eventIds);
+        service.removeManyEventsFromFavourites(userId, eventIds);
     }
 }

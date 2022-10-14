@@ -1,6 +1,5 @@
 package cat.cultura.backend.controller;
 
-import cat.cultura.backend.entity.AddFavouriteCommand;
 import cat.cultura.backend.entity.Event;
 import cat.cultura.backend.entity.User;
 import cat.cultura.backend.service.UserService;
@@ -14,12 +13,12 @@ public class UserController {
     @Autowired
     private UserService service;
 
-    @PostMapping("/createUser/name={name}")
+    @PostMapping("/addUser/name={name}")
     public User addUser(@PathVariable String name) {
         return service.createUser(name);
     }
 
-    @PostMapping("/createUsers")
+    @PostMapping("/addUsers")
     public List<User> addUser(@RequestBody List<String> userNames) {
         return service.createUsers(userNames);
     }
