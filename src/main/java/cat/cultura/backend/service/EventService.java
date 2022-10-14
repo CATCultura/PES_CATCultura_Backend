@@ -34,7 +34,7 @@ public class EventService {
 
     public String deleteEvent(Long id) {
         repo.deleteById(id);
-        return "event removed";
+        return "Event with id: " + id + " removed";
     }
 
     public Event updateEvent(Event ev) {

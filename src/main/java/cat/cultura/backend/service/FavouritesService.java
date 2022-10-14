@@ -7,15 +7,11 @@ import cat.cultura.backend.exceptions.UserNotFoundException;
 import cat.cultura.backend.repository.EventJpaRepository;
 import cat.cultura.backend.repository.UserJpaRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.hateoas.MediaTypes;
-import org.springframework.hateoas.mediatype.problem.Problem;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.stream.Collectors;
+import java.util.Objects;
+
 
 @Service
 public class FavouritesService {
@@ -31,72 +27,46 @@ public class FavouritesService {
      * @param eventId
      * @return Ok or HTTP error
      */
-    public ResponseEntity<?> addToFavourites(Long userId, Long eventId) {
-
-        User user = repoUser.findById(userId)
-                .orElseThrow(() -> new UserNotFoundException());
-
-        Event event = repoEvent.findById(eventId)
-                .orElseThrow(() -> new EventNotFoundException());
-
-        List<Event> favs = user.getFavourites()
-                .stream()
-                .filter(fav -> eventId.equals(fav.getId())).collect(Collectors.toUnmodifiableList());
-
-        if (favs != null && favs.isEmpty()) {
-            user.getFavourites().add(event);
-            repoUser.saveAndFlush(user);
-            return ResponseEntity.ok("Event added to favorites");
-        } else {
-            return ResponseEntity //
-                    .status(HttpStatus.METHOD_NOT_ALLOWED) //
-                    .header(HttpHeaders.CONTENT_TYPE, MediaTypes.HTTP_PROBLEM_DETAILS_JSON_VALUE) //
-                    .body(Problem.create() //
-                            .withTitle("Method not allowed") //
-                            .withDetail("The event with id " + eventId + " is already in Favourites"));
-        }
-    }
-
-    public void addManyEventsToFavourites(Long userId, List<Long> eventIds) {
-        User user = repoUser.findById(userId)
-                .orElseThrow(UserNotFoundException::new);
-        List<Event> events = repoEvent.findAllById(eventIds);
-        for (Event e: events) {
-            user.addFavourite(e);
+    public String addToFavourites(Long userId, Long eventId) {
+        User user = repoUser.findById(userId).orElseThrow(() -> new UserNotFoundException());
+        Event event = repoEvent.findById(eventId).orElseThrow(() -> new EventNotFoundException());
+        try {
+            user.addFavourite(event);
+        } catch (AssertionError e) {
+            return "Event with id: " + eventId + " is already in favourites";
         }
         repoUser.save(user);
+        return "Event added successfully";
     }
 
-    public ResponseEntity<?> removeFromFavourites(Long userId, Long eventId) {
-
-        User user = repoUser.findById(userId)
-                .orElseThrow(() -> new UserNotFoundException());
-
-        Event event = repoEvent.findById(eventId)
-                .orElseThrow(() -> new EventNotFoundException());
-
-        List<Event> favs = user.getFavourites()
-                .stream()
-                .filter(fav -> eventId.equals(fav.getId())).collect(Collectors.toUnmodifiableList());
-
-        if (favs != null && !favs.isEmpty()) {
-            user.getFavourites().remove(event);
-            repoUser.saveAndFlush(user);
-            return ResponseEntity.ok("Event removed from favorites");
-        } else {
-            return ResponseEntity //
-                    .status(HttpStatus.METHOD_NOT_ALLOWED) //
-                    .header(HttpHeaders.CONTENT_TYPE, MediaTypes.HTTP_PROBLEM_DETAILS_JSON_VALUE) //
-                    .body(Problem.create() //
-                            .withTitle("Method not allowed") //
-                            .withDetail("The event with id " + eventId + " was not in Favourites"));
-        }
-    }
-
-    public void removeManyEventsFromFavourites(Long userId, List<Long> eventIds) {
+    public String addManyEventsToFavourites(Long userId, List<Long> eventIds) {
         for(Long eventId : eventIds) {
-            removeFromFavourites(userId,eventId);
+            if(Objects.equals(addToFavourites(userId, eventId), "Event with id: " + eventId + " is already in favourites")) {
+                return "Event with id: " + eventId + " is already in favourites";
+            }
         }
+        return "Events added successfully";
+    }
+
+    public String removeFromFavourites(Long userId, Long eventId) {
+        User user = repoUser.findById(userId).orElseThrow(() -> new UserNotFoundException());
+        Event event = repoEvent.findById(eventId).orElseThrow(() -> new EventNotFoundException());
+        try {
+            user.removeFavourite(event);
+        } catch (AssertionError e) {
+            return "Event with id: " + eventId + " is not in favourites";
+        }
+        repoUser.save(user);
+        return "Event removed successfully";
+    }
+
+    public String removeManyEventsFromFavourites(Long userId, List<Long> eventIds) {
+        for(Long eventId : eventIds) {
+            if(Objects.equals(removeFromFavourites(userId, eventId), "Event with id: " + eventId + " is not in favourites")) {
+                return "Event with id: " + eventId + " is not in favourites";
+            }
+        }
+        return "Events removed successfully";
     }
 
 
