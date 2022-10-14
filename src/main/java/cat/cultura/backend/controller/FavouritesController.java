@@ -1,7 +1,9 @@
 package cat.cultura.backend.controller;
 
+import cat.cultura.backend.factories.RepoFactory;
 import cat.cultura.backend.service.AddFavouriteCommand;
 import cat.cultura.backend.service.FavouritesService;
+import cat.cultura.backend.service.FeatureCommand;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -24,8 +26,11 @@ public class FavouritesController {
 
     @PutMapping("/user/id={userId}/addManyToFavourites/")
     public String addManyToFavourites(@PathVariable Long userId, @RequestBody List<Long> eventIds) {
+
+
         try {
-            service.addManyEventsToFavourites(userId, eventIds);
+            FeatureCommand f = new AddFavouriteCommand(userId,eventIds);
+            f.execute();
             return "Success";
         }
         catch (AssertionError as) {
