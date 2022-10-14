@@ -14,14 +14,15 @@ public class UserController {
     @Autowired
     private UserService service;
 
-    @PostMapping("/addUser/name={name}")
-    public User addUser(@PathVariable String name) {
-        return service.createUser(name);
+    @PostMapping("/addUser")
+    public User addUser(@RequestBody User user) {
+        service.createUser(user);
+        return user;
     }
 
     @PostMapping("/addUsers")
-    public List<User> addUser(@RequestBody List<String> userNames) {
-        return service.createUsers(userNames);
+    public List<User> addUser(@RequestBody List<User> users) {
+        return service.createUsers(users);
     }
 
     @GetMapping("/users")

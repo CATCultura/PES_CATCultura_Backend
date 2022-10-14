@@ -16,20 +16,14 @@ public class UserService {
     @Autowired
     public UserJpaRepository repo;
 
-    public User createUser(String userName) {
-        User us = new User();
-        us.setName(userName);
-        us.setCreationDate(new SimpleDateFormat("dd/MM/yyyy HH:mm:ss").format(Calendar.getInstance().getTime()));
-        return repo.save(us);
+    public User createUser(User user) {
+        user.setCreationDate(new SimpleDateFormat("dd/MM/yyyy HH:mm:ss").format(Calendar.getInstance().getTime()));
+        return repo.save(user);
     }
 
-    public List<User> createUsers(List<String> usersNames) {
-        List<User> users = new ArrayList<User>();
-        for(String userName : usersNames) {
-            User us = new User();
-            us.setName(userName);
-            us.setCreationDate(new SimpleDateFormat("dd/MM/yyyy HH:mm:ss").format(Calendar.getInstance().getTime()));
-            users.add(us);
+    public List<User> createUsers(List<User> users) {
+        for(User user : users) {
+            user.setCreationDate(new SimpleDateFormat("dd/MM/yyyy HH:mm:ss").format(Calendar.getInstance().getTime()));
         }
         return repo.saveAll(users);
     }

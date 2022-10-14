@@ -22,6 +22,14 @@ public class User {
     @Column(name="favourites")
     private List<Event> favourites = new ArrayList<>();
 
+    public User(String name) {
+        this.name = name;
+    }
+
+    public User(){
+        
+    }
+
     public Long getId() {
         return id;
     }
