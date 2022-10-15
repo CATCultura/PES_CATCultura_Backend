@@ -27,8 +27,7 @@ public class BackendApplication  implements WebMvcConfigurer {
 	@Autowired
 	private RepoFactory repoFactory;
 
-	@Autowired
-	private GlobalMessageSource globalMessageSource;
+
 
 	public static void main(String[] args) {
 		SpringApplication.run(BackendApplication.class, args);
@@ -37,7 +36,7 @@ public class BackendApplication  implements WebMvcConfigurer {
 	@PostConstruct
 	public void initialize() {
 		repoFactory.initialize();
-		globalMessageSource.initialize();
+
 	}
 
 	@Bean
@@ -58,6 +57,8 @@ public class BackendApplication  implements WebMvcConfigurer {
 	public void addInterceptors(InterceptorRegistry registry) {
 		registry.addInterceptor(localeChangeInterceptor());
 	}
+
+
 
 
 }
