@@ -3,15 +3,25 @@ package cat.cultura.backend.controller;
 import cat.cultura.backend.entity.Event;
 import cat.cultura.backend.service.EventService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.MessageSource;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Locale;
 
 @RestController
 public class EventController {
     @Autowired
     private EventService service;
 
+    @Autowired
+    MessageSource messageSource;
+
+    @GetMapping("/test")
+    public String test(Locale locale)
+    {
+        return messageSource.getMessage("event_not_found",null, locale);
+    }
     @PostMapping("/addEvent")
     public Event addEvent(@RequestBody Event ev) {
         return service.saveEvent(ev);

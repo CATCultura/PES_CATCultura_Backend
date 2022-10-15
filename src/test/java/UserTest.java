@@ -53,7 +53,4 @@ public class UserTest {
         u.addFavourite(e1);
         Assertions.assertThrows(AssertionError.class, () -> u.removeFavourite(e2));
     }
-
-
-
 }
