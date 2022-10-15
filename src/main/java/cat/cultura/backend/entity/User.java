@@ -1,5 +1,7 @@
 package cat.cultura.backend.entity;
 
+import cat.cultura.backend.factories.GlobalMessageSource;
+
 import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -63,12 +65,12 @@ public class User {
     }
 
     public void addFavourite(Event e) {
-        if (favourites.contains(e)) throw new AssertionError("Event in favourites");
+        if (favourites.contains(e)) throw new AssertionError("L'esdeveniment ja està marcat com a favorit.");
         favourites.add(e);
     }
 
     public void removeFavourite(Event e) {
-        if (!favourites.contains(e)) throw new AssertionError("Event is not in favourites");
+        if (!favourites.contains(e)) throw new AssertionError("L'esdeveniment no està a favorits.");
         favourites.remove(e);
     }
 }
