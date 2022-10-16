@@ -28,6 +28,6 @@ public class AddFavourite implements FeatureCommand {
         for (Event e : events) {
             user.addFavourite(e);
         }
-
+        RepoFactory.getInstance().getUserRepo().save(user);
     }
 }
