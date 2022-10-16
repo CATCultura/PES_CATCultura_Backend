@@ -62,7 +62,7 @@ public class UserController {
 
     @DeleteMapping("/deleteUser/name={name}")
     public String deleteUser(@PathVariable String name){
-        return service.deleteUserByName(name);
+        return service.deleteUserByUsername(name);
     }
 
 

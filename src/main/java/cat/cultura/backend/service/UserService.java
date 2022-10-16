@@ -37,7 +37,7 @@ public class UserService {
     }
 
     public User getUserByUsername(String username) {
-        return repo.findByName(username);
+        return repo.findByUsername(username);
     }
 
     public String deleteUserByID(Long id) {
@@ -45,9 +45,9 @@ public class UserService {
         return "user with id " + id.toString() + " was removed";
     }
 
-    public String deleteUserByName(String name) {
-        repo.deleteByName(name);
-        return name + " was removed";
+    public String deleteUserByUsername(String username) {
+        repo.deleteByUsername(username);
+        return username + " was removed";
     }
 
     public User updateUser(User usr) {
@@ -67,7 +67,7 @@ public class UserService {
     }
 
     public List<Event> getFavouriteEventsByName(String name) {
-        User existingUser = repo.findByName(name);
+        User existingUser = repo.findByUsername(name);
         return existingUser.getFavourites();
     }
 
