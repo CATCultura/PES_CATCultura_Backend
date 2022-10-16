@@ -27,5 +27,6 @@ public class RemoveFavourite implements FeatureCommand{
         for (Event e : events) {
             user.removeFavourite(e);
         }
+        RepoFactory.getInstance().getUserRepo().save(user);
     }
 }

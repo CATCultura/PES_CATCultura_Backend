@@ -21,7 +21,7 @@ public class User {
     private String creationDate;
     @ElementCollection
     @CollectionTable(name="favourites", joinColumns=@JoinColumn(name="id"))
-    @Column(name="favourites")
+    //@Column(name="favourites")
     private List<Event> favourites = new ArrayList<>();
 
     public User(String name) {
