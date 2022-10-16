@@ -37,7 +37,7 @@ public class UserController {
 
     @GetMapping("/user/name={name}")
     public User findUserByName(@PathVariable String name) {
-        return service.getUserByName(name);
+        return service.getUserByUsername(name);
     }
 
     @GetMapping("/user/id={id}/favourites")

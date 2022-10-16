@@ -14,18 +14,26 @@ public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
-    @Column(name="name", unique = true)
-    private String name;
+    @Column(name="username", unique = true)
+    private String username;
 
+    @Column(name="nameAndSurname")
+    private String nameAndSurname;
+
+    @Column(name="email")
+    private String email;
+
+    @Column(name="password")
+    private String password;
     @Column(name="creationDate")
     private String creationDate;
     @ElementCollection
     @CollectionTable(name="favourites", joinColumns=@JoinColumn(name="id"))
-    //@Column(name="favourites")
+    @Column(name="favourites")
     private List<Event> favourites = new ArrayList<>();
 
-    public User(String name) {
-        this.name = name;
+    public User(String username) {
+        this.username = username;
     }
 
     public User(){
@@ -40,12 +48,36 @@ public class User {
         this.id = id;
     }
 
-    public String getName() {
-        return name;
+    public String getUsername() {
+        return username;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public void setUsername(String username) {
+        this.username = username;
+    }
+
+    public String getNameAndSurname() {
+        return nameAndSurname;
+    }
+
+    public void setNameAndSurname(String nameAndSurname) {
+        this.nameAndSurname = nameAndSurname;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
     }
 
     public List<Event> getFavourites() {
@@ -65,12 +97,12 @@ public class User {
     }
 
     public void addFavourite(Event e) {
-        if (favourites.contains(e)) throw new AssertionError("L'esdeveniment ja està marcat com a favorit.");
+        if (favourites.contains(e)) throw new AssertionError("Event " + e.getId() + " already in favourites");
         favourites.add(e);
     }
 
     public void removeFavourite(Event e) {
-        if (!favourites.contains(e)) throw new AssertionError("L'esdeveniment no està a favorits.");
+        if (!favourites.contains(e)) throw new AssertionError("Event " + e.getId() +  " is not in favourites");
         favourites.remove(e);
     }
 }

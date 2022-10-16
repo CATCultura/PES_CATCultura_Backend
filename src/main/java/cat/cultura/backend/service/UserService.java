@@ -36,8 +36,8 @@ public class UserService {
         return repo.findById(id).orElse(null);
     }
 
-    public User getUserByName(String name) {
-        return repo.findByName(name);
+    public User getUserByUsername(String username) {
+        return repo.findByName(username);
     }
 
     public String deleteUserByID(Long id) {
@@ -52,7 +52,10 @@ public class UserService {
 
     public User updateUser(User usr) {
         User existingUser = repo.findById(usr.getId()).orElse(null);
-        existingUser.setName(usr.getName());
+        existingUser.setUsername(usr.getUsername());
+        existingUser.setNameAndSurname(usr.getNameAndSurname());
+        existingUser.setEmail(usr.getEmail());
+        existingUser.setPassword(usr.getPassword());
         //existingUser.setFavourites(usr.getFavourites());
         //Aquí se pueden añadir futuros atributos
         return repo.save(existingUser);
@@ -67,5 +70,6 @@ public class UserService {
         User existingUser = repo.findByName(name);
         return existingUser.getFavourites();
     }
+
 
 }
