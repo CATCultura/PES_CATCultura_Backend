@@ -4,9 +4,10 @@ pipeline {
     stages {
 
         stage('SonarQube Analysis') {
-
-            withMaven() {
-              sh "mvn clean verify sonar:sonar -Dsonar.projectKey=CATCultura"
+            steps {
+                withMaven() {
+                    sh "mvn clean verify sonar:sonar -Dsonar.projectKey=CATCultura"
+                }
             }
           }
 
