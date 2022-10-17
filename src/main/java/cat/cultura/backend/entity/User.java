@@ -1,11 +1,16 @@
 package cat.cultura.backend.entity;
 
+import com.fasterxml.jackson.annotation.JsonAutoDetect;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
 import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
 
 @Entity
 @Table(name = "User")
+@JsonIgnoreProperties(ignoreUnknown=true)
+@JsonAutoDetect(fieldVisibility= JsonAutoDetect.Visibility.ANY)
 public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)

@@ -56,6 +56,7 @@ public class UserService {
 
     public User updateUser(User usr) {
         User existingUser = repo.findById(usr.getId()).orElse(null);
+        assert existingUser != null;
         existingUser.setUsername(usr.getUsername());
         existingUser.setNameAndSurname(usr.getNameAndSurname());
         existingUser.setEmail(usr.getEmail());
