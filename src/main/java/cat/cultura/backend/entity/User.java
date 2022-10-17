@@ -1,11 +1,7 @@
 package cat.cultura.backend.entity;
 
-import cat.cultura.backend.factories.GlobalMessageSource;
-
 import javax.persistence.*;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
 import java.util.List;
 
 @Entity
@@ -29,7 +25,7 @@ public class User {
     private String creationDate;
 
     @Column(name="points")
-    private int points;
+    private int points = 0;
     @ElementCollection
     @CollectionTable(name="favourites", joinColumns=@JoinColumn(name="id"))
     private List<Event> favourites = new ArrayList<>();
@@ -129,13 +125,13 @@ public class User {
         favourites.remove(e);
     }
 
-    public void addTrophy(Trophy e) {
-        if (trophies.contains(e)) throw new AssertionError("Trophy " + e.getId() + " already in trophies");
-        trophies.add(e);
+    public void addTrophy(Trophy t) {
+        if (trophies.contains(t)) throw new AssertionError("Trophy " + t.getId() + " already in trophies");
+        trophies.add(t);
     }
 
-    public void removeTrophy(Trophy e) {
-        if (!trophies.contains(e)) throw new AssertionError("Trophy " + e.getId() +  " is not in trophies");
-        trophies.remove(e);
+    public void removeTrophy(Trophy t) {
+        if (!trophies.contains(t)) throw new AssertionError("Trophy " + t.getId() +  " is not in trophies");
+        trophies.remove(t);
     }
 }

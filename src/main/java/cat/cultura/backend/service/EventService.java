@@ -9,8 +9,12 @@ import java.util.List;
 
 @Service
 public class EventService {
-    @Autowired
-    public EventJpaRepository repo;
+
+    private final EventJpaRepository repo;
+
+    public EventService(EventJpaRepository repo) {
+        this.repo = repo;
+    }
 
     public Event saveEvent(Event ev) {
         return repo.save(ev);
@@ -39,6 +43,7 @@ public class EventService {
 
     public Event updateEvent(Event ev) {
         Event existingEvent = repo.findById(ev.getId()).orElse(null);
+        repo.save(ev);
         existingEvent.setCodi((Long) ev.getCodi());
         existingEvent.setDataFi(ev.getDataFi());
         existingEvent.setDataInici(ev.getDataInici());
