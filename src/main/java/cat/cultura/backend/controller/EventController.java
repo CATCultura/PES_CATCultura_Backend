@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Locale;
+import java.util.Optional;
 
 @RestController
 public class EventController {
@@ -28,11 +29,12 @@ public class EventController {
     }
 
     @GetMapping("/events")
-    public List<Event> findAllEvents() {
+    public List<Event> findAllEvents(@RequestParam() Optional<String> name) {
+        System.out.println(name);
         return service.getEvents();
     }
 
-    @GetMapping("/events/id={id}")
+    @GetMapping("/events/{id}")
     public Event findEventById(@PathVariable Long id) {
         return service.getEventByID(id);
     }

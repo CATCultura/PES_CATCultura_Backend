@@ -13,8 +13,12 @@ import java.util.List;
 
 @Service
 public class UserService {
-    @Autowired
-    public UserJpaRepository repo;
+
+    private final UserJpaRepository repo;
+
+    public UserService(UserJpaRepository repo) {
+        this.repo = repo;
+    }
 
     public User createUser(User user) {
         user.setCreationDate(new SimpleDateFormat("dd/MM/yyyy HH:mm:ss").format(Calendar.getInstance().getTime()));
