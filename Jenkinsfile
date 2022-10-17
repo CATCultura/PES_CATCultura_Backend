@@ -31,7 +31,7 @@ pipeline {
 
         stage('Deploy') {
             steps {
-                sh 'sudo docker kill $(sudo docker ps -q)'
+                sh 'sudo docker kill $(sudo docker ps -q -f ancestor=backend)'
                 sh 'sudo docker rmi backend -f'
                 withMaven {
                     sh 'mvn clean package'
