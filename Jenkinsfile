@@ -2,6 +2,16 @@ pipeline {
     agent any
 
     stages {
+
+        stage('SonarQube Analysis') {
+            steps {
+                withMaven() {
+                    sh "mvn clean verify sonar:sonar -Dsonar.projectKey=CATCultura -Dsonar.host.url=http://10.4.41.41:9000 -Dsonar.login=sqp_d295ab10e5d707f13b7066e17ce3624f6c0f0417"
+                }
+            }
+          }
+
+
         stage('Build') {
             steps {
                 withMaven {
