@@ -3,7 +3,7 @@ package cat.cultura.backend.controller;
 import cat.cultura.backend.entity.Event;
 import cat.cultura.backend.entity.User;
 import cat.cultura.backend.repository.UserJpaRepository;
-import cat.cultura.backend.service.UserService;
+import cat.cultura.backend.service.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -14,15 +14,10 @@ public class UserController {
     @Autowired
     private UserService service;
 
-    @PostMapping("/addUser")
+    @PostMapping("/users")
     public User addUser(@RequestBody User user) {
         service.createUser(user);
         return user;
-    }
-
-    @PostMapping("/addUsers")
-    public List<User> addUser(@RequestBody List<User> users) {
-        return service.createUsers(users);
     }
 
     @GetMapping("/users")
@@ -30,41 +25,77 @@ public class UserController {
         return service.getUsers();
     }
 
-    @GetMapping("/user/id={id}")
+    @GetMapping("/users?id={id}")
     public User findUserById(@PathVariable Long id) {
         return service.getUserByID(id);
     }
 
-    @GetMapping("/user/name={name}")
+    @GetMapping("/users?name={name}")
     public User findUserByName(@PathVariable String name) {
         return service.getUserByUsername(name);
     }
 
-    @GetMapping("/user/id={id}/favourites")
+    @GetMapping("/users/{id}/favourites")
     public List<Event> getFavouritesFromUser(@PathVariable Long id) {
         return service.getFavouriteEventsByID(id);
     }
 
-    @GetMapping("/user/name={name}/favourites")
-    public List<Event> getFavouritesFromUser(@PathVariable String name) {
-        return service.getFavouriteEventsByName(name);
-    }
-
-    @PutMapping("/updateUser")
+    @PutMapping("/users")
     public User updateUser(@RequestBody User us) {
         return service.updateUser(us);
     }
 
-    @DeleteMapping("/deleteUser/id={id}")
+    @DeleteMapping("/users/{id}")
     public String deleteUser(@PathVariable Long id){
         return service.deleteUserByID(id);
     }
 
-    @DeleteMapping("/deleteUser/name={name}")
-    public String deleteUser(@PathVariable String name){
-        return service.deleteUserByUsername(name);
+    @PutMapping("/users/{userId}/favourites")
+    public String addManyToFavourites(@PathVariable Long userId, @RequestBody List<Long> eventIds) {
+        try {
+            FeatureCommand fc = new AddFavourite(userId,eventIds);
+            fc.execute();
+            return "Success";
+        }
+        catch (AssertionError as) {
+            return as.getMessage();
+        }
     }
 
+    @DeleteMapping("/users/{userId}/favourites")
+    public String removeFromFavourites(@PathVariable Long userId, @RequestBody List<Long> eventIds) {
+        try {
+            FeatureCommand fc = new RemoveFavourite(userId,eventIds);
+            fc.execute();
+            return "Success";
+        }
+        catch (AssertionError as) {
+            return as.getMessage();
+        }
+    }
 
+    @PutMapping("/users/{userId}/trophy")
+    public String addManyToTrophies(@PathVariable Long userId, @RequestBody List<Long> trophiesIds) {
+        try {
+            FeatureCommand fc = new AddTrophy(userId,trophiesIds);
+            fc.execute();
+            return "Success";
+        }
+        catch (AssertionError as) {
+            return as.getMessage();
+        }
+    }
+
+    @DeleteMapping("/users/{userId}/trophy")
+    public String removeFromTrophy(@PathVariable Long userId, @RequestBody List<Long> trophiesIds) {
+        try {
+            FeatureCommand fc = new RemoveTrophy(userId,trophiesIds);
+            fc.execute();
+            return "Success";
+        }
+        catch (AssertionError as) {
+            return as.getMessage();
+        }
+    }
 
 }
