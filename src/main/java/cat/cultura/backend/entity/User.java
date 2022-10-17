@@ -135,7 +135,7 @@ public class User {
     }
 
     public void removeTrophy(Trophy e) {
-        if (!favourites.contains(e)) throw new AssertionError("Trophy " + e.getId() +  " is not in trophies");
-        favourites.remove(e);
+        if (!trophies.contains(e)) throw new AssertionError("Trophy " + e.getId() +  " is not in trophies");
+        trophies.remove(e);
     }
 }
