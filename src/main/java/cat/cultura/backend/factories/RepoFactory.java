@@ -1,6 +1,7 @@
 package cat.cultura.backend.factories;
 
 import cat.cultura.backend.repository.EventJpaRepository;
+import cat.cultura.backend.repository.TrophyJpaRepository;
 import cat.cultura.backend.repository.UserJpaRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -12,6 +13,9 @@ public class RepoFactory {
 
     @Autowired
     private UserJpaRepository userRepo;
+
+    @Autowired
+    private TrophyJpaRepository trophyRepo;
 
     private static RepoFactory instance;
 
@@ -32,6 +36,10 @@ public class RepoFactory {
 
     public EventJpaRepository getEventRepo() {
         return eventRepo;
+    }
+
+    public TrophyJpaRepository getTrophyRepo() {
+        return trophyRepo;
     }
 
     public void initialize() {

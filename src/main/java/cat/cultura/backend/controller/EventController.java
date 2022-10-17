@@ -17,17 +17,12 @@ public class EventController {
     @Autowired
     MessageSource messageSource;
 
-    @GetMapping("/test")
-    public String test(Locale locale)
-    {
-        return messageSource.getMessage("event_not_found",null, locale);
-    }
-    @PostMapping("/addEvent")
+    @PostMapping("/event")
     public Event addEvent(@RequestBody Event ev) {
         return service.saveEvent(ev);
     }
 
-    @PostMapping("/addEvents")
+    @PostMapping("/events")
     public List<Event> addEvent(@RequestBody List<Event> ev) {
         return service.saveEvents(ev);
     }
@@ -37,22 +32,17 @@ public class EventController {
         return service.getEvents();
     }
 
-    @GetMapping("/event/id={id}")
+    @GetMapping("/events/id={id}")
     public Event findEventById(@PathVariable Long id) {
         return service.getEventByID(id);
     }
 
-    @GetMapping("/event/codi={codi}")
-    public Event findEventByCodi(@PathVariable Long codi) {
-        return service.getEventByCodi(codi);
-    }
-
-    @PutMapping("/updateEvent")
+    @PutMapping("/events")
     public Event updateEvent(@RequestBody Event ev) {
         return service.updateEvent(ev);
     }
 
-    @DeleteMapping("/deleteEvent/id={id}")
+    @DeleteMapping("/events/{id}")
     public String deleteEvent(@PathVariable Long id){
         return service.deleteEvent(id);
     }

@@ -1,3 +1,5 @@
+package cat.cultura.backend;
+
 import cat.cultura.backend.entity.Event;
 import cat.cultura.backend.entity.User;
 import org.junit.jupiter.api.Assertions;
