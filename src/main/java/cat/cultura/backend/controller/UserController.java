@@ -31,7 +31,7 @@ public class UserController {
     @GetMapping("/users")
     public List<User> findUsers(@RequestParam(name = "name", required = false) String name) {
 
-        if (name.isEmpty()) return userService.getUsers();
+        if (name == null) return userService.getUsers();
         List<User> u = new ArrayList<>();
         u.add(userService.getUserByUsername(name));
         return u;

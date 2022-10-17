@@ -1,9 +1,14 @@
 package cat.cultura.backend.entity;
 
+import com.fasterxml.jackson.annotation.JsonAutoDetect;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
 import javax.persistence.*;
 
 @Entity
 @Table(name = "Trophy")
+@JsonIgnoreProperties(ignoreUnknown=true)
+@JsonAutoDetect(fieldVisibility= JsonAutoDetect.Visibility.ANY)
 public class Trophy {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
