@@ -2,7 +2,6 @@ package cat.cultura.backend.service;
 
 import cat.cultura.backend.entity.Event;
 import cat.cultura.backend.repository.EventJpaRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;

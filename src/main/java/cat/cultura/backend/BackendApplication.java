@@ -1,10 +1,6 @@
 package cat.cultura.backend;
 
-import cat.cultura.backend.entity.Event;
-import cat.cultura.backend.factories.GlobalMessageSource;
-import cat.cultura.backend.factories.RepoFactory;
 import org.modelmapper.ModelMapper;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;

@@ -4,15 +4,15 @@ import cat.cultura.backend.dtos.EventDto;
 import cat.cultura.backend.dtos.UserDto;
 import cat.cultura.backend.entity.Event;
 import cat.cultura.backend.entity.User;
-import cat.cultura.backend.service.*;
+import cat.cultura.backend.service.FavouriteService;
+import cat.cultura.backend.service.UserService;
+import cat.cultura.backend.service.UserTrophyService;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
 import java.text.ParseException;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @RestController
@@ -32,14 +32,14 @@ public class UserController {
     @PostMapping("/users")
     public UserDto addUser(@RequestBody UserDto user) throws ParseException {
         User userEntity = convertUserDtoToEntity(user);
-        User userCreated = service.createUser(userEntity);
+        User userCreated = userService.createUser(userEntity);
         return convertUserToDto(userCreated);
     }
 
 
     @GetMapping("/users")
     public List<UserDto> findAllUsers() {
-        List<User> users = service.getUsers();
+        List<User> users = userService.getUsers();
         return users.stream()
                 .map(this::convertUserToDto)
                 .collect(Collectors.toList());
@@ -47,19 +47,19 @@ public class UserController {
 
     @GetMapping("/users/{id}")
     public UserDto findUserById(@PathVariable Long id) {
-        User user = service.getUserByID(id);
+        User user = userService.getUserByID(id);
         return convertUserToDto(user);
     }
 
     @GetMapping("/users?name={name}")
     public UserDto findUserByName(@PathVariable String name) {
-        User user = service.getUserByUsername(name);
+        User user = userService.getUserByUsername(name);
         return convertUserToDto(user);
     }
 
     @GetMapping("/users/{id}/favourites")
     public List<EventDto> getFavouritesFromUser(@PathVariable Long id) {
-        List<Event> events = service.getFavouriteEventsByID(id);
+        List<Event> events = userService.getFavouriteEventsByID(id);
         return events.stream()
                 .map(this::convertEventToDto)
                 .collect(Collectors.toList());
@@ -68,7 +68,7 @@ public class UserController {
     @PutMapping("/users")
     public UserDto updateUser(@RequestBody UserDto us) throws ParseException {
         User userEntity = convertUserDtoToEntity(us);
-        User user = service.updateUser(userEntity);
+        User user = userService.updateUser(userEntity);
         return convertUserToDto(user);
     }
 
