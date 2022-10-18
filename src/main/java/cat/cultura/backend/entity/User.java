@@ -40,6 +40,10 @@ public class User {
     @CollectionTable(name="trophies", joinColumns=@JoinColumn(name="id"))
     private List<Trophy> trophies = new ArrayList<>();
 
+    @ElementCollection
+    @CollectionTable(name="friends", joinColumns=@JoinColumn(name="id"))
+    private List<User> friends = new ArrayList<>();
+
     public User(String username) {
         this.username = username;
     }
@@ -121,6 +125,14 @@ public class User {
         this.trophies = trophies;
     }
 
+    public List<User> getFriends() {
+        return friends;
+    }
+
+    public void setFriends(List<User> friends) {
+        this.friends = friends;
+    }
+
     public void addFavourite(Event e) {
         if (favourites.contains(e)) throw new AssertionError("Event " + e.getId() + " already in favourites");
         favourites.add(e);
@@ -139,5 +151,15 @@ public class User {
     public void removeTrophy(Trophy t) {
         if (!trophies.contains(t)) throw new AssertionError("Trophy " + t.getId() +  " is not in trophies");
         trophies.remove(t);
+    }
+
+    public void addFriend(User friend) {
+        if (friends.contains(friend)) throw new AssertionError("Friend " + friend.getId() + " already in friends");
+        friends.add(friend);
+    }
+
+    public void removeFriend(User friend) {
+        if (!friends.contains(friend)) throw new AssertionError("Friend " + friend.getId() +  " is not in friends");
+        friends.remove(friend);
     }
 }
