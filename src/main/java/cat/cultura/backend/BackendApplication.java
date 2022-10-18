@@ -3,6 +3,7 @@ package cat.cultura.backend;
 import cat.cultura.backend.entity.Event;
 import cat.cultura.backend.factories.GlobalMessageSource;
 import cat.cultura.backend.factories.RepoFactory;
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -51,6 +52,11 @@ public class BackendApplication  implements WebMvcConfigurer {
 		LocaleChangeInterceptor lci = new LocaleChangeInterceptor();
 		lci.setParamName("lang");
 		return lci;
+	}
+
+	@Bean
+	public ModelMapper modelMapper() {
+		return new ModelMapper();
 	}
 
 	@Override

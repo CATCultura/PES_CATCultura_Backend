@@ -51,15 +51,7 @@ public class UserService {
     }
 
     public User updateUser(User usr) {
-        User existingUser = repo.findById(usr.getId()).orElse(null);
-        existingUser.setUsername(usr.getUsername());
-        existingUser.setNameAndSurname(usr.getNameAndSurname());
-        existingUser.setEmail(usr.getEmail());
-        existingUser.setPassword(usr.getPassword());
-        existingUser.setPoints(usr.getPoints());
-        //existingUser.setFavourites(usr.getFavourites());
-        //Aquí se pueden añadir futuros atributos
-        return repo.save(existingUser);
+        return repo.save(usr);
     }
 
     public List<Event> getFavouriteEventsByID(Long id) {

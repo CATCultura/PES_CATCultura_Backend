@@ -38,36 +38,6 @@ public class EventService {
     }
 
     public Event updateEvent(Event ev) {
-        Event existingEvent = repo.findById(ev.getId()).orElse(null);
-        existingEvent.setCodi((Long) ev.getCodi());
-        existingEvent.setDataFi(ev.getDataFi());
-        existingEvent.setDataInici(ev.getDataInici());
-        existingEvent.setDataFiAprox(ev.getDataFiAprox());
-        existingEvent.setDenominacio(ev.getDenominacio());
-        existingEvent.setDescripcio(ev.getDescripcio());
-        existingEvent.setEntrades(ev.getEntrades());
-        existingEvent.setHorari(ev.getHorari());
-        existingEvent.setSubtitol(ev.getSubtitol());
-        existingEvent.setTagsAmbits(ev.getTagsAmbits());
-        existingEvent.setTagsCateg(ev.getTagsCateg());
-        existingEvent.setTagsAltresCateg(ev.getTagsAltresCateg());
-        existingEvent.setLinks(ev.getLinks());
-        existingEvent.setDocuments(ev.getDocuments());
-        existingEvent.setImatges(ev.getImatges());
-        existingEvent.setVideos(ev.getVideos());
-        existingEvent.setAdreca(ev.getAdreca());
-        existingEvent.setCodiPostal(ev.getCodiPostal());
-        existingEvent.setComarcaIMunicipi(ev.getComarcaIMunicipi());
-        existingEvent.setEmail(ev.getEmail());
-        existingEvent.setEspai(ev.getEspai());
-        existingEvent.setLatitud(ev.getLatitud());
-        existingEvent.setLocalitat(ev.getLocalitat());
-        existingEvent.setLongitud(ev.getLongitud());
-        existingEvent.setRegioOPais(ev.getRegioOPais());
-        existingEvent.setTelf(ev.getTelf());
-        existingEvent.setURL(ev.getURL());
-        existingEvent.setImgApp(ev.getImgApp());
-        existingEvent.setDescripcioHtml(ev.getDescripcioHtml());
-        return repo.save(existingEvent);
+        return repo.save(ev);
     }
 }

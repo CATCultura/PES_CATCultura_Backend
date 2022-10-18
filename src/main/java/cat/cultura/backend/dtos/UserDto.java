@@ -1,54 +1,25 @@
-package cat.cultura.backend.entity;
+package cat.cultura.backend.dtos;
 
-import cat.cultura.backend.factories.GlobalMessageSource;
+import cat.cultura.backend.entity.Event;
+import cat.cultura.backend.entity.Trophy;
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
-import javax.persistence.*;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
 import java.util.List;
 
-@Entity
-@Table(name = "User")
 @JsonIgnoreProperties(ignoreUnknown=true)
 @JsonAutoDetect(fieldVisibility= JsonAutoDetect.Visibility.ANY)
-public class User {
-    @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+public class UserDto {
     private Long id;
-    @Column(name="username", unique = true)
     private String username;
-
-    @Column(name="nameAndSurname")
     private String nameAndSurname;
-
-    @Column(name="email")
     private String email;
-
-    @Column(name="password")
     private String password;
-    @Column(name="creationDate")
     private String creationDate;
-
-    @Column(name="points")
     private int points;
-    @ElementCollection
-    @CollectionTable(name="favourites", joinColumns=@JoinColumn(name="id"))
     private List<Event> favourites = new ArrayList<>();
-
-    @ElementCollection
-    @CollectionTable(name="trophies", joinColumns=@JoinColumn(name="id"))
     private List<Trophy> trophies = new ArrayList<>();
-
-    public User(String username) {
-        this.username = username;
-    }
-
-    public User(){
-
-    }
 
     public Long getId() {
         return id;
@@ -110,7 +81,6 @@ public class User {
         return favourites;
     }
 
-
     public void setFavourites(List<Event> favourites) {
         this.favourites = favourites;
     }
@@ -121,25 +91,5 @@ public class User {
 
     public void setTrophies(List<Trophy> trophies) {
         this.trophies = trophies;
-    }
-
-    public void addFavourite(Event e) {
-        if (favourites.contains(e)) throw new AssertionError("Event " + e.getId() + " already in favourites");
-        favourites.add(e);
-    }
-
-    public void removeFavourite(Event e) {
-        if (!favourites.contains(e)) throw new AssertionError("Event " + e.getId() +  " is not in favourites");
-        favourites.remove(e);
-    }
-
-    public void addTrophy(Trophy e) {
-        if (trophies.contains(e)) throw new AssertionError("Trophy " + e.getId() + " already in trophies");
-        trophies.add(e);
-    }
-
-    public void removeTrophy(Trophy e) {
-        if (!trophies.contains(e)) throw new AssertionError("Trophy " + e.getId() +  " is not in trophies");
-        trophies.remove(e);
     }
 }

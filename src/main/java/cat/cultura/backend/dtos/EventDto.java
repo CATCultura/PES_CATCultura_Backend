@@ -1,18 +1,39 @@
-package cat.cultura.backend.entity;
+package cat.cultura.backend.dtos;
 
-import com.fasterxml.jackson.annotation.JsonAutoDetect;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-
-import javax.persistence.*;
 import java.util.List;
 
-@Entity
-@Table(name = "Event", uniqueConstraints = {
-        @UniqueConstraint(name = "uc_event_codi_datainici", columnNames = {"codi", "dataInici", "denominacio"})
-})
-@JsonIgnoreProperties(ignoreUnknown=true)
-@JsonAutoDetect(fieldVisibility= JsonAutoDetect.Visibility.ANY)
-public class Event {
+public class EventDto {
+    private Long id;
+    private Long codi;
+    private String dataFi;
+    private String dataInici;
+    private String dataFiAprox;
+    private String denominacio;
+    private String descripcio;
+    private String entrades;
+    private String horari;
+    private String subtitol;
+    private List<String> tagsAmbits;
+    private List<String> tagsCateg;
+    private List<String> tagsAltresCateg;
+    private String links;
+    private String documents;
+    private String imatges;
+    private String videos;
+    private String adreca;
+    private int codiPostal;
+    private String comarcaIMunicipi;
+    private String email;
+    private String espai;
+    private double latitud;
+    private String localitat;
+    private double longitud;
+    private String regioOPais;
+    private String telf;
+    private String URL;
+    private String imgApp;
+    private String descripcioHtml;
+    private boolean cancelado;
 
     public Long getId() {
         return id;
@@ -21,90 +42,6 @@ public class Event {
     public void setId(Long id) {
         this.id = id;
     }
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    private Long id;
-    @Column(name="codi")
-    private Long codi;
-    @Column(name="dataFi")
-    private String dataFi;
-    @Column(name="dataInici")
-    private String dataInici;
-    @Column(name="dataFiAprox")
-    private String dataFiAprox;
-    @Column(name="denominacio")
-    private String denominacio;
-    @Lob
-    @Column(name="descripcio")
-    private String descripcio;
-    @Column(name = "entrades", length = 1024)
-    private String entrades;
-    @Column(name="horari")
-    private String horari;
-    @Column(name="subtitol")
-    private String subtitol;
-    @ElementCollection
-    @CollectionTable(name="tagsAmbits", joinColumns=@JoinColumn(name="id"))
-    @Column(name="tagsAmbits")
-    private List<String> tagsAmbits;
-    @ElementCollection
-    @CollectionTable(name="tagsCateg", joinColumns=@JoinColumn(name="id"))
-    @Column(name="tagsCateg")
-    private List<String> tagsCateg;
-    @ElementCollection
-    @CollectionTable(name="tagsAltresCateg", joinColumns=@JoinColumn(name="id"))
-    @Column(name="tagsAltresCateg")
-    private List<String> tagsAltresCateg;
-    @Lob
-    @Column(name="links")
-    private String links;
-    @Column(name="documents")
-    private String documents;
-    @Column(name="imatges")
-    private String imatges;
-    @Column(name="videos")
-    private String videos;
-    @Column(name="adreca")
-    private String adreca;
-    @Column(name="codiPostal")
-    private int codiPostal;
-    @Column(name="comarcaIMunicipi")
-    private String comarcaIMunicipi;
-    @Column(name="email")
-    private String email;
-    @Column(name="espai")
-    private String espai;
-    @Column(name="latitud")
-    private double latitud;
-    @Column(name="localitat")
-    private String localitat;
-    @Column(name="longitud")
-    private double longitud;
-    @Column(name="regioOPais")
-    private String regioOPais;
-    @Column(name="telf")
-    private String telf;
-    @Column(name="URL")
-    private String URL;
-    @Column(name="imgApp")
-    private String imgApp;
-    @Lob
-    @Column(name="descripcioHtml")
-    private String descripcioHtml;
-    @Column(name="cancelado")
-    private boolean cancelado;
-
-    public String getImgApp() {
-        return imgApp;
-    }
-
-
-    public String getDescripcioHtml() {
-        return descripcioHtml;
-    }
-
-
 
     public Long getCodi() {
         return codi;
@@ -322,8 +259,16 @@ public class Event {
         this.URL = URL;
     }
 
+    public String getImgApp() {
+        return imgApp;
+    }
+
     public void setImgApp(String imgApp) {
         this.imgApp = imgApp;
+    }
+
+    public String getDescripcioHtml() {
+        return descripcioHtml;
     }
 
     public void setDescripcioHtml(String descripcioHtml) {
