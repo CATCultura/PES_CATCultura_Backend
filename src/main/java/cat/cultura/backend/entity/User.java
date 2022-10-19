@@ -41,12 +41,18 @@ public class User {
     private List<Trophy> trophies = new ArrayList<>();
 
     @ElementCollection
+    @CollectionTable(name="assistance", joinColumns=@JoinColumn(name="id"))
+    private List<Event> assistance = new ArrayList<>();
+    
+    @ElementCollection
     @CollectionTable(name="friends", joinColumns=@JoinColumn(name="id"))
     private List<User> friends = new ArrayList<>();
+
 
     public User(String username) {
         this.username = username;
     }
+
 
     public User(){
 
@@ -90,6 +96,18 @@ public class User {
 
     public void setPassword(String password) {
         this.password = password;
+    }
+
+    public List<Event> getAssistance() { return assistance; }
+
+    public void addAssistance(Event e) {
+        if(assistance.contains(e)) throw new AssertionError("L'esdeveniment ja està marcat com a hi assistiré.");
+        assistance.add(e);
+    }
+
+    public void removeAssistance(Event e) {
+        if (!assistance.contains(e)) throw new AssertionError("L'esdeveniment no està marcat com a hi assistiré.");
+        assistance.remove(e);
     }
 
     public String getCreationDate() {

@@ -20,6 +20,7 @@ public class UserDto {
     private int points;
     private List<Event> favourites = new ArrayList<>();
     private List<Trophy> trophies = new ArrayList<>();
+    private List<Event> hiAssistire = new ArrayList<>();
 
     public Long getId() {
         return id;
