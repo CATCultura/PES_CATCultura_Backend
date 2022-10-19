@@ -4,6 +4,7 @@ import cat.cultura.backend.dtos.EventDto;
 import cat.cultura.backend.dtos.UserDto;
 import cat.cultura.backend.entity.Event;
 import cat.cultura.backend.entity.User;
+import cat.cultura.backend.service.AssistanceService;
 import cat.cultura.backend.service.FavouriteService;
 import cat.cultura.backend.service.UserService;
 import cat.cultura.backend.service.UserTrophyService;
@@ -22,6 +23,9 @@ public class UserController {
 
     @Autowired
     private FavouriteService favouriteService;
+
+    @Autowired
+    private AssistanceService assistanceService;
 
     @Autowired
     private UserTrophyService userTrophyService;
@@ -65,11 +69,34 @@ public class UserController {
                 .collect(Collectors.toList());
     }
 
-    @GetMapping("/user/name={name}/assistance")
+    @GetMapping("/user/{id}/assistance")
     public List<EventDto> getAssistanceFromUser(@PathVariable Long id) {
         List<Event> events = userService.getAssistanceEventsByID(id);
         return events.stream().map(this::convertEventToDto).collect(Collectors.toList());
     }
+
+    @DeleteMapping("/users/{userId}/assistance")
+    public String removeFromAssistance(@PathVariable Long userId, @RequestBody List<Long> eventIds) {
+        try {
+            assistanceService.removeAssistance(userId, eventIds);
+        }
+        catch (AssertionError as) {
+            return as.getMessage();
+        }
+        return "Success";
+    }
+
+    @PutMapping("/users/{userId}/assistance")
+    public String addManyToAssistance(@PathVariable Long userId, @RequestBody List<Long> eventIds) {
+        try {
+            assistanceService.addAssistance(userId,eventIds);
+            return "Success";
+        }
+        catch (AssertionError as) {
+            return as.getMessage();
+        }
+    }
+
 
     @PutMapping("/users")
     public UserDto updateUser(@RequestBody UserDto us) throws ParseException {
