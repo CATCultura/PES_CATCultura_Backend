@@ -4,6 +4,8 @@ import cat.cultura.backend.entity.Event;
 import cat.cultura.backend.entity.User;
 import cat.cultura.backend.repository.UserJpaRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.text.SimpleDateFormat;
@@ -66,6 +68,10 @@ public class UserService {
     public List<Event> getFavouriteEventsByName(String name) {
         User existingUser = repo.findByUsername(name);
         return existingUser.getFavourites();
+    }
+
+    public Page<User> getByQuery(Long id, String username, String nameAndSurname, Pageable pageable) {
+        return repo.getByQuery(id, username, nameAndSurname, pageable);
     }
 
 

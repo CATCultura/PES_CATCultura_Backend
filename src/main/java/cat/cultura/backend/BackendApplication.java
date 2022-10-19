@@ -47,7 +47,4 @@ public class BackendApplication  implements WebMvcConfigurer {
 		registry.addInterceptor(localeChangeInterceptor());
 	}
 
-
-
-
 }
