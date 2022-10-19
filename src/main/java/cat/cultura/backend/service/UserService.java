@@ -60,11 +60,13 @@ public class UserService {
 
     public List<Event> getFavouriteEventsByID(Long id) {
         User existingUser = repo.findById(id).orElse(null);
+        assert existingUser != null;
         return existingUser.getFavourites();
     }
 
     public List<Event> getAssistanceEventsByID(Long id){
         User existingUser = repo.findById(id).orElse(null);
+        assert existingUser != null;
         return existingUser.getAssistance();
     }
 
