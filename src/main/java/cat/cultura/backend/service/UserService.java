@@ -63,6 +63,12 @@ public class UserService {
         return existingUser.getFavourites();
     }
 
+    public List<Event> getAssistanceEventsByID(Long id){
+        User existingUser = repo.findById(id).orElse(null);
+        return existingUser.getAssistance();
+    }
+
+
     public List<Event> getFavouriteEventsByName(String name) {
         User existingUser = repo.findByUsername(name);
         return existingUser.getFavourites();

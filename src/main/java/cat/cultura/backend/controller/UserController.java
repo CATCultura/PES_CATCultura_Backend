@@ -65,6 +65,12 @@ public class UserController {
                 .collect(Collectors.toList());
     }
 
+    @GetMapping("/user/name={name}/assistance")
+    public List<EventDto> getAssistanceFromUser(@PathVariable Long id) {
+        List<Event> events = userService.getAssistanceEventsByID(id);
+        return events.stream().map(this::convertEventToDto).collect(Collectors.toList());
+    }
+
     @PutMapping("/users")
     public UserDto updateUser(@RequestBody UserDto us) throws ParseException {
         User userEntity = convertUserDtoToEntity(us);
