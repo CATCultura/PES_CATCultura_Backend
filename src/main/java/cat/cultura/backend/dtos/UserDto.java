@@ -93,4 +93,5 @@ public class UserDto {
     public void setTrophies(List<Trophy> trophies) {
         this.trophies = trophies;
     }
+
 }

@@ -4,6 +4,7 @@ import cat.cultura.backend.dtos.EventDto;
 import cat.cultura.backend.dtos.UserDto;
 import cat.cultura.backend.entity.Event;
 import cat.cultura.backend.entity.User;
+import cat.cultura.backend.exceptions.UserNotFoundException;
 import cat.cultura.backend.service.FavouriteService;
 import cat.cultura.backend.service.FriendService;
 import cat.cultura.backend.service.UserService;
@@ -42,15 +43,15 @@ public class UserController {
         return convertUserToDto(userCreated);
     }
 
-    @GetMapping("/users")
-    public List<UserDto> findAllUsers() {
-        List<User> users = userService.getUsers();
-        return users.stream()
-                .map(this::convertUserToDto)
-                .collect(Collectors.toList());
-    }
+//    @GetMapping("/users")
+//    public List<UserDto> findAllUsers() {
+//        List<User> users = userService.getUsers();
+//        return users.stream()
+//                .map(this::convertUserToDto)
+//                .collect(Collectors.toList());
+//    }
 
-    @GetMapping("/usersQuery")
+    @GetMapping("/users")
     public List<UserDto> getAllByQuery(
             @RequestParam(value = "id", required = false) Long id,
             @RequestParam(value = "username", required = false) String username,
@@ -58,6 +59,7 @@ public class UserController {
             Pageable pageable
     ) {
         Page<User> users = userService.getByQuery(id, username, nameAndSurname, pageable);
+        if(users.isEmpty()) throw new UserNotFoundException();
         return users.stream()
                 .map(this::convertUserToDto)
                 .collect(Collectors.toList());
@@ -169,7 +171,7 @@ public class UserController {
 
     private UserDto convertUserToDto(User user) {
         UserDto userDto = modelMapper.map(user, UserDto.class);
-        //....modifications....
+        userDto.setPassword(null);
         return userDto;
     }
 
