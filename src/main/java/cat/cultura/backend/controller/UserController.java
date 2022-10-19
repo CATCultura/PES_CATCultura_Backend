@@ -5,10 +5,13 @@ import cat.cultura.backend.dtos.UserDto;
 import cat.cultura.backend.entity.Event;
 import cat.cultura.backend.entity.User;
 import cat.cultura.backend.service.FavouriteService;
+import cat.cultura.backend.service.FriendService;
 import cat.cultura.backend.service.UserService;
 import cat.cultura.backend.service.UserTrophyService;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.web.bind.annotation.*;
 
 import java.text.ParseException;
@@ -27,6 +30,9 @@ public class UserController {
     private UserTrophyService userTrophyService;
 
     @Autowired
+    private FriendService friendService;
+
+    @Autowired
     private ModelMapper modelMapper;
 
     @PostMapping("/users")
@@ -36,10 +42,22 @@ public class UserController {
         return convertUserToDto(userCreated);
     }
 
-
     @GetMapping("/users")
     public List<UserDto> findAllUsers() {
         List<User> users = userService.getUsers();
+        return users.stream()
+                .map(this::convertUserToDto)
+                .collect(Collectors.toList());
+    }
+
+    @GetMapping("/usersQuery")
+    public List<UserDto> getAllByQuery(
+            @RequestParam(value = "id", required = false) Long id,
+            @RequestParam(value = "username", required = false) String username,
+            @RequestParam(value = "name-and-surname", required = false) String nameAndSurname,
+            Pageable pageable
+    ) {
+        Page<User> users = userService.getByQuery(id, username, nameAndSurname, pageable);
         return users.stream()
                 .map(this::convertUserToDto)
                 .collect(Collectors.toList());
@@ -51,7 +69,7 @@ public class UserController {
         return convertUserToDto(user);
     }
 
-    @GetMapping("/users?name={name}")
+    @GetMapping("/users/name={name}")
     public UserDto findUserByName(@PathVariable String name) {
         User user = userService.getUserByUsername(name);
         return convertUserToDto(user);
@@ -120,6 +138,28 @@ public class UserController {
     public String removeFromTrophy(@PathVariable Long userId, @RequestBody List<Long> trophiesIds) {
         try {
             userTrophyService.removeTrophy(userId,trophiesIds);
+        }
+        catch (AssertionError as) {
+            return as.getMessage();
+        }
+        return "Success";
+    }
+
+    @PutMapping("/users/{userId}/friends")
+    public String addManyToFriends(@PathVariable Long userId, @RequestBody List<Long> friendsIds) {
+        try {
+            friendService.addFriends(userId,friendsIds);
+        }
+        catch (AssertionError as) {
+            return as.getMessage();
+        }
+        return "Success";
+    }
+
+    @DeleteMapping("/users/{userId}/friends")
+    public String removeFriend(@PathVariable Long userId, @RequestBody List<Long> friendsIds) {
+        try {
+            friendService.removeFriends(userId,friendsIds);
         }
         catch (AssertionError as) {
             return as.getMessage();

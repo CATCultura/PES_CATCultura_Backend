@@ -1,7 +1,10 @@
 package cat.cultura.backend.service;
 
 import cat.cultura.backend.entity.Event;
+import cat.cultura.backend.entity.User;
 import cat.cultura.backend.repository.EventJpaRepository;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -42,5 +45,9 @@ public class EventService {
 
     public Event updateEvent(Event ev) {
         return repo.save(ev);
+    }
+
+    public Page<Event> getByQuery(Long id, Pageable pageable) {
+        return repo.getByQuery(id, pageable);
     }
 }

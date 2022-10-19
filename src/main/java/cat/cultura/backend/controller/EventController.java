@@ -1,11 +1,15 @@
 package cat.cultura.backend.controller;
 
 import cat.cultura.backend.dtos.EventDto;
+import cat.cultura.backend.dtos.UserDto;
 import cat.cultura.backend.entity.Event;
+import cat.cultura.backend.entity.User;
 import cat.cultura.backend.service.EventService;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.web.bind.annotation.*;
 
 import java.text.ParseException;
@@ -48,6 +52,17 @@ public class EventController {
     public List<EventDto> findAllEvents() {
         List<Event> events = service.getEvents();
         return events.stream().map(this::convertEventToDto).collect(Collectors.toList());
+    }
+
+    @GetMapping("/eventsQuery")
+    public List<EventDto> getAllByQuery(
+            @RequestParam(value = "id", required = false) Long id,
+            Pageable pageable
+    ) {
+        Page<Event> users = service.getByQuery(id, pageable);
+        return users.stream()
+                .map(this::convertEventToDto)
+                .collect(Collectors.toList());
     }
 
     @GetMapping("/events/{id}")
