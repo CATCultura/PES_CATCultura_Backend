@@ -69,7 +69,7 @@ public class UserController {
                 .collect(Collectors.toList());
     }
 
-    @GetMapping("/user/{id}/assistance")
+    @GetMapping("/users/{id}/assistance")
     public List<EventDto> getAssistanceFromUser(@PathVariable Long id) {
         List<Event> events = userService.getAssistanceEventsByID(id);
         return events.stream().map(this::convertEventToDto).collect(Collectors.toList());
