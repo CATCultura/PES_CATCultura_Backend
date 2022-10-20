@@ -37,19 +37,11 @@ public class UserController {
     private ModelMapper modelMapper;
 
     @PostMapping("/users")
-    public UserDto addUser(@RequestBody UserDto user) throws ParseException {
+    public UserDto addUser(@RequestBody UserDto user) {
         User userEntity = convertUserDtoToEntity(user);
         User userCreated = userService.createUser(userEntity);
         return convertUserToDto(userCreated);
     }
-
-//    @GetMapping("/users")
-//    public List<UserDto> findAllUsers() {
-//        List<User> users = userService.getUsers();
-//        return users.stream()
-//                .map(this::convertUserToDto)
-//                .collect(Collectors.toList());
-//    }
 
     @GetMapping("/users")
     public List<UserDto> getAllByQuery(
@@ -62,7 +54,7 @@ public class UserController {
         if(users.isEmpty()) throw new UserNotFoundException();
         return users.stream()
                 .map(this::convertUserToDto)
-                .collect(Collectors.toList());
+                .toList();
     }
 
     @GetMapping("/users/{id}")
@@ -82,17 +74,17 @@ public class UserController {
         List<Event> events = userService.getFavouriteEventsByID(id);
         return events.stream()
                 .map(this::convertEventToDto)
-                .collect(Collectors.toList());
+                .toList();
     }
 
-    @GetMapping("/user/name={name}/assistance")
-    public List<EventDto> getAssistanceFromUser(@PathVariable Long id) {
-        List<Event> events = userService.getAssistanceEventsByID(id);
-        return events.stream().map(this::convertEventToDto).collect(Collectors.toList());
+    @GetMapping("/user/name={name}/attendance")
+    public List<EventDto> getAttendanceFromUser(@PathVariable Long id) {
+        List<Event> events = userService.getAttendanceEventsByID(id);
+        return events.stream().map(this::convertEventToDto).toList();
     }
 
     @PutMapping("/users")
-    public UserDto updateUser(@RequestBody UserDto us) throws ParseException {
+    public UserDto updateUser(@RequestBody UserDto us) {
         User userEntity = convertUserDtoToEntity(us);
         User user = userService.updateUser(userEntity);
         return convertUserToDto(user);
@@ -181,13 +173,13 @@ public class UserController {
         return eventDto;
     }
 
-    private User convertUserDtoToEntity(UserDto userDto) throws ParseException {
+    private User convertUserDtoToEntity(UserDto userDto) {
         User user = modelMapper.map(userDto, User.class);
         //....modifications....
         return user;
     }
 
-    private Event convertEventDtoToEntity(EventDto eventDto) throws ParseException {
+    private Event convertEventDtoToEntity(EventDto eventDto) {
         Event event = modelMapper.map(eventDto, Event.class);
         //....modifications....
         return event;

@@ -9,30 +9,30 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 @Service
-public class AssistanceService {
+public class AttendanceService {
 
     private final EventJpaRepository eventRepo;
     private final UserJpaRepository userRepo;
 
-    public AssistanceService(EventJpaRepository eventRepo, UserJpaRepository userRepo) {
+    public AttendanceService(EventJpaRepository eventRepo, UserJpaRepository userRepo) {
         this.eventRepo = eventRepo;
         this.userRepo = userRepo;
     }
 
-    public void addAssistance(Long userID, List<Long> eventIDs) {
+    public void addAttendance(Long userID, List<Long> eventIDs) {
         User user = userRepo.findById(userID).orElseThrow(UserNotFoundException::new);
         List<Event> events = eventRepo.findAllById(eventIDs);
         for (Event e : events) {
-            user.addAssistance(e);
+            user.addAttendance(e);
         }
         userRepo.save(user);
     }
 
-    public void removeAssistance(Long userID, List<Long> eventIDs) {
+    public void removeAttendance(Long userID, List<Long> eventIDs) {
         User user = userRepo.findById(userID).orElseThrow(UserNotFoundException::new);
         List<Event> events = eventRepo.findAllById(eventIDs);
         for (Event e : events) {
-            user.removeAssistance(e);
+            user.removeAttendance(e);
         }
         userRepo.save(user);
     }
