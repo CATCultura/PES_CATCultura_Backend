@@ -41,8 +41,8 @@ public class User {
     private List<Trophy> trophies = new ArrayList<>();
 
     @ElementCollection
-    @CollectionTable(name="assistance", joinColumns=@JoinColumn(name="id"))
-    private List<Event> assistance = new ArrayList<>();
+    @CollectionTable(name="attendance", joinColumns=@JoinColumn(name="id"))
+    private List<Event> attendance = new ArrayList<>();
     
     @ElementCollection
     @CollectionTable(name="friends", joinColumns=@JoinColumn(name="id"))
@@ -98,16 +98,16 @@ public class User {
         this.password = password;
     }
 
-    public List<Event> getAssistance() { return assistance; }
+    public List<Event> getAttendance() { return attendance; }
 
-    public void addAssistance(Event e) {
-        if(assistance.contains(e)) throw new AssertionError("L'esdeveniment ja està marcat com a hi assistiré.");
-        assistance.add(e);
+    public void addAttendance(Event e) {
+        if(attendance.contains(e)) throw new AssertionError("L'esdeveniment ja està marcat com a hi assistiré.");
+        attendance.add(e);
     }
 
-    public void removeAssistance(Event e) {
-        if (!assistance.contains(e)) throw new AssertionError("L'esdeveniment no està marcat com a hi assistiré.");
-        assistance.remove(e);
+    public void removeAttendance(Event e) {
+        if (!attendance.contains(e)) throw new AssertionError("L'esdeveniment no està marcat com a hi assistiré.");
+        attendance.remove(e);
     }
 
     public String getCreationDate() {
