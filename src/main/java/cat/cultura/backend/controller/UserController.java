@@ -4,11 +4,9 @@ import cat.cultura.backend.dtos.EventDto;
 import cat.cultura.backend.dtos.UserDto;
 import cat.cultura.backend.entity.Event;
 import cat.cultura.backend.entity.User;
+import cat.cultura.backend.service.*;
+import cat.cultura.backend.service.AttendanceService;
 import cat.cultura.backend.exceptions.UserNotFoundException;
-import cat.cultura.backend.service.FavouriteService;
-import cat.cultura.backend.service.FriendService;
-import cat.cultura.backend.service.UserService;
-import cat.cultura.backend.service.UserTrophyService;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -28,6 +26,9 @@ public class UserController {
     private FavouriteService favouriteService;
 
     @Autowired
+    private AttendanceService attendanceService;
+
+    @Autowired
     private UserTrophyService userTrophyService;
 
     @Autowired
@@ -37,7 +38,7 @@ public class UserController {
     private ModelMapper modelMapper;
 
     @PostMapping("/users")
-    public UserDto addUser(@RequestBody UserDto user) {
+    public UserDto addUser(@RequestBody UserDto user) throws ParseException {
         User userEntity = convertUserDtoToEntity(user);
         User userCreated = userService.createUser(userEntity);
         return convertUserToDto(userCreated);
@@ -77,11 +78,34 @@ public class UserController {
                 .toList();
     }
 
-    @GetMapping("/user/name={name}/attendance")
+    @GetMapping("/user/{id}/attendance")
     public List<EventDto> getAttendanceFromUser(@PathVariable Long id) {
         List<Event> events = userService.getAttendanceEventsByID(id);
         return events.stream().map(this::convertEventToDto).toList();
     }
+
+    @DeleteMapping("/users/{userId}/assistance")
+    public String removeFromAssistance(@PathVariable Long userId, @RequestBody List<Long> eventIds) {
+        try {
+            attendanceService.removeAttendance(userId, eventIds);
+        }
+        catch (AssertionError as) {
+            return as.getMessage();
+        }
+        return "Success";
+    }
+
+    @PutMapping("/users/{userId}/assistance")
+    public String addManyToAssistance(@PathVariable Long userId, @RequestBody List<Long> eventIds) {
+        try {
+            attendanceService.addAttendance(userId,eventIds);
+            return "Success";
+        }
+        catch (AssertionError as) {
+            return as.getMessage();
+        }
+    }
+
 
     @PutMapping("/users")
     public UserDto updateUser(@RequestBody UserDto us) {
