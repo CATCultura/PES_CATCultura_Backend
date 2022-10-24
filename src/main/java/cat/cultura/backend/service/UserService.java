@@ -3,11 +3,11 @@ package cat.cultura.backend.service;
 import cat.cultura.backend.entity.Event;
 import cat.cultura.backend.entity.User;
 import cat.cultura.backend.repository.UserJpaRepository;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 
@@ -64,16 +64,20 @@ public class UserService {
         return existingUser.getFavourites();
     }
 
-    public List<Event> getAssistanceEventsByID(Long id){
+    public List<Event> getAttendanceEventsByID(Long id){
         User existingUser = repo.findById(id).orElse(null);
         assert existingUser != null;
-        return existingUser.getAssistance();
+        return existingUser.getAttendance();
     }
 
 
     public List<Event> getFavouriteEventsByName(String name) {
         User existingUser = repo.findByUsername(name);
         return existingUser.getFavourites();
+    }
+
+    public Page<User> getByQuery(Long id, String username, String nameAndSurname, Pageable pageable) {
+        return repo.getByQuery(id, username, nameAndSurname, pageable);
     }
 
 

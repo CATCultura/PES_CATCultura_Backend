@@ -5,11 +5,15 @@ import cat.cultura.backend.dtos.UserDto;
 import cat.cultura.backend.entity.Event;
 import cat.cultura.backend.entity.User;
 import cat.cultura.backend.service.AssistanceService;
+import cat.cultura.backend.exceptions.UserNotFoundException;
 import cat.cultura.backend.service.FavouriteService;
+import cat.cultura.backend.service.FriendService;
 import cat.cultura.backend.service.UserService;
 import cat.cultura.backend.service.UserTrophyService;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.web.bind.annotation.*;
 
 import java.text.ParseException;
@@ -31,6 +35,9 @@ public class UserController {
     private UserTrophyService userTrophyService;
 
     @Autowired
+    private FriendService friendService;
+
+    @Autowired
     private ModelMapper modelMapper;
 
     @PostMapping("/users")
@@ -40,13 +47,18 @@ public class UserController {
         return convertUserToDto(userCreated);
     }
 
-
     @GetMapping("/users")
-    public List<UserDto> findAllUsers() {
-        List<User> users = userService.getUsers();
+    public List<UserDto> getAllByQuery(
+            @RequestParam(value = "id", required = false) Long id,
+            @RequestParam(value = "username", required = false) String username,
+            @RequestParam(value = "name-and-surname", required = false) String nameAndSurname,
+            Pageable pageable
+    ) {
+        Page<User> users = userService.getByQuery(id, username, nameAndSurname, pageable);
+        if(users.isEmpty()) throw new UserNotFoundException();
         return users.stream()
                 .map(this::convertUserToDto)
-                .collect(Collectors.toList());
+                .toList();
     }
 
     @GetMapping("/users/{id}")
@@ -55,7 +67,7 @@ public class UserController {
         return convertUserToDto(user);
     }
 
-    @GetMapping("/users?name={name}")
+    @GetMapping("/users/name={name}")
     public UserDto findUserByName(@PathVariable String name) {
         User user = userService.getUserByUsername(name);
         return convertUserToDto(user);
@@ -66,13 +78,13 @@ public class UserController {
         List<Event> events = userService.getFavouriteEventsByID(id);
         return events.stream()
                 .map(this::convertEventToDto)
-                .collect(Collectors.toList());
+                .toList();
     }
 
-    @GetMapping("/users/{id}/assistance")
-    public List<EventDto> getAssistanceFromUser(@PathVariable Long id) {
-        List<Event> events = userService.getAssistanceEventsByID(id);
-        return events.stream().map(this::convertEventToDto).collect(Collectors.toList());
+    @GetMapping("/user/{id}/attendance")
+    public List<EventDto> getAttendanceFromUser(@PathVariable Long id) {
+        List<Event> events = userService.getAttendanceEventsByID(id);
+        return events.stream().map(this::convertEventToDto).toList();
     }
 
     @DeleteMapping("/users/{userId}/assistance")
@@ -99,7 +111,7 @@ public class UserController {
 
 
     @PutMapping("/users")
-    public UserDto updateUser(@RequestBody UserDto us) throws ParseException {
+    public UserDto updateUser(@RequestBody UserDto us) {
         User userEntity = convertUserDtoToEntity(us);
         User user = userService.updateUser(userEntity);
         return convertUserToDto(user);
@@ -154,9 +166,31 @@ public class UserController {
         return "Success";
     }
 
+    @PutMapping("/users/{userId}/friends")
+    public String addManyToFriends(@PathVariable Long userId, @RequestBody List<Long> friendsIds) {
+        try {
+            friendService.addFriends(userId,friendsIds);
+        }
+        catch (AssertionError as) {
+            return as.getMessage();
+        }
+        return "Success";
+    }
+
+    @DeleteMapping("/users/{userId}/friends")
+    public String removeFriend(@PathVariable Long userId, @RequestBody List<Long> friendsIds) {
+        try {
+            friendService.removeFriends(userId,friendsIds);
+        }
+        catch (AssertionError as) {
+            return as.getMessage();
+        }
+        return "Success";
+    }
+
     private UserDto convertUserToDto(User user) {
         UserDto userDto = modelMapper.map(user, UserDto.class);
-        //....modifications....
+        userDto.setPassword(null);
         return userDto;
     }
 
@@ -166,13 +200,13 @@ public class UserController {
         return eventDto;
     }
 
-    private User convertUserDtoToEntity(UserDto userDto) throws ParseException {
+    private User convertUserDtoToEntity(UserDto userDto) {
         User user = modelMapper.map(userDto, User.class);
         //....modifications....
         return user;
     }
 
-    private Event convertEventDtoToEntity(EventDto eventDto) throws ParseException {
+    private Event convertEventDtoToEntity(EventDto eventDto) {
         Event event = modelMapper.map(eventDto, Event.class);
         //....modifications....
         return event;

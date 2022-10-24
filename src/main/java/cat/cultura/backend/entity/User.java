@@ -41,8 +41,13 @@ public class User {
     private List<Trophy> trophies = new ArrayList<>();
 
     @ElementCollection
-    @CollectionTable(name="assistance", joinColumns=@JoinColumn(name="id"))
-    private List<Event> assistance = new ArrayList<>();
+    @CollectionTable(name="attendance", joinColumns=@JoinColumn(name="id"))
+    private List<Event> attendance = new ArrayList<>();
+    
+    @ElementCollection
+    @CollectionTable(name="friends", joinColumns=@JoinColumn(name="id"))
+    private List<User> friends = new ArrayList<>();
+
 
     public User(String username) {
         this.username = username;
@@ -93,16 +98,16 @@ public class User {
         this.password = password;
     }
 
-    public List<Event> getAssistance() { return assistance; }
+    public List<Event> getAttendance() { return attendance; }
 
-    public void addAssistance(Event e) {
-        if(assistance.contains(e)) throw new AssertionError("L'esdeveniment ja està marcat com a hi assistiré.");
-        assistance.add(e);
+    public void addAttendance(Event e) {
+        if(attendance.contains(e)) throw new AssertionError("L'esdeveniment ja està marcat com a hi assistiré.");
+        attendance.add(e);
     }
 
-    public void removeAssistance(Event e) {
-        if (!assistance.contains(e)) throw new AssertionError("L'esdeveniment no està marcat com a hi assistiré.");
-        assistance.remove(e);
+    public void removeAttendance(Event e) {
+        if (!attendance.contains(e)) throw new AssertionError("L'esdeveniment no està marcat com a hi assistiré.");
+        attendance.remove(e);
     }
 
     public String getCreationDate() {
@@ -138,6 +143,14 @@ public class User {
         this.trophies = trophies;
     }
 
+    public List<User> getFriends() {
+        return friends;
+    }
+
+    public void setFriends(List<User> friends) {
+        this.friends = friends;
+    }
+
     public void addFavourite(Event e) {
         if (favourites.contains(e)) throw new AssertionError("Event " + e.getId() + " already in favourites");
         favourites.add(e);
@@ -156,5 +169,15 @@ public class User {
     public void removeTrophy(Trophy t) {
         if (!trophies.contains(t)) throw new AssertionError("Trophy " + t.getId() +  " is not in trophies");
         trophies.remove(t);
+    }
+
+    public void addFriend(User friend) {
+        if (friends.contains(friend)) throw new AssertionError("Friend " + friend.getId() + " already in friends");
+        friends.add(friend);
+    }
+
+    public void removeFriend(User friend) {
+        if (!friends.contains(friend)) throw new AssertionError("Friend " + friend.getId() +  " is not in friends");
+        friends.remove(friend);
     }
 }
