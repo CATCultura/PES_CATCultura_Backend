@@ -4,12 +4,9 @@ import cat.cultura.backend.dtos.EventDto;
 import cat.cultura.backend.dtos.UserDto;
 import cat.cultura.backend.entity.Event;
 import cat.cultura.backend.entity.User;
-import cat.cultura.backend.service.AssistanceService;
+import cat.cultura.backend.service.*;
+import cat.cultura.backend.service.AttendanceService;
 import cat.cultura.backend.exceptions.UserNotFoundException;
-import cat.cultura.backend.service.FavouriteService;
-import cat.cultura.backend.service.FriendService;
-import cat.cultura.backend.service.UserService;
-import cat.cultura.backend.service.UserTrophyService;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -29,7 +26,7 @@ public class UserController {
     private FavouriteService favouriteService;
 
     @Autowired
-    private AssistanceService assistanceService;
+    private AttendanceService attendanceService;
 
     @Autowired
     private UserTrophyService userTrophyService;
@@ -90,7 +87,7 @@ public class UserController {
     @DeleteMapping("/users/{userId}/assistance")
     public String removeFromAssistance(@PathVariable Long userId, @RequestBody List<Long> eventIds) {
         try {
-            assistanceService.removeAssistance(userId, eventIds);
+            attendanceService.removeAttendance(userId, eventIds);
         }
         catch (AssertionError as) {
             return as.getMessage();
@@ -101,7 +98,7 @@ public class UserController {
     @PutMapping("/users/{userId}/assistance")
     public String addManyToAssistance(@PathVariable Long userId, @RequestBody List<Long> eventIds) {
         try {
-            assistanceService.addAssistance(userId,eventIds);
+            attendanceService.addAttendance(userId,eventIds);
             return "Success";
         }
         catch (AssertionError as) {
