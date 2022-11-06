@@ -12,6 +12,7 @@ import java.util.List;
 public class AttendanceService {
 
     private final EventJpaRepository eventRepo;
+
     private final UserJpaRepository userRepo;
 
     public AttendanceService(EventJpaRepository eventRepo, UserJpaRepository userRepo) {
@@ -19,22 +20,23 @@ public class AttendanceService {
         this.userRepo = userRepo;
     }
 
-    public void addAttendance(Long userID, List<Long> eventIDs) {
-        User user = userRepo.findById(userID).orElseThrow(UserNotFoundException::new);
-        List<Event> events = eventRepo.findAllById(eventIDs);
+    public void addAttendance(Long userId, List<Long> eventIds) {
+        User user = userRepo.findById(userId).orElseThrow(() -> new UserNotFoundException("User with id: " + userId + " not found\n"));
+        List<Event> events = eventRepo.findAllById(eventIds);
         for (Event e : events) {
             user.addAttendance(e);
         }
         userRepo.save(user);
     }
 
-    public void removeAttendance(Long userID, List<Long> eventIDs) {
-        User user = userRepo.findById(userID).orElseThrow(UserNotFoundException::new);
-        List<Event> events = eventRepo.findAllById(eventIDs);
+    public void removeAttendance(Long userId, List<Long> eventIds) {
+        User user = userRepo.findById(userId).orElseThrow(() -> new UserNotFoundException("User with id: " + userId + " not found\n"));
+        List<Event> events = eventRepo.findAllById(eventIds);
         for (Event e : events) {
             user.removeAttendance(e);
         }
         userRepo.save(user);
     }
+
 }
 

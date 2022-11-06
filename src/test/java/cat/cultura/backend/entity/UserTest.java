@@ -4,12 +4,17 @@ import cat.cultura.backend.entity.Event;
 import cat.cultura.backend.entity.User;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
 
+@ActiveProfiles("test")
 public class UserTest {
-
 
     @Test
     void addFavouriteTest() {
@@ -54,6 +59,51 @@ public class UserTest {
         e2.setCodi(654321L);
         u.addFavourite(e1);
         Assertions.assertThrows(AssertionError.class, () -> u.removeFavourite(e2));
+    }
+
+    @Test
+    void addAttendanceTest() {
+        User u = new User("Joan");
+        Event e = new Event();
+        e.setCodi(123456L);
+        List<Event> expected = new ArrayList<>();
+        expected.add(e);
+        u.addAttendance(e);
+        Assertions.assertEquals(expected, u.getAttendance());
+    }
+
+    @Test
+    void addAttendanceTestError() {
+        User u = new User("Joan");
+        Event e = new Event();
+        e.setCodi(123456L);
+        u.addAttendance(e);
+        Assertions.assertThrows(AssertionError.class, () -> u.addAttendance(e));
+    }
+    @Test
+    void removeFromAttendanceTest() {
+        User u = new User("Joan");
+        Event e1 = new Event();
+        Event e2 = new Event();
+        e1.setCodi(123456L);
+        e2.setCodi(654321L);
+        List<Event> expected = new ArrayList<>();
+        expected.add(e1);
+        u.addAttendance(e1);
+        u.addAttendance(e2);
+        u.removeAttendance(e2);
+        Assertions.assertEquals(expected, u.getAttendance());
+    }
+
+    @Test
+    void removeAttendanceTestError() {
+        User u = new User("Joan");
+        Event e1 = new Event();
+        Event e2 = new Event();
+        e1.setCodi(123456L);
+        e2.setCodi(654321L);
+        u.addAttendance(e1);
+        Assertions.assertThrows(AssertionError.class, () -> u.removeAttendance(e2));
     }
 
     @Test

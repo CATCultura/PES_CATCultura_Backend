@@ -1,7 +1,8 @@
 package cat.cultura.backend.service;
 
 import cat.cultura.backend.entity.Event;
-import cat.cultura.backend.entity.User;
+import cat.cultura.backend.exceptions.EventNotFoundException;
+import cat.cultura.backend.exceptions.TrophyNotFoundException;
 import cat.cultura.backend.repository.EventJpaRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -12,42 +13,47 @@ import java.util.List;
 @Service
 public class EventService {
 
-    private final EventJpaRepository repo;
+    private final EventJpaRepository eventRepo;
 
-    public EventService(EventJpaRepository repo) {
-        this.repo = repo;
+    public EventService(EventJpaRepository eventRepo) {
+        this.eventRepo = eventRepo;
     }
 
     public Event saveEvent(Event ev) {
-        return repo.save(ev);
+        return eventRepo.save(ev);
     }
 
     public List<Event> saveEvents(List<Event> evs) {
-        return repo.saveAll(evs);
+        return eventRepo.saveAll(evs);
     }
 
     public List<Event> getEvents() {
-        return repo.findAll();
+        List<Event> result = eventRepo.findAll();
+        if(result.isEmpty()) throw new TrophyNotFoundException("No Events found\n");
+        else return result;
     }
 
     public Event getEventByID(Long id) {
-        return repo.findById(id).orElse(null);
+        return eventRepo.findById(id).orElseThrow(()-> new EventNotFoundException("Event with id: " + id + " not found\n"));
     }
 
     public Event getEventByCodi(Long codi) {
-        return repo.findByCodi(codi);
+        return eventRepo.findByCodi(codi).orElseThrow(()-> new EventNotFoundException("Event with code: " + codi + " not found\n"));
     }
 
-    public String deleteEvent(Long id) {
-        repo.deleteById(id);
-        return "Event with id: " + id + " removed";
+    public void deleteEvent(Long id) {
+        Event event = eventRepo.findById(id).orElseThrow(()-> new EventNotFoundException("Event with id: " + id + " not found\n"));
+        eventRepo.delete(event);
     }
 
     public Event updateEvent(Event ev) {
-        return repo.save(ev);
+        return eventRepo.save(ev);
     }
 
     public Page<Event> getByQuery(Long id, Pageable pageable) {
-        return repo.getByQuery(id, pageable);
+        Page<Event> result = eventRepo.getByQuery(id, pageable);
+        if(result.isEmpty()) throw new EventNotFoundException("No events found\n");
+        else return result;
     }
+
 }

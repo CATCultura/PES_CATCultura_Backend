@@ -1,6 +1,8 @@
 package cat.cultura.backend.service;
 
 import cat.cultura.backend.entity.Trophy;
+import cat.cultura.backend.exceptions.EventNotFoundException;
+import cat.cultura.backend.exceptions.TrophyNotFoundException;
 import cat.cultura.backend.repository.TrophyJpaRepository;
 import org.springframework.stereotype.Service;
 
@@ -24,10 +26,18 @@ public class TrophyService {
     }
 
     public List<Trophy> getTrophies() {
-        return trophyRepo.findAll();
+        List<Trophy> result = trophyRepo.findAll();
+        if(result.isEmpty()) throw new TrophyNotFoundException("No Trophies found\n");
+        else return result;
     }
 
     public Trophy getTrophy(Long id) {
-        return trophyRepo.findById(id).orElse(null);
+        return trophyRepo.findById(id).orElseThrow(()-> new TrophyNotFoundException("Trophy with id: " + id + " not found\n"));
     }
+
+    public void deleteTrophy(Long id) {
+        Trophy result = trophyRepo.findById(id).orElseThrow(()-> new TrophyNotFoundException("Trophy with id: " + id + " not found\n"));
+        trophyRepo.delete(result);
+    }
+
 }

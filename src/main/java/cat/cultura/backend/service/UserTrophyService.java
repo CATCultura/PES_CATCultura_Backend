@@ -13,6 +13,7 @@ import java.util.List;
 public class UserTrophyService {
 
     private final TrophyJpaRepository trophyRepo;
+
     private final UserJpaRepository userRepo;
 
     public UserTrophyService(UserJpaRepository userRepo, TrophyJpaRepository trophyRepo) {
@@ -37,4 +38,10 @@ public class UserTrophyService {
         }
         userRepo.save(user);
     }
+
+    public List<Trophy> getTrophiesByID(Long userID) {
+        User user = userRepo.findById(userID).orElseThrow(UserNotFoundException::new);
+        return user.getTrophies();
+    }
+
 }

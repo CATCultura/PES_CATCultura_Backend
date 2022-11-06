@@ -1,9 +1,11 @@
 package cat.cultura.backend.exceptions;
 
+public class EventNotFoundException extends RuntimeException {
+    public EventNotFoundException() {
+        super("Event not found\n");
+    }
+    public EventNotFoundException(String message) {
+        super(message);
+    }
 
-import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.annotation.ResponseStatus;
-
-
-@ResponseStatus(value = HttpStatus.NOT_FOUND, reason = "Event not found")
-public class EventNotFoundException extends RuntimeException {}
+}
