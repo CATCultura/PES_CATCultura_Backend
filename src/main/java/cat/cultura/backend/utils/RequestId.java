@@ -13,9 +13,9 @@ public class RequestId implements Serializable {
     public RequestId() {
     }
 
-    public RequestId(Long requesterId, Long friendId) {
+    public RequestId(Long requesterId, Long friendId1) {
         this.requesterId = requesterId;
-        this.friendId = friendId;
+        this.friendId = friendId1;
     }
 
     public Long getRequesterId() {
