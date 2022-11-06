@@ -3,6 +3,7 @@ package cat.cultura.backend.dtos;
 import java.util.List;
 
 public class EventDto {
+
     private Long id;
     private Long codi;
     private String dataFi;
@@ -282,4 +283,5 @@ public class EventDto {
     public void setCancelado(boolean cancelado) {
         this.cancelado = cancelado;
     }
+
 }

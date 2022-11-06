@@ -1,7 +1,13 @@
 package cat.cultura.backend.exceptions;
 
-import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.annotation.ResponseStatus;
+public class UserNotFoundException extends RuntimeException {
 
-@ResponseStatus(value = HttpStatus.NOT_FOUND, reason = "User Not Found")
-public class UserNotFoundException extends RuntimeException {}
+    public UserNotFoundException() {
+        super("User not found\n");
+    }
+
+    public UserNotFoundException(String message) {
+        super(message);
+    }
+
+}

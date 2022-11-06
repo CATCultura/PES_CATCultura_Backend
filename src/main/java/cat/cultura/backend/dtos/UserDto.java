@@ -1,12 +1,7 @@
 package cat.cultura.backend.dtos;
 
-import cat.cultura.backend.entity.Event;
-import cat.cultura.backend.entity.Trophy;
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-
-import java.util.ArrayList;
-import java.util.List;
 
 @JsonIgnoreProperties(ignoreUnknown=true)
 @JsonAutoDetect(fieldVisibility= JsonAutoDetect.Visibility.ANY)
@@ -18,9 +13,10 @@ public class UserDto {
     private String password;
     private String creationDate;
     private int points;
-    private List<Event> favourites = new ArrayList<>();
-    private List<Trophy> trophies = new ArrayList<>();
-    private List<Event> hiAssistire = new ArrayList<>();
+//    private List<Event> favourites = new ArrayList<>();
+//    private List<Trophy> trophies = new ArrayList<>();
+//    private List<Event> attendance = new ArrayList<>();
+//    private List<User> friends = new ArrayList<>();
 
     public Long getId() {
         return id;
@@ -78,20 +74,36 @@ public class UserDto {
         this.points = points;
     }
 
-    public List<Event> getFavourites() {
-        return favourites;
-    }
-
-    public void setFavourites(List<Event> favourites) {
-        this.favourites = favourites;
-    }
-
-    public List<Trophy> getTrophies() {
-        return trophies;
-    }
-
-    public void setTrophies(List<Trophy> trophies) {
-        this.trophies = trophies;
-    }
+//    public List<Event> getFavourites() {
+//        return favourites;
+//    }
+//
+//    public void setFavourites(List<Event> favourites) {
+//        this.favourites = favourites;
+//    }
+//
+//    public List<Trophy> getTrophies() {
+//        return trophies;
+//    }
+//
+//    public void setTrophies(List<Trophy> trophies) {
+//        this.trophies = trophies;
+//    }
+//
+//    public List<Event> getAttendance() {
+//        return attendance;
+//    }
+//
+//    public void setAttendance(List<Event> attendance) {
+//        this.attendance = attendance;
+//    }
+//
+//    public List<User> getFriends() {
+//        return friends;
+//    }
+//
+//    public void setFriends(List<User> friends) {
+//        this.friends = friends;
+//    }
 
 }
