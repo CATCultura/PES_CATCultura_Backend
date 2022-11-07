@@ -23,17 +23,14 @@ public class EventDto {
     private String videos;
     private String adreca;
     private int codiPostal;
-    private String comarcaIMunicipi;
     private String email;
     private String espai;
     private double latitud;
-    private String localitat;
     private double longitud;
-    private String regioOPais;
     private String telf;
     private String URL;
+    private String ubicacio;
     private String imgApp;
-    private String descripcioHtml;
     private boolean cancelado;
 
     public Long getId() {
@@ -188,13 +185,7 @@ public class EventDto {
         this.codiPostal = codiPostal;
     }
 
-    public String getComarcaIMunicipi() {
-        return comarcaIMunicipi;
-    }
 
-    public void setComarcaIMunicipi(String comarcaIMunicipi) {
-        this.comarcaIMunicipi = comarcaIMunicipi;
-    }
 
     public String getEmail() {
         return email;
@@ -220,13 +211,7 @@ public class EventDto {
         this.latitud = latitud;
     }
 
-    public String getLocalitat() {
-        return localitat;
-    }
 
-    public void setLocalitat(String localitat) {
-        this.localitat = localitat;
-    }
 
     public double getLongitud() {
         return longitud;
@@ -236,13 +221,6 @@ public class EventDto {
         this.longitud = longitud;
     }
 
-    public String getRegioOPais() {
-        return regioOPais;
-    }
-
-    public void setRegioOPais(String regioOPais) {
-        this.regioOPais = regioOPais;
-    }
 
     public String getTelf() {
         return telf;
@@ -268,13 +246,7 @@ public class EventDto {
         this.imgApp = imgApp;
     }
 
-    public String getDescripcioHtml() {
-        return descripcioHtml;
-    }
 
-    public void setDescripcioHtml(String descripcioHtml) {
-        this.descripcioHtml = descripcioHtml;
-    }
 
     public boolean isCancelado() {
         return cancelado;
@@ -284,4 +256,11 @@ public class EventDto {
         this.cancelado = cancelado;
     }
 
+    public String getUbicacio() {
+        return ubicacio;
+    }
+
+    public void setUbicacio(String ubicacio) {
+        this.ubicacio = ubicacio;
+    }
 }

@@ -8,7 +8,7 @@ import java.util.List;
 
 @Entity
 @Table(name = "Event", uniqueConstraints = {
-        @UniqueConstraint(name = "uc_event_codi_datainici", columnNames = {"codi", "dataInici", "denominacio"})}
+        @UniqueConstraint(name = "uc_event_codi_datainici", columnNames = {"codi", "dataInici", "denominacio","ubicacio", "adreca", "espai"})}
 )
 @JsonIgnoreProperties(ignoreUnknown=true)
 @JsonAutoDetect(fieldVisibility= JsonAutoDetect.Visibility.ANY)
@@ -80,8 +80,8 @@ public class Event {
     @Column(name="codiPostal")
     private int codiPostal;
 
-    @Column(name="comarcaIMunicipi")
-    private String comarcaIMunicipi;
+    @Column(name="ubicacio")
+    private String ubicacio;
 
     @Column(name="email")
     private String email;
@@ -92,14 +92,8 @@ public class Event {
     @Column(name="latitud")
     private double latitud;
 
-    @Column(name="localitat")
-    private String localitat;
-
     @Column(name="longitud")
     private double longitud;
-
-    @Column(name="regioOPais")
-    private String regioOPais;
 
     @Column(name="telf")
     private String telf;
@@ -110,9 +104,6 @@ public class Event {
     @Column(name="imgApp")
     private String imgApp;
 
-    @Lob
-    @Column(name="descripcioHtml")
-    private String descripcioHtml;
 
     @Column(name="cancelado")
     private boolean cancelado;
@@ -269,14 +260,6 @@ public class Event {
         this.codiPostal = codiPostal;
     }
 
-    public String getComarcaIMunicipi() {
-        return comarcaIMunicipi;
-    }
-
-    public void setComarcaIMunicipi(String comarcaIMunicipi) {
-        this.comarcaIMunicipi = comarcaIMunicipi;
-    }
-
     public String getEmail() {
         return email;
     }
@@ -301,13 +284,6 @@ public class Event {
         this.latitud = latitud;
     }
 
-    public String getLocalitat() {
-        return localitat;
-    }
-
-    public void setLocalitat(String localitat) {
-        this.localitat = localitat;
-    }
 
     public double getLongitud() {
         return longitud;
@@ -317,13 +293,6 @@ public class Event {
         this.longitud = longitud;
     }
 
-    public String getRegioOPais() {
-        return regioOPais;
-    }
-
-    public void setRegioOPais(String regioOPais) {
-        this.regioOPais = regioOPais;
-    }
 
     public String getTelf() {
         return telf;
@@ -345,9 +314,6 @@ public class Event {
         this.imgApp = imgApp;
     }
 
-    public void setDescripcioHtml(String descripcioHtml) {
-        this.descripcioHtml = descripcioHtml;
-    }
 
     public boolean isCancelado() {
         return cancelado;
@@ -361,8 +327,12 @@ public class Event {
         return imgApp;
     }
 
-    public String getDescripcioHtml() {
-        return descripcioHtml;
+
+    public String getUbicacio() {
+        return ubicacio;
     }
 
+    public void setUbicacio(String ubicacio) {
+        this.ubicacio = ubicacio;
+    }
 }
