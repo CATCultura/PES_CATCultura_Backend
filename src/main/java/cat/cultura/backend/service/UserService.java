@@ -33,16 +33,16 @@ public class UserService {
         return userRepo.saveAll(users);
     }
 
-    public User getUserByID(Long id) {
-        return userRepo.findById(id).orElseThrow(() -> new UserNotFoundException("User with id: " + id + " not found\n"));
+    public User getUserById(Long id) {
+        return userRepo.findById(id).orElseThrow(() -> new UserNotFoundException("User with id: " + id + " not found"));
     }
 
     public User getUserByUsername(String username) {
-        return userRepo.findByUsername(username).orElseThrow(() -> new UserNotFoundException("User with id: " + username + " not found\n"));
+        return userRepo.findByUsername(username).orElseThrow(() -> new UserNotFoundException("User with id: " + username + " not found"));
     }
 
-    public void deleteUserByID(Long id) {
-        User existingUser = userRepo.findById(id).orElseThrow(() -> new UserNotFoundException("User with id: " + id + " not found\n"));
+    public void deleteUserById(Long id) {
+        User existingUser = userRepo.findById(id).orElseThrow(() -> new UserNotFoundException("User with id: " + id + " not found"));
         userRepo.delete(existingUser);
     }
 
@@ -50,19 +50,19 @@ public class UserService {
         return userRepo.save(usr);
     }
 
-    public List<Event> getFavouriteEventsByID(Long id) {
-        User existingUser = userRepo.findById(id).orElseThrow(() -> new UserNotFoundException("User with id: " + id + " not found\n"));
+    public List<Event> getFavouriteEventsById(Long id) {
+        User existingUser = userRepo.findById(id).orElseThrow(() -> new UserNotFoundException("User with id: " + id + " not found"));
         return existingUser.getFavourites();
     }
 
-    public List<Event> getAttendanceEventsByID(Long id){
-        User existingUser = userRepo.findById(id).orElseThrow(() -> new UserNotFoundException("User with id: " + id + " not found\n"));
+    public List<Event> getAttendanceEventsById(Long id){
+        User existingUser = userRepo.findById(id).orElseThrow(() -> new UserNotFoundException("User with id: " + id + " not found"));
         return existingUser.getAttendance();
     }
 
     public Page<User> getUsersByQuery(Long id, String username, String nameAndSurname, Pageable pageable) {
         Page<User> result = userRepo.getUsersByQuery(id, username, nameAndSurname, pageable);
-        if(result.isEmpty()) throw new UserNotFoundException("No users found\n");
+        if(result.isEmpty()) throw new UserNotFoundException("No users found");
         else return result;
     }
 
