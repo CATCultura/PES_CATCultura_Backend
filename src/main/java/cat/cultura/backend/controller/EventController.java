@@ -15,7 +15,6 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @RestController
 public class EventController {
@@ -26,6 +25,22 @@ public class EventController {
     @Autowired
     private ModelMapper modelMapper;
 
+    @PostMapping("/insert")
+    public ResponseEntity<String> updateDB(@RequestHeader("auth-token") String authToken, @RequestBody List<EventDto> ev) {
+        if (authToken.equals("my-hash")) {
+            List<Event> eventsEntities = new ArrayList<>();
+            for (EventDto eventDto : ev) {
+                Event event = convertEventDtoToEntity(eventDto);
+                eventsEntities.add(event);
+            }
+            eventService.saveEvents(eventsEntities);
+            return new ResponseEntity<>("All ok", HttpStatus.OK);
+        }
+        else {
+            return new ResponseEntity<>("You've done fucked up", HttpStatus.FORBIDDEN);
+        }
+    }
+
     @PostMapping("/events")
     public ResponseEntity<List<EventDto>> addEvent(@RequestBody List<EventDto> ev) {
         List<Event> eventsEntities = new ArrayList<>();
@@ -34,7 +49,7 @@ public class EventController {
             eventsEntities.add(event);
         }
         List<Event> events = eventService.saveEvents(eventsEntities);
-        return ResponseEntity.status(HttpStatus.CREATED).body(events.stream().map(this::convertEventToDto).collect(Collectors.toList()));
+        return ResponseEntity.status(HttpStatus.CREATED).body(events.stream().map(this::convertEventToDto).toList());
     }
 
     @GetMapping("/events")
@@ -44,7 +59,7 @@ public class EventController {
     ) {
         Page<Event> events = eventService.getByQuery(id, pageable);
         if(events.isEmpty()) throw new EventNotFoundException();
-        return ResponseEntity.status(HttpStatus.OK).body(events.stream().map(this::convertEventToDto).collect(Collectors.toList()));
+        return ResponseEntity.status(HttpStatus.OK).body(events.stream().map(this::convertEventToDto).toList());
     }
 
     @GetMapping("/events/{id}")
