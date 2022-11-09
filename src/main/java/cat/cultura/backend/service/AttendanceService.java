@@ -2,12 +2,12 @@ package cat.cultura.backend.service;
 
 import cat.cultura.backend.entity.Event;
 import cat.cultura.backend.entity.User;
+import cat.cultura.backend.exceptions.EventNotFoundException;
 import cat.cultura.backend.exceptions.UserNotFoundException;
 import cat.cultura.backend.repository.EventJpaRepository;
 import cat.cultura.backend.repository.UserJpaRepository;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
 @Service
 public class AttendanceService {
 
@@ -20,21 +20,17 @@ public class AttendanceService {
         this.userRepo = userRepo;
     }
 
-    public void addAttendance(Long userId, List<Long> eventIds) {
-        User user = userRepo.findById(userId).orElseThrow(() -> new UserNotFoundException("User with id: " + userId + " not found\n"));
-        List<Event> events = eventRepo.findAllById(eventIds);
-        for (Event e : events) {
-            user.addAttendance(e);
-        }
+    public void addAttendance(Long userId, Long eventId) {
+        User user = userRepo.findById(userId).orElseThrow(() -> new UserNotFoundException("User with id: " + userId + " not found"));
+        Event event = eventRepo.findById(eventId).orElseThrow(() -> new EventNotFoundException("Event with id: " + eventId + "not found"));
+        user.addAttendance(event);
         userRepo.save(user);
     }
 
-    public void removeAttendance(Long userId, List<Long> eventIds) {
-        User user = userRepo.findById(userId).orElseThrow(() -> new UserNotFoundException("User with id: " + userId + " not found\n"));
-        List<Event> events = eventRepo.findAllById(eventIds);
-        for (Event e : events) {
-            user.removeAttendance(e);
-        }
+    public void removeAttendance(Long userId, Long eventId) {
+        User user = userRepo.findById(userId).orElseThrow(() -> new UserNotFoundException("User with id: " + userId + " not found"));
+        Event event = eventRepo.findById(eventId).orElseThrow(() -> new EventNotFoundException("Event with id: " + eventId + "not found"));
+        user.removeAttendance(event);
         userRepo.save(user);
     }
 

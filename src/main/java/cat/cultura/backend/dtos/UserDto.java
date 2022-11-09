@@ -10,7 +10,7 @@ public class UserDto {
     private String username;
     private String nameAndSurname;
     private String email;
-    private String password;
+    private String pass;
     private String creationDate;
     private int points;
 //    private List<Event> favourites = new ArrayList<>();
@@ -51,11 +51,11 @@ public class UserDto {
     }
 
     public String getPassword() {
-        return password;
+        return pass;
     }
 
     public void setPassword(String password) {
-        this.password = password;
+        this.pass = password;
     }
 
     public String getCreationDate() {

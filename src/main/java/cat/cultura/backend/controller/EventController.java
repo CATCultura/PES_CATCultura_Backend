@@ -26,13 +26,6 @@ public class EventController {
     @Autowired
     private ModelMapper modelMapper;
 
-    @PostMapping("/event")
-    public ResponseEntity<EventDto> addEvent(@RequestBody EventDto ev) {
-        Event eventEntity = convertEventDtoToEntity(ev);
-        Event event = eventService.saveEvent(eventEntity);
-        return ResponseEntity.status(HttpStatus.CREATED).body(convertEventToDto(event));
-    }
-
     @PostMapping("/events")
     public ResponseEntity<List<EventDto>> addEvent(@RequestBody List<EventDto> ev) {
         List<Event> eventsEntities = new ArrayList<>();
@@ -56,7 +49,7 @@ public class EventController {
 
     @GetMapping("/events/{id}")
     public ResponseEntity<EventDto> getEventById(@PathVariable Long id) {
-        Event event = eventService.getEventByID(id);
+        Event event = eventService.getEventById(id);
         return ResponseEntity.status(HttpStatus.OK).body(convertEventToDto(event));
     }
 

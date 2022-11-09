@@ -17,7 +17,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 @RestController
 public class UserController {
@@ -63,7 +65,7 @@ public class UserController {
 
     @GetMapping("/users/{id}")
     public ResponseEntity<UserDto> getUserById(@PathVariable Long id) {
-        User user = userService.getUserByID(id);
+        User user = userService.getUserById(id);
         return ResponseEntity.status(HttpStatus.OK).body(convertUserToDto(user));
     }
 
@@ -82,64 +84,64 @@ public class UserController {
 
     @DeleteMapping("/users/{id}")
     public ResponseEntity<String> deleteUser(@PathVariable Long id){
-        userService.deleteUserByID(id);
-        return ResponseEntity.status(HttpStatus.OK).body("User removed\n");
+        userService.deleteUserById(id);
+        return ResponseEntity.status(HttpStatus.OK).body("User removed");
     }
 
     //Put, Get and Delete for attendance of a user
 
-    @PutMapping("/users/{id}/attendance")
-    public ResponseEntity<String> addAttendance(@PathVariable Long id, @RequestBody List<Long> eventIds) {
+    @PutMapping("/users/{id}/attendance/{eventId}")
+    public ResponseEntity<String> addAttendance(@PathVariable Long id, @PathVariable Long eventId) {
         try {
-            attendanceService.addAttendance(id,eventIds);
+            attendanceService.addAttendance(id,eventId);
         } catch (AssertionError as) {
-            ResponseEntity.status(HttpStatus.BAD_REQUEST).body(as.getMessage()+"\n");
+            ResponseEntity.status(HttpStatus.BAD_REQUEST).body(as.getMessage());
         }
-        return ResponseEntity.status(HttpStatus.CREATED).body("Event attendance added\n");
+        return ResponseEntity.status(HttpStatus.CREATED).body("Event attendance added");
     }
 
     @GetMapping("/user/{id}/attendance")
     public ResponseEntity<List<EventDto>> getAttendance(@PathVariable Long id) {
-        List<Event> events = userService.getAttendanceEventsByID(id);
+        List<Event> events = userService.getAttendanceEventsById(id);
         return ResponseEntity.status(HttpStatus.OK).body(events.stream().map(this::convertEventToDto).toList());
     }
 
-    @DeleteMapping("/users/{id}/assistance")
-    public ResponseEntity<String> removeAttendance(@PathVariable Long id, @RequestBody List<Long> eventIds) {
+    @DeleteMapping("/users/{id}/assistance/{eventId}")
+    public ResponseEntity<String> removeAttendance(@PathVariable Long id, @PathVariable Long eventId) {
         try {
-            attendanceService.removeAttendance(id, eventIds);
+            attendanceService.removeAttendance(id, eventId);
         } catch (AssertionError as) {
-            ResponseEntity.status(HttpStatus.BAD_REQUEST).body(as.getMessage()+"\n");
+            ResponseEntity.status(HttpStatus.BAD_REQUEST).body(as.getMessage());
         }
-        return ResponseEntity.status(HttpStatus.OK).body("Event attendance removed\n");
+        return ResponseEntity.status(HttpStatus.OK).body("Event attendance removed");
     }
 
     //Put, Get and Delete for favourites of a user
 
-    @PutMapping("/users/{id}/favourites")
-    public ResponseEntity<String> addFavourites(@PathVariable Long id, @RequestBody List<Long> eventIds) {
+    @PutMapping("/users/{id}/favourites/{eventId}")
+    public ResponseEntity<String> addFavourites(@PathVariable Long id, @PathVariable Long eventId) {
         try {
-            favouriteService.addFavourite(id,eventIds);
+            favouriteService.addFavourite(id,eventId);
         } catch (AssertionError as) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(as.getMessage()+"\n");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(as.getMessage());
         }
-        return ResponseEntity.status(HttpStatus.CREATED).body("Favourites added\n");
+        return ResponseEntity.status(HttpStatus.CREATED).body("Favourite added");
     }
 
     @GetMapping("/users/{id}/favourites")
     public ResponseEntity<List<EventDto>> getFavourites(@PathVariable Long id) {
-        List<Event> events = userService.getFavouriteEventsByID(id);
+        List<Event> events = userService.getFavouriteEventsById(id);
         return ResponseEntity.status(HttpStatus.OK).body(events.stream().map(this::convertEventToDto).toList());
     }
 
-    @DeleteMapping("/users/{id}/favourites")
-    public ResponseEntity<String> removeFavourites(@PathVariable Long id, @RequestBody List<Long> eventIds) {
+    @DeleteMapping("/users/{id}/favourites/{eventId}")
+    public ResponseEntity<String> removeFavourites(@PathVariable Long id, @PathVariable Long eventId) {
         try {
-            favouriteService.removeFavourite(id, eventIds);
+            favouriteService.removeFavourite(id, eventId);
         } catch (AssertionError as) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(as.getMessage()+"\n");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(as.getMessage());
         }
-        return ResponseEntity.status(HttpStatus.OK).body("Favourites removed\n");
+        return ResponseEntity.status(HttpStatus.OK).body("Favourite removed");
     }
 
     //Put, Get and Delete for trophies of a user
@@ -149,9 +151,9 @@ public class UserController {
         try {
             userTrophyService.addTrophy(id,trophiesIds);
         } catch (AssertionError as) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(as.getMessage()+"\n");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(as.getMessage());
         }
-        return ResponseEntity.status(HttpStatus.CREATED).body("Trophies added\n");
+        return ResponseEntity.status(HttpStatus.CREATED).body("Trophies added");
     }
 
     @GetMapping("/users/{id}/trophies")
@@ -165,95 +167,41 @@ public class UserController {
         try {
             userTrophyService.removeTrophy(id,trophiesIds);
         } catch (AssertionError as) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(as.getMessage()+"\n");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(as.getMessage());
         }
-        return ResponseEntity.status(HttpStatus.OK).body("Trophies removed\n");
+        return ResponseEntity.status(HttpStatus.OK).body("Trophies removed");
     }
 
     //Put, Get and Delete for the friend requests to other users of a user
 
-    @PutMapping("/users/{id}/friends/requests/to")
-    public ResponseEntity<String> addRequestsTo(@PathVariable Long id, @RequestBody List<Long> friendsIds) {
+    @PutMapping("/users/{id}/friends/{friendId}")
+    public ResponseEntity<String> addRequestsTo(@PathVariable Long id, @PathVariable Long friendId) {
         try {
-            requestService.addFriendRequestsTo(id,friendsIds);
+            requestService.addFriendRequestsTo(id,friendId);
         } catch (AssertionError as) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(as.getMessage()+"\n");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(as.getMessage());
         }
-        return ResponseEntity.status(HttpStatus.CREATED).body("Requests added\n");
-    }
-
-    @GetMapping("users/{id}/friends/requests/to")
-    public ResponseEntity<List<UserDto>> getRequestsTo(@PathVariable Long id) {
-        List<User> users = requestService.getRequestsTo(id);
-        if(users.isEmpty()) throw new UserNotFoundException();
-        return ResponseEntity.status(HttpStatus.OK).body(users.stream().map(this::convertUserToDto).toList());
-    }
-
-    @DeleteMapping("/users/{id}/friends/requests/to")
-    public ResponseEntity<String> removeRequestsTo(@PathVariable Long id, @RequestBody List<Long> friendsIds) {
-        try {
-            requestService.removeFriendRequestsTo(id,friendsIds);
-        } catch (AssertionError as) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(as.getMessage()+"\n");
-        }
-        return ResponseEntity.status(HttpStatus.OK).body("Friends removed\n");
-    }
-
-    //Put, Get and Delete for the friend requests from other users of a user
-    @PutMapping("/users/{id}/friends/requests/from/accept")
-    public ResponseEntity<String> acceptRequestsFrom(@PathVariable Long id, @RequestBody List<Long> friendsIds) {
-        try {
-            requestService.acceptOrDismissFriendRequestsFrom(id,friendsIds,true);
-        } catch (AssertionError as) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(as.getMessage()+"\n");
-        }
-        return ResponseEntity.status(HttpStatus.CREATED).body("Requests accepted (Inverse requests created)\n");
-    }
-
-    @GetMapping("users/{id}/friends/requests/from")
-    public ResponseEntity<List<UserDto>> getRequestsFrom(@PathVariable Long id) {
-        List<User> users = requestService.getRequestFrom(id);
-        if(users.isEmpty()) throw new UserNotFoundException();
-        return ResponseEntity.status(HttpStatus.OK).body(users.stream().map(this::convertUserToDto).toList());
-    }
-
-    @DeleteMapping("/users/{id}/friends/requests/from/dismiss")
-    public ResponseEntity<String> dismissRequestsFrom(@PathVariable Long id, @RequestBody List<Long> friendsIds) {
-        try {
-            requestService.acceptOrDismissFriendRequestsFrom(id,friendsIds,false);
-        } catch (AssertionError as) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(as.getMessage()+"\n");
-        }
-        return ResponseEntity.status(HttpStatus.OK).body("Requests dismissed\n");
-    }
-
-    //Put, Get and Delete for the friends of a user
-
-    @PutMapping("users/{id}/friends")
-    public ResponseEntity<String> addFriends(@PathVariable Long id, @RequestBody List<Long> friendsIds) {
-        try {
-            requestService.addFriends(id,friendsIds);
-        } catch (AssertionError as) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(as.getMessage()+"\n");
-        }
-        return ResponseEntity.status(HttpStatus.CREATED).body("Friends added (Requests in both users added)\n");
+        return ResponseEntity.status(HttpStatus.CREATED).body("Request added");
     }
 
     @GetMapping("users/{id}/friends")
-    public ResponseEntity<List<UserDto>> getFriends(@PathVariable Long id) {
-        List<User> users = requestService.getFriends(id);
+    public ResponseEntity<List<UserDto>> getRequestsTo(@PathVariable Long id, @RequestParam(required = true) String status) {
+        List<User> users = new ArrayList<>();
+        if(Objects.equals(status, "requested")) users = requestService.getRequestsTo(id);
+        else if(Objects.equals(status, "received")) users = requestService.getRequestFrom(id);
+        else if(Objects.equals(status, "accepted")) users = requestService.getFriends(id);
         if(users.isEmpty()) throw new UserNotFoundException();
         return ResponseEntity.status(HttpStatus.OK).body(users.stream().map(this::convertUserToDto).toList());
     }
 
-    @DeleteMapping("/users/{id}/friends")
-    public ResponseEntity<String> removeFriends(@PathVariable Long id, @RequestBody List<Long> friendsIds) {
+    @DeleteMapping("/users/{id}/friends/{friendId}")
+    public ResponseEntity<String> removeRequestsTo(@PathVariable Long id, @PathVariable Long friendId) {
         try {
-            requestService.removeFriends(id, friendsIds);
+            requestService.removeFriendRequestsTo(id,friendId);
         } catch (AssertionError as) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(as.getMessage()+"\n");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(as.getMessage());
         }
-        return ResponseEntity.status(HttpStatus.OK).body("Friends removed\n");
+        return ResponseEntity.status(HttpStatus.OK).body("Friend removed");
     }
 
     //Dto conversion functions

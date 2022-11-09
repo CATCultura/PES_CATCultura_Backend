@@ -5,10 +5,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 
 import javax.persistence.*;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 @Entity
 @Table(name = "User")
@@ -23,14 +20,14 @@ public class User {
     @Column(name="username", unique = true)
     private String username;
 
-    @Column(name="nameAndSurname")
+    @Column(name="name_and_surname")
     private String nameAndSurname;
 
     @Column(name="email")
     private String email;
 
-    @Column(name="password")
-    private String password;
+    @Column(name="pass")
+    private String pass;
 
     @Column(name="creationDate")
     private String creationDate;
@@ -48,7 +45,7 @@ public class User {
     @ManyToMany
     @JoinTable(name="trophies",
             joinColumns = {@JoinColumn(name = "id") },
-            inverseJoinColumns = {@JoinColumn(name = "trophieId")}
+            inverseJoinColumns = {@JoinColumn(name = "trophyId")}
     )
     private List<Trophy> trophies = new ArrayList<>();
 
@@ -69,7 +66,7 @@ public class User {
      * Set of Friend requests where requester=other user and friend=this
      */
     @OneToMany(fetch = FetchType.EAGER, mappedBy = "friend")
-    private Set<Request> requestsFrom = new HashSet<>();
+    private Set<Request>  requestsFrom = new HashSet<>();
 
     public User(){}
 
@@ -109,23 +106,23 @@ public class User {
         this.email = email;
     }
 
-    public String getPassword() {
-        return password;
+    public String getPass() {
+        return pass;
     }
 
-    public void setPassword(String password) {
-        this.password = password;
+    public void setPass(String pass) {
+        this.pass = pass;
     }
 
     public List<Event> getAttendance() { return attendance; }
 
     public void addAttendance(Event e) {
-        if(attendance.contains(e)) throw new AssertionError("Event with id: " + e.getId() + " already in attendance\n");
+        if(attendance.contains(e)) throw new AssertionError("Event with id: " + e.getId() + " already in attendance");
         attendance.add(e);
     }
 
     public void removeAttendance(Event e) {
-        if (!attendance.contains(e)) throw new AssertionError("Event with id: " + e.getId() + " is not in attendance\n");
+        if (!attendance.contains(e)) throw new AssertionError("Event with id: " + e.getId() + " is not in attendance");
         attendance.remove(e);
     }
 
@@ -182,43 +179,90 @@ public class User {
     }
 
     public void addFavourite(Event e) {
-        if (favourites.contains(e)) throw new AssertionError("Event with id: " + e.getId() + " already in favourites\n");
+        if (favourites.contains(e)) throw new AssertionError("Event with id: " + e.getId() + " already in favourites");
         favourites.add(e);
     }
 
     public void removeFavourite(Event e) {
-        if (!favourites.contains(e)) throw new AssertionError("Event with id: " + e.getId() +  " is not in favourites\n");
+        if (!favourites.contains(e)) throw new AssertionError("Event with id: " + e.getId() +  " is not in favourites");
         favourites.remove(e);
     }
 
     public void addTrophy(Trophy t) {
-        if (trophies.contains(t)) throw new AssertionError("Trophy with id: " + t.getId() + " already in trophies\n");
+        if (trophies.contains(t)) throw new AssertionError("Trophy with id: " + t.getId() + " already in trophies");
         trophies.add(t);
     }
 
     public void removeTrophy(Trophy t) {
-        if (!trophies.contains(t)) throw new AssertionError("Trophy with id: " + t.getId() +  " is not in trophies\n");
+        if (!trophies.contains(t)) throw new AssertionError("Trophy with id: " + t.getId() +  " is not in trophies");
         trophies.remove(t);
     }
 
     public void addFriendRequestTo(Request fd) {
-        if (requestsTo.contains(fd)) throw new AssertionError("Request is already in friendRequestsFor\n");
+        if (requestsTo.contains(fd)) throw new AssertionError("Request is already exists");
         requestsTo.add(fd);
     }
 
     public void removeFriendRequestTo(Request fd) {
-        if (!requestsTo.contains(fd)) throw new AssertionError("Request is not in friendRequestsFor\n");
-        requestsFrom.remove(fd);
+        if (!requestsTo.contains(fd)) throw new AssertionError("Request does not exist");
+        requestsTo.add(fd);
     }
 
     public void addFriendRequestFrom(Request fd) {
-        if (requestsFrom.contains(fd)) throw new AssertionError("Request is already in friendRequestsFrom\n");
+        if (requestsFrom.contains(fd)) throw new AssertionError("Request is already exists");
         requestsFrom.add(fd);
     }
 
     public void removeFriendRequestFrom(Request fd) {
-        if (!requestsFrom.contains(fd)) throw new AssertionError("Request is not in friendRequestsFrom\n");
-        requestsFrom.remove(fd);
+        if (!requestsFrom.contains(fd)) throw new AssertionError("Request does not exist");
+        requestsFrom.add(fd);
     }
 
+    public List<User> getRequestFrom(){
+        List<User> users = new ArrayList<>();
+        for (Request f: requestsFrom) {
+            boolean friend = false;
+            User req = f.getRequester();
+            for(Request f1: requestsTo){
+                if(f1.getFriend()==req) {
+                    friend = true;
+                    break;
+                }
+            }
+            if(!friend) users.add(req);
+        }
+        return users;
+    }
+
+    public List<User> getRequestTo(){
+        List<User> users = new ArrayList<>();
+        for (Request f: requestsTo) {
+            boolean friend = false;
+            User req = f.getFriend();
+            for(Request f1: requestsFrom){
+                if(f1.getRequester()==req) {
+                    friend = true;
+                    break;
+                }
+            }
+            if(!friend) users.add(req);
+        }
+        return users;
+    }
+
+    public List<User> getFriends(){
+        List<User> users = new ArrayList<>();
+        for (Request f: requestsTo) {
+            boolean friend = false;
+            User req = f.getFriend();
+            for(Request f1: requestsFrom){
+                if(f1.getRequester()==req) {
+                    friend = true;
+                    break;
+                }
+            }
+            if(friend) users.add(req);
+        }
+        return users;
+    }
 }

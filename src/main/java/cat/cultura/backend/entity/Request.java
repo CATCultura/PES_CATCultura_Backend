@@ -16,7 +16,6 @@ public class Request {
     private RequestId requestId;
 
     @ManyToOne
-
     @JoinColumn(name="requester")
     private User requester;
 
@@ -46,6 +45,14 @@ public class Request {
 
     public void setFriend(User friend) {
         this.friend = friend;
+    }
+
+    public RequestId getRequestId() {
+        return requestId;
+    }
+
+    public void setRequestId(RequestId requestId) {
+        this.requestId = requestId;
     }
 
 }
