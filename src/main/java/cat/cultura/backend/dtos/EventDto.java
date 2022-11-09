@@ -19,7 +19,7 @@ public class EventDto {
     private List<String> tagsAltresCateg;
     private String links;
     private String documents;
-    private String imatges;
+    private List<String> imatges;
     private String videos;
     private String adreca;
     private int codiPostal;
@@ -153,11 +153,11 @@ public class EventDto {
         this.documents = documents;
     }
 
-    public String getImatges() {
+    public List<String> getImatges() {
         return imatges;
     }
 
-    public void setImatges(String imatges) {
+    public void setImatges(List<String> imatges) {
         this.imatges = imatges;
     }
 

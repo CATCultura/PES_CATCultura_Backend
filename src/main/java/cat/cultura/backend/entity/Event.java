@@ -8,8 +8,8 @@ import java.util.List;
 
 @Entity
 @Table(name = "Event", uniqueConstraints = {
-        @UniqueConstraint(name = "uc_event_codi_datainici", columnNames = {"codi", "dataInici", "denominacio","ubicacio", "adreca", "espai"})}
-)
+
+})
 @JsonIgnoreProperties(ignoreUnknown=true)
 @JsonAutoDetect(fieldVisibility= JsonAutoDetect.Visibility.ANY)
 public class Event {
@@ -40,6 +40,7 @@ public class Event {
     @Column(name = "entrades", length = 1024)
     private String entrades;
 
+    @Lob
     @Column(name="horari")
     private String horari;
 
@@ -68,9 +69,12 @@ public class Event {
     @Column(name="documents")
     private String documents;
 
+    @ElementCollection
+    @CollectionTable(name="imatges", joinColumns=@JoinColumn(name="id"))
     @Column(name="imatges")
-    private String imatges;
+    private List<String> imatges;
 
+    @Lob
     @Column(name="videos")
     private String videos;
 
@@ -228,11 +232,11 @@ public class Event {
         this.documents = documents;
     }
 
-    public String getImatges() {
+    public List<String> getImatges() {
         return imatges;
     }
 
-    public void setImatges(String imatges) {
+    public void setImatges(List<String> imatges) {
         this.imatges = imatges;
     }
 
