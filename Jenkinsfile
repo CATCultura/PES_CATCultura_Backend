@@ -32,11 +32,12 @@ pipeline {
         stage('Deploy') {
             when { branch 'dev-main' }
             steps {
-                sh 'sudo docker kill $(sudo docker ps -q -f ancestor=backend)'
-                sh 'sudo docker rmi backend -f'
+
                 withMaven {
                     sh 'mvn clean package'
                 }
+                sh 'sudo docker kill $(sudo docker ps -q -f ancestor=backend)'
+                sh 'sudo docker rmi backend -f'
                 sh 'sudo docker build -t backend .'
                 sh 'sudo docker run -d -p 8081:8081 backend'
             }
