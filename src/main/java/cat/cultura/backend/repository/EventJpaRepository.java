@@ -7,6 +7,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
 import java.util.Optional;
 
 @Repository
@@ -17,5 +18,11 @@ public interface EventJpaRepository extends JpaRepository<Event, Long> {
     @Query("select m from Event m where " +
             "(?1 is null or m.id = ?1) " )
     Page<Event> getByQuery(Long id, final Pageable pageable);
+
+    List<Event> findByDenominacioLikeIgnoreCaseAllIgnoreCase(String denominacio);
+
+
+
+
 
 }

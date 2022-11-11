@@ -339,4 +339,18 @@ public class Event {
     public void setUbicacio(String ubicacio) {
         this.ubicacio = ubicacio;
     }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == null) return false;
+        if (this.getClass() != obj.getClass()) return false;
+        Event that = (Event) obj;
+        if (!this.denominacio.equalsIgnoreCase(that.denominacio)) return false;
+        if (!this.dataInici.equalsIgnoreCase(that.dataInici)) return false;
+        if (!this.ubicacio.equalsIgnoreCase(that.ubicacio)) return false;
+        if (!this.adreca.equalsIgnoreCase(that.adreca)) return false;
+        return this.espai.equalsIgnoreCase(that.espai);
+
+
+    }
 }

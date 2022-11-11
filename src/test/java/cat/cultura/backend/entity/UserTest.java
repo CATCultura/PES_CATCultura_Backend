@@ -1,20 +1,14 @@
 package cat.cultura.backend.entity;
 
-import cat.cultura.backend.entity.Event;
-import cat.cultura.backend.entity.User;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.junit4.SpringRunner;
-import org.springframework.transaction.annotation.Propagation;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
 
 @ActiveProfiles("test")
-public class UserTest {
+class UserTest {
 
     @Test
     void addFavouriteTest() {
