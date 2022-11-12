@@ -104,9 +104,7 @@ public class EventController {
     private Event convertEventDtoToEntity(EventDto eventDto) {
         if (eventDto.getDenominacio() == null) throw new MissingRequiredParametersException();
         if (eventDto.getDataInici() == null) throw new MissingRequiredParametersException();
-        if (eventDto.getAdreca() == null) throw new MissingRequiredParametersException();
         if (eventDto.getUbicacio() == null) throw new MissingRequiredParametersException();
-        if (eventDto.getEspai() == null) throw new MissingRequiredParametersException();
         //....modifications....
         return modelMapper.map(eventDto, Event.class);
     }
