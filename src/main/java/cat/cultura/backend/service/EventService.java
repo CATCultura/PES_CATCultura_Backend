@@ -1,8 +1,8 @@
 package cat.cultura.backend.service;
 
 import cat.cultura.backend.entity.Event;
+import cat.cultura.backend.exceptions.EventAlreadyCreatedException;
 import cat.cultura.backend.exceptions.EventNotFoundException;
-import cat.cultura.backend.exceptions.TrophyNotFoundException;
 import cat.cultura.backend.repository.EventJpaRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -15,21 +15,34 @@ public class EventService {
 
     private final EventJpaRepository eventRepo;
 
+    private boolean isUniqueInDB(Event ev) {
+        List<Event> sameDenominacioEvents = eventRepo.findByDenominacioLikeIgnoreCaseAllIgnoreCase(ev.getDenominacio());
+        if (sameDenominacioEvents.isEmpty()) return true;
+        for (Event e : sameDenominacioEvents) {
+            if (ev.equals(e)) return false;
+        }
+        return true;
+    }
+
     public EventService(EventJpaRepository eventRepo) {
         this.eventRepo = eventRepo;
     }
 
     public Event saveEvent(Event ev) {
-        return eventRepo.save(ev);
+        if (isUniqueInDB(ev)) return eventRepo.save(ev);
+        throw new EventAlreadyCreatedException();
     }
 
     public List<Event> saveEvents(List<Event> evs) {
+        for (Event e : evs) {
+            if (!isUniqueInDB(e)) throw new EventAlreadyCreatedException();
+        }
         return eventRepo.saveAll(evs);
     }
 
     public List<Event> getEvents() {
         List<Event> result = eventRepo.findAll();
-        if(result.isEmpty()) throw new TrophyNotFoundException("No Events found");
+        if(result.isEmpty()) throw new EventNotFoundException("No Events found");
         else return result;
     }
 
@@ -47,6 +60,7 @@ public class EventService {
     }
 
     public Event updateEvent(Event ev) {
+        if (!isUniqueInDB(ev)) throw new EventAlreadyCreatedException();
         return eventRepo.save(ev);
     }
 

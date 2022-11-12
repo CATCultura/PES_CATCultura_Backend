@@ -79,7 +79,7 @@ public class Event {
     private String videos;
 
     @Column(name="adreca")
-    private String adreca;
+    private String adreca = "";
 
     @Column(name="codiPostal")
     private int codiPostal;
@@ -91,7 +91,7 @@ public class Event {
     private String email;
 
     @Column(name="espai")
-    private String espai;
+    private String espai = "";
 
     @Column(name="latitud")
     private double latitud;
@@ -339,4 +339,25 @@ public class Event {
     public void setUbicacio(String ubicacio) {
         this.ubicacio = ubicacio;
     }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == null) return false;
+        if (this.getClass() != obj.getClass()) return false;
+        Event that = (Event) obj;
+        if (!this.denominacio.equalsIgnoreCase(that.denominacio)) return false;
+        if (!this.dataInici.equalsIgnoreCase(that.dataInici)) return false;
+        if (!this.ubicacio.equalsIgnoreCase(that.ubicacio)) return false;
+        if (!this.adreca.equalsIgnoreCase(that.adreca)) return false;
+        return this.espai.equalsIgnoreCase(that.espai);
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = ((this.id == null) ? 1 : this.id.hashCode());
+        hash += this.denominacio.hashCode() + this.dataInici.hashCode() + ubicacio.hashCode();
+        hash += adreca.hashCode() + espai.hashCode();
+        return hash;
+    }
+
 }

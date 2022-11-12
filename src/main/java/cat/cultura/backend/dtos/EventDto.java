@@ -21,10 +21,10 @@ public class EventDto {
     private String documents;
     private List<String> imatges;
     private String videos;
-    private String adreca;
+    private String adreca = "";
     private int codiPostal;
     private String email;
-    private String espai;
+    private String espai = "";
     private double latitud;
     private double longitud;
     private String telf;

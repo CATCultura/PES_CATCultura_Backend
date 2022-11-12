@@ -3,7 +3,9 @@ package cat.cultura.backend.controller;
 import cat.cultura.backend.dtos.EventDto;
 import cat.cultura.backend.entity.Event;
 
+import cat.cultura.backend.exceptions.EventAlreadyCreatedException;
 import cat.cultura.backend.exceptions.EventNotFoundException;
+import cat.cultura.backend.exceptions.MissingRequiredParametersException;
 import cat.cultura.backend.service.EventService;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -45,10 +47,22 @@ public class EventController {
     public ResponseEntity<List<EventDto>> addEvent(@RequestBody List<EventDto> ev) {
         List<Event> eventsEntities = new ArrayList<>();
         for (EventDto eventDto : ev) {
-            Event event = convertEventDtoToEntity(eventDto);
+            Event event;
+            try {
+                event = convertEventDtoToEntity(eventDto);
+            }
+            catch (MissingRequiredParametersException mpe) {
+                return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
+            }
             eventsEntities.add(event);
         }
-        List<Event> events = eventService.saveEvents(eventsEntities);
+        List<Event> events;
+        try {
+            events = eventService.saveEvents(eventsEntities);
+        } catch (EventAlreadyCreatedException eac) {
+            return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
+        }
+
         return ResponseEntity.status(HttpStatus.CREATED).body(events.stream().map(this::convertEventToDto).toList());
     }
 
@@ -88,9 +102,11 @@ public class EventController {
     }
 
     private Event convertEventDtoToEntity(EventDto eventDto) {
-        Event event = modelMapper.map(eventDto, Event.class);
+        if (eventDto.getDenominacio() == null) throw new MissingRequiredParametersException();
+        if (eventDto.getDataInici() == null) throw new MissingRequiredParametersException();
+        if (eventDto.getUbicacio() == null) throw new MissingRequiredParametersException();
         //....modifications....
-        return event;
+        return modelMapper.map(eventDto, Event.class);
     }
 
 }
