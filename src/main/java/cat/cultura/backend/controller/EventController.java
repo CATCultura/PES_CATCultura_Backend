@@ -32,10 +32,24 @@ public class EventController {
         if (authToken.equals("my-hash")) {
             List<Event> eventsEntities = new ArrayList<>();
             for (EventDto eventDto : ev) {
-                Event event = convertEventDtoToEntity(eventDto);
-                eventsEntities.add(event);
+                Event event = null;
+                try {
+                    event = convertEventDtoToEntity(eventDto);
+                }
+                catch (MissingRequiredParametersException ignored) {
+
+                }
+                if (event != null)
+                    eventsEntities.add(event);
             }
-            eventService.saveEvents(eventsEntities);
+            for (Event e: eventsEntities) {
+                try {
+                    eventService.saveEvent(e);
+                }
+                catch (EventAlreadyCreatedException ignored) {
+
+                }
+            }
             return new ResponseEntity<>("All ok", HttpStatus.OK);
         }
         else {
