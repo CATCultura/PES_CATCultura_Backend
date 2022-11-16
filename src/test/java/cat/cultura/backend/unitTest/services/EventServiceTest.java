@@ -1,102 +1,220 @@
 package cat.cultura.backend.unitTest.services;
 
+
 import cat.cultura.backend.entity.Event;
-import cat.cultura.backend.entity.User;
-import cat.cultura.backend.exceptions.EventNotFoundException;
+import cat.cultura.backend.exceptions.EventAlreadyCreatedException;
 import cat.cultura.backend.repository.EventJpaRepository;
 import cat.cultura.backend.service.EventService;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
-import static org.junit.Assert.*;
 import static org.mockito.BDDMockito.given;
 
 @SpringBootTest
-public class EventServiceTest {
+class EventServiceTest {
 
     @Autowired
-    private EventService eventService;
+    EventService eventService;
 
     @MockBean
-    private EventJpaRepository eventRepo;
+    EventJpaRepository eventJpaRepository;
 
     @Test
-    public void saveEventsTest() throws Exception {
-        Event event = new Event();
-        event.setId(3L);
-        List<Event> events = new ArrayList<>();
-        events.add(event);
-        given(eventRepo.saveAll(events)).willReturn(events);
+    void saveEventTestAllOk() {
+        Event ev1 = new Event();
+        ev1.setDenominacio("Concert de primavera");
+        ev1.setDataInici("Dimarts");
+        ev1.setUbicacio("Barcelona");
+        ev1.setAdreca("C/ Quinta Forca");
+        ev1.setEspai("Sideral");
 
-        List<Event> result = eventService.saveEvents(events);
-        assertEquals(events, result);
+        given(eventJpaRepository.save(ev1)).willReturn(ev1);
+
+        Event result = eventService.saveEvent(ev1);
+        Assertions.assertEquals(ev1, result);
     }
 
     @Test
-    public void getEventByIdTest() throws Exception {
-        Event event = new Event();
-        event.setId(3L);
-        given(eventRepo.findById(3L)).willReturn(Optional.of(event));
+    void saveEventTestRepeated() {
+        Event ev1 = new Event();
+        ev1.setDenominacio("Concert de primavera");
+        ev1.setDataInici("Dimarts");
+        ev1.setUbicacio("Barcelona");
+        ev1.setAdreca("C/ Quinta Forca");
+        ev1.setEspai("Sideral");
 
-        Event result = eventService.getEventById(3L);
-        assertEquals(event, result);
+        List<Event> eventList = new ArrayList<>();
+
+        eventList.add(ev1);
+
+        Event ev2 = new Event();
+        ev2.setDenominacio("Concert de primavera");
+        ev2.setDataInici("Dimarts");
+        ev2.setUbicacio("Barcelona");
+        ev2.setAdreca("C/ Quinta Forca");
+        ev2.setEspai("Sideral");
+
+
+        given(eventJpaRepository.findByDenominacioLikeIgnoreCaseAllIgnoreCase(ev2.getDenominacio())).willReturn(eventList);
+
+        Assertions.assertThrows(EventAlreadyCreatedException.class, ()-> eventService.saveEvent(ev2));
     }
 
     @Test
-    public void getEventByIdIfTheEventDoesNotExistTest() throws Exception {
-        given(eventRepo.findById(3L)).willReturn(Optional.empty());
+    void saveEventTestSameDenominacioDifferentAdreca() {
+        Event ev1 = new Event();
+        ev1.setDenominacio("Concert de primavera");
+        ev1.setDataInici("Dimarts");
+        ev1.setUbicacio("Barcelona");
+        ev1.setAdreca("C/ Quinta Forca");
+        ev1.setEspai("Sideral");
 
-        assertThrows(
-                EventNotFoundException.class,
-                ()->eventService.getEventById(2L)
-        );
+        List<Event> eventList = new ArrayList<>();
+
+        eventList.add(ev1);
+
+        Event ev2 = new Event();
+        ev2.setDenominacio("Concert de primavera");
+        ev2.setDataInici("Dimarts");
+        ev2.setUbicacio("Barcelona");
+        ev2.setAdreca("C/ Quarta Forca");
+        ev2.setEspai("Sideral");
+
+
+        given(eventJpaRepository.findByDenominacioLikeIgnoreCaseAllIgnoreCase(ev2.getDenominacio())).willReturn(eventList);
+        given(eventJpaRepository.save(ev2)).willReturn(ev2);
+
+        Event res = eventService.saveEvent(ev2);
+
+        Assertions.assertEquals(res,ev2);
     }
 
     @Test
-    public void updateEventTest() throws Exception {
-        Event event = new Event();
-        event.setId(3L);
-        given(eventRepo.save(event)).willReturn(event);
+    void testSaveSeveralEventsAllOk() {
+        Event ev1 = new Event();
+        ev1.setDenominacio("Concert de primavera");
+        ev1.setDataInici("Dimarts");
+        ev1.setUbicacio("Barcelona");
+        ev1.setAdreca("C/ Quinta Forca");
+        ev1.setEspai("Sideral");
 
-        Event result = eventService.updateEvent(event);
-        assertEquals(event, result);
+        Event ev2 = new Event();
+        ev2.setDenominacio("Concert de primavera");
+        ev2.setDataInici("Dimarts");
+        ev2.setUbicacio("Barcelona");
+        ev2.setAdreca("C/ Quarta Forca");
+        ev2.setEspai("Sideral");
+
+        List<Event> eventList = new ArrayList<>();
+        eventList.add(ev1);
+        eventList.add(ev2);
+
+        given(eventJpaRepository.saveAll(eventList)).willReturn(eventList);
+
+        List<Event> res = eventService.saveEvents(eventList);
+
+        Assertions.assertEquals(res,eventList);
     }
 
     @Test
-    public void getEventsByQueryIdTest() throws Exception {
-        Event event = new Event();
-        event.setId(2L);
-        List<Event> events = new ArrayList<>();
-        events.add(event);
-        Page<Event> page = new PageImpl<>(events);
-        Pageable pageable = PageRequest.of(0, 20);
-        given(eventRepo.getByQuery(2L, pageable)).willReturn(page);
+    void testSaveSeveralEventsRepeated() {
+        Event ev1 = new Event();
+        ev1.setDenominacio("Concert de primavera");
+        ev1.setDataInici("Dimarts");
+        ev1.setUbicacio("Barcelona");
+        ev1.setAdreca("C/ Quinta Forca");
+        ev1.setEspai("Sideral");
 
-        Page<Event> result = eventService.getByQuery(2l,pageable);
-        assertEquals(page, result);
+        List<Event> eventList = new ArrayList<>();
+        eventList.add(ev1);
+
+        Event ev2 = new Event();
+        ev2.setDenominacio("Concert de tardor");
+        ev2.setDataInici("Dimarts");
+        ev2.setUbicacio("Barcelona");
+        ev2.setAdreca("C/ Quarta Forca");
+        ev2.setEspai("Sideral");
+
+        Event ev3 = new Event();
+        ev3.setDenominacio("Concert de primavera");
+        ev3.setDataInici("Dimarts");
+        ev3.setUbicacio("Barcelona");
+        ev3.setAdreca("C/ Quinta Forca");
+        ev3.setEspai("Sideral");
+
+        List<Event> eventsToInsert = new ArrayList<>();
+        eventsToInsert.add(ev1);
+        eventsToInsert.add(ev2);
+
+        given(eventJpaRepository.findByDenominacioLikeIgnoreCaseAllIgnoreCase(ev3.getDenominacio())).willReturn(eventList);
+
+        Assertions.assertThrows(EventAlreadyCreatedException.class, ()-> eventService.saveEvents(eventsToInsert));
+
     }
 
     @Test
-    public void getEventsByQueryIdIfNoEventsFoundTest() throws Exception {
-        List<Event> events = new ArrayList<>();
-        Page<Event> page = new PageImpl<>(events);
-        Pageable pageable = PageRequest.of(0, 20);
-        given(eventRepo.getByQuery(2L, pageable)).willReturn(page);
+    void testUpdateEventOk() {
+        Event old_event = new Event();
+        old_event.setDenominacio("Concert de primavera");
+        old_event.setDataInici("Dimarts");
+        old_event.setUbicacio("Barcelona");
+        old_event.setAdreca("C/ Quinta Forca");
+        old_event.setEspai("Sideral");
 
-        assertThrows(
-                EventNotFoundException.class,
-                ()->eventService.getByQuery(2l,pageable)
-        );
+        Event ev2 = new Event();
+        ev2.setDenominacio("Concert de primavera");
+        ev2.setDataInici("Dimarts");
+        ev2.setUbicacio("Barcelona");
+        ev2.setAdreca("C/ Quarta Forca");
+        ev2.setEspai("Sideral");
+
+        List<Event> eventList = new ArrayList<>();
+
+        eventList.add(old_event);
+
+        given(eventJpaRepository.findByDenominacioLikeIgnoreCaseAllIgnoreCase(ev2.getDenominacio())).willReturn(eventList);
+
+        given(eventJpaRepository.save(ev2)).willReturn(ev2);
+
+        ev2.setDenominacio("Concert de tardor");
+
+        Event updated = eventService.updateEvent(ev2);
+
+        Assertions.assertEquals(ev2,updated);
+    }
+
+    @Test
+    void testUpdateEventRepeated() {
+        Event old_event = new Event();
+        old_event.setDenominacio("Concert de primavera");
+        old_event.setDataInici("Dimarts");
+        old_event.setUbicacio("Barcelona");
+        old_event.setAdreca("C/ Quinta Forca");
+        old_event.setEspai("Sideral");
+
+        Event ev2 = new Event();
+        ev2.setDenominacio("Concert de primavera");
+        ev2.setDataInici("Dimarts");
+        ev2.setUbicacio("Barcelona");
+        ev2.setAdreca("C/ Quarta Forca");
+        ev2.setEspai("Sideral");
+
+        List<Event> eventList = new ArrayList<>();
+
+        eventList.add(old_event);
+
+        given(eventJpaRepository.findByDenominacioLikeIgnoreCaseAllIgnoreCase(ev2.getDenominacio())).willReturn(eventList);
+
+        ev2.setAdreca("C/ Quinta Forca");
+
+
+        Assertions.assertThrows(EventAlreadyCreatedException.class, () -> eventService.updateEvent(ev2));
     }
 
 }

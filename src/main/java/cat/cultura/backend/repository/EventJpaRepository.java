@@ -19,6 +19,8 @@ public interface EventJpaRepository extends JpaRepository<Event, Long> {
             "(?1 is null or m.id = ?1) " )
     Page<Event> getByQuery(Long id, final Pageable pageable);
 
+    List<Event> findByDenominacioLikeIgnoreCaseAllIgnoreCase(String denominacio);
+
     @Query("select m from Event m where " +
             "(?1 is null or m.id = ?1) " )
     List<Event> getEventsByDayAndLocation(String day1, String day2, double lat, double lon, double lat1,

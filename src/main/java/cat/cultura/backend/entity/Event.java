@@ -8,8 +8,8 @@ import java.util.List;
 
 @Entity
 @Table(name = "Event", uniqueConstraints = {
-        @UniqueConstraint(name = "uc_event_codi_datainici", columnNames = {"codi", "dataInici", "denominacio"})}
-)
+
+})
 @JsonIgnoreProperties(ignoreUnknown=true)
 @JsonAutoDetect(fieldVisibility= JsonAutoDetect.Visibility.ANY)
 public class Event {
@@ -40,6 +40,7 @@ public class Event {
     @Column(name = "entrades", length = 1024)
     private String entrades;
 
+    @Lob
     @Column(name="horari")
     private String horari;
 
@@ -68,38 +69,35 @@ public class Event {
     @Column(name="documents")
     private String documents;
 
+    @ElementCollection
+    @CollectionTable(name="imatges", joinColumns=@JoinColumn(name="id"))
     @Column(name="imatges")
-    private String imatges;
+    private List<String> imatges;
 
+    @Lob
     @Column(name="videos")
     private String videos;
 
     @Column(name="adreca")
-    private String adreca;
+    private String adreca = "";
 
     @Column(name="codiPostal")
     private int codiPostal;
 
-    @Column(name="comarcaIMunicipi")
-    private String comarcaIMunicipi;
+    @Column(name="ubicacio")
+    private String ubicacio;
 
     @Column(name="email")
     private String email;
 
     @Column(name="espai")
-    private String espai;
+    private String espai = "";
 
     @Column(name="latitud")
     private double latitud;
 
-    @Column(name="localitat")
-    private String localitat;
-
     @Column(name="longitud")
     private double longitud;
-
-    @Column(name="regioOPais")
-    private String regioOPais;
 
     @Column(name="telf")
     private String telf;
@@ -110,9 +108,6 @@ public class Event {
     @Column(name="imgApp")
     private String imgApp;
 
-    @Lob
-    @Column(name="descripcioHtml")
-    private String descripcioHtml;
 
     @Column(name="cancelado")
     private boolean cancelado;
@@ -237,11 +232,11 @@ public class Event {
         this.documents = documents;
     }
 
-    public String getImatges() {
+    public List<String> getImatges() {
         return imatges;
     }
 
-    public void setImatges(String imatges) {
+    public void setImatges(List<String> imatges) {
         this.imatges = imatges;
     }
 
@@ -269,14 +264,6 @@ public class Event {
         this.codiPostal = codiPostal;
     }
 
-    public String getComarcaIMunicipi() {
-        return comarcaIMunicipi;
-    }
-
-    public void setComarcaIMunicipi(String comarcaIMunicipi) {
-        this.comarcaIMunicipi = comarcaIMunicipi;
-    }
-
     public String getEmail() {
         return email;
     }
@@ -301,13 +288,6 @@ public class Event {
         this.latitud = latitud;
     }
 
-    public String getLocalitat() {
-        return localitat;
-    }
-
-    public void setLocalitat(String localitat) {
-        this.localitat = localitat;
-    }
 
     public double getLongitud() {
         return longitud;
@@ -317,13 +297,6 @@ public class Event {
         this.longitud = longitud;
     }
 
-    public String getRegioOPais() {
-        return regioOPais;
-    }
-
-    public void setRegioOPais(String regioOPais) {
-        this.regioOPais = regioOPais;
-    }
 
     public String getTelf() {
         return telf;
@@ -345,9 +318,6 @@ public class Event {
         this.imgApp = imgApp;
     }
 
-    public void setDescripcioHtml(String descripcioHtml) {
-        this.descripcioHtml = descripcioHtml;
-    }
 
     public boolean isCancelado() {
         return cancelado;
@@ -361,8 +331,33 @@ public class Event {
         return imgApp;
     }
 
-    public String getDescripcioHtml() {
-        return descripcioHtml;
+
+    public String getUbicacio() {
+        return ubicacio;
+    }
+
+    public void setUbicacio(String ubicacio) {
+        this.ubicacio = ubicacio;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == null) return false;
+        if (this.getClass() != obj.getClass()) return false;
+        Event that = (Event) obj;
+        if (!this.denominacio.equalsIgnoreCase(that.denominacio)) return false;
+        if (!this.dataInici.equalsIgnoreCase(that.dataInici)) return false;
+        if (!this.ubicacio.equalsIgnoreCase(that.ubicacio)) return false;
+        if (!this.adreca.equalsIgnoreCase(that.adreca)) return false;
+        return this.espai.equalsIgnoreCase(that.espai);
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = ((this.id == null) ? 1 : this.id.hashCode());
+        hash += this.denominacio.hashCode() + this.dataInici.hashCode() + ubicacio.hashCode();
+        hash += adreca.hashCode() + espai.hashCode();
+        return hash;
     }
 
 }

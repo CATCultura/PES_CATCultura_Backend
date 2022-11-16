@@ -3,7 +3,9 @@ package cat.cultura.backend.controller;
 import cat.cultura.backend.dtos.EventDto;
 import cat.cultura.backend.entity.Event;
 
+import cat.cultura.backend.exceptions.EventAlreadyCreatedException;
 import cat.cultura.backend.exceptions.EventNotFoundException;
+import cat.cultura.backend.exceptions.MissingRequiredParametersException;
 import cat.cultura.backend.service.EventService;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,7 +17,6 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @RestController
 public class EventController {
@@ -26,15 +27,57 @@ public class EventController {
     @Autowired
     private ModelMapper modelMapper;
 
+    @PostMapping("/insert")
+    public ResponseEntity<String> updateDB(@RequestHeader("auth-token") String authToken, @RequestBody List<EventDto> ev) {
+        if (authToken.equals("my-hash")) {
+            List<Event> eventsEntities = new ArrayList<>();
+            for (EventDto eventDto : ev) {
+                Event event = null;
+                try {
+                    event = convertEventDtoToEntity(eventDto);
+                }
+                catch (MissingRequiredParametersException ignored) {
+
+                }
+                if (event != null)
+                    eventsEntities.add(event);
+            }
+            for (Event e: eventsEntities) {
+                try {
+                    eventService.saveEvent(e);
+                }
+                catch (EventAlreadyCreatedException ignored) {
+
+                }
+            }
+            return new ResponseEntity<>("All ok", HttpStatus.OK);
+        }
+        else {
+            return new ResponseEntity<>("You've done fucked up", HttpStatus.FORBIDDEN);
+        }
+    }
+
     @PostMapping("/events")
     public ResponseEntity<List<EventDto>> addEvent(@RequestBody List<EventDto> ev) {
         List<Event> eventsEntities = new ArrayList<>();
         for (EventDto eventDto : ev) {
-            Event event = convertEventDtoToEntity(eventDto);
+            Event event;
+            try {
+                event = convertEventDtoToEntity(eventDto);
+            }
+            catch (MissingRequiredParametersException mpe) {
+                return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
+            }
             eventsEntities.add(event);
         }
-        List<Event> events = eventService.saveEvents(eventsEntities);
-        return ResponseEntity.status(HttpStatus.CREATED).body(events.stream().map(this::convertEventToDto).collect(Collectors.toList()));
+        List<Event> events;
+        try {
+            events = eventService.saveEvents(eventsEntities);
+        } catch (EventAlreadyCreatedException eac) {
+            return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
+        }
+
+        return ResponseEntity.status(HttpStatus.CREATED).body(events.stream().map(this::convertEventToDto).toList());
     }
 
     @GetMapping("/events")
@@ -44,7 +87,7 @@ public class EventController {
     ) {
         Page<Event> events = eventService.getByQuery(id, pageable);
         if(events.isEmpty()) throw new EventNotFoundException();
-        return ResponseEntity.status(HttpStatus.OK).body(events.stream().map(this::convertEventToDto).collect(Collectors.toList()));
+        return ResponseEntity.status(HttpStatus.OK).body(events.stream().map(this::convertEventToDto).toList());
     }
 
     @GetMapping("/events/{id}")
@@ -73,9 +116,11 @@ public class EventController {
     }
 
     private Event convertEventDtoToEntity(EventDto eventDto) {
-        Event event = modelMapper.map(eventDto, Event.class);
+        if (eventDto.getDenominacio() == null) throw new MissingRequiredParametersException();
+        if (eventDto.getDataInici() == null) throw new MissingRequiredParametersException();
+        if (eventDto.getUbicacio() == null) throw new MissingRequiredParametersException();
         //....modifications....
-        return event;
+        return modelMapper.map(eventDto, Event.class);
     }
 
 }
