@@ -1,6 +1,7 @@
-package cat.cultura.backend.entity;
+package cat.cultura.backend.unitTest.entity;
 
 import cat.cultura.backend.entity.Event;
+import cat.cultura.backend.entity.Trophy;
 import cat.cultura.backend.entity.User;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;

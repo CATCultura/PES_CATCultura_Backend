@@ -1,4 +1,4 @@
-package cat.cultura.backend.dto;
+package cat.cultura.backend.unitTest.dto;
 
 import cat.cultura.backend.dtos.EventDto;
 import cat.cultura.backend.dtos.UserDto;

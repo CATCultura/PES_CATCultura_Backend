@@ -13,10 +13,18 @@ public class UserDto {
     private String pass;
     private String creationDate;
     private int points;
-//    private List<Event> favourites = new ArrayList<>();
+
+    //    private List<Event> favourites = new ArrayList<>();
 //    private List<Trophy> trophies = new ArrayList<>();
 //    private List<Event> attendance = new ArrayList<>();
 //    private List<User> friends = new ArrayList<>();
+    public String getPass() {
+        return pass;
+    }
+
+    public void setPass(String pass) {
+        this.pass = pass;
+    }
 
     public Long getId() {
         return id;
