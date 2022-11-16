@@ -26,8 +26,8 @@ public class User {
     @Column(name="email")
     private String email;
 
-    @Column(name="pass")
-    private String pass;
+    @Column(name="password")
+    private String password;
 
     @Column(name="creationDate")
     private String creationDate;
@@ -106,12 +106,12 @@ public class User {
         this.email = email;
     }
 
-    public String getPass() {
-        return pass;
+    public String getPassword() {
+        return password;
     }
 
-    public void setPass(String pass) {
-        this.pass = pass;
+    public void setPassword(String password) {
+        this.password = password;
     }
 
     public List<Event> getAttendance() { return attendance; }
@@ -199,23 +199,24 @@ public class User {
     }
 
     public void addFriendRequestTo(Request fd) {
-        if (requestsTo.contains(fd)) throw new AssertionError("Request is already exists");
+        if (requestsTo.contains(fd)) throw new AssertionError("Request already exists");
         requestsTo.add(fd);
     }
 
     public void removeFriendRequestTo(Request fd) {
         if (!requestsTo.contains(fd)) throw new AssertionError("Request does not exist");
-        requestsTo.add(fd);
+        requestsTo.remove(fd);
+
     }
 
     public void addFriendRequestFrom(Request fd) {
-        if (requestsFrom.contains(fd)) throw new AssertionError("Request is already exists");
+        if (requestsFrom.contains(fd)) throw new AssertionError("Request already exists");
         requestsFrom.add(fd);
     }
 
     public void removeFriendRequestFrom(Request fd) {
         if (!requestsFrom.contains(fd)) throw new AssertionError("Request does not exist");
-        requestsFrom.add(fd);
+        requestsFrom.remove(fd);
     }
 
     public List<User> getRequestFrom(){

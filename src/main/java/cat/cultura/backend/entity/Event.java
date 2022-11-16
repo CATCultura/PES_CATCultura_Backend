@@ -4,7 +4,10 @@ import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import javax.persistence.*;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.List;
+import java.util.Date;
 
 @Entity
 @Table(name = "Event", uniqueConstraints = {
@@ -13,6 +16,18 @@ import java.util.List;
 @JsonIgnoreProperties(ignoreUnknown=true)
 @JsonAutoDetect(fieldVisibility= JsonAutoDetect.Visibility.ANY)
 public class Event {
+
+//    @Basic
+//    @Temporal(TemporalType.DATE)
+//    private Date sqlDate;
+//
+//    public void setUtilDate(String sqlDate) throws ParseException {
+//        this.sqlDate = new SimpleDateFormat("yyyy-MM-dd").parse(sqlDate);
+//    }
+//
+//    public Date getUtilDate() throws ParseException {
+//        return sqlDate;
+//    }
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)

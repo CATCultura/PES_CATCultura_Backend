@@ -15,12 +15,12 @@ public class Request {
     @EmbeddedId
     private RequestId requestId;
 
+    @MapsId("requesterId")
     @ManyToOne
-    @JoinColumn(name="requester")
     private User requester;
 
+    @MapsId("friendId")
     @ManyToOne
-    @JoinColumn(name="friend")
     private User friend;
 
     Request() {}
@@ -29,6 +29,7 @@ public class Request {
         this.requestId = new RequestId(requester.getId(),friend.getId());
         this.requester = requester;
         this.friend = friend;
+
     }
 
     public User getRequester() {
