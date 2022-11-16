@@ -2,9 +2,11 @@ package cat.cultura.backend.service;
 
 import cat.cultura.backend.entity.Request;
 import cat.cultura.backend.entity.User;
+import cat.cultura.backend.exceptions.RequestNotFoundException;
 import cat.cultura.backend.exceptions.UserNotFoundException;
 import cat.cultura.backend.repository.RequestJpaRepository;
 import cat.cultura.backend.repository.UserJpaRepository;
+import cat.cultura.backend.utils.RequestId;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -38,7 +40,7 @@ public class RequestService {
     public void removeFriendRequestsTo(Long userId, Long friendId) {
         User user = userRepo.findById(userId).orElseThrow(UserNotFoundException::new);
         User friend = userRepo.findById(friendId).orElseThrow(UserNotFoundException::new);
-        Request f1 = new Request(user,friend);
+        Request f1 = requestRepo.findByRequestId(new RequestId(userId,friendId)).orElseThrow(RequestNotFoundException::new);
         user.removeFriendRequestTo(f1);
         friend.removeFriendRequestFrom(f1);
         userRepo.save(user);

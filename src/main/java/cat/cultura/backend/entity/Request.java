@@ -15,12 +15,12 @@ public class Request {
     @EmbeddedId
     private RequestId requestId;
 
+    @MapsId("requesterId")
     @ManyToOne
-    @JoinColumn(name="requester")
     private User requester;
 
+    @MapsId("friendId")
     @ManyToOne
-    @JoinColumn(name="friend")
     private User friend;
 
     Request() {}
