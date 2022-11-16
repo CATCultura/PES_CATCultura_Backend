@@ -26,8 +26,8 @@ public class User {
     @Column(name="email")
     private String email;
 
-    @Column(name="pass")
-    private String pass;
+    @Column(name="password")
+    private String password;
 
     @Column(name="creationDate")
     private String creationDate;
@@ -106,12 +106,12 @@ public class User {
         this.email = email;
     }
 
-    public String getPass() {
-        return pass;
+    public String getPassword() {
+        return password;
     }
 
-    public void setPass(String pass) {
-        this.pass = pass;
+    public void setPassword(String password) {
+        this.password = password;
     }
 
     public List<Event> getAttendance() { return attendance; }

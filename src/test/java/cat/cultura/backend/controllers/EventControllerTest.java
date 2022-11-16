@@ -75,23 +75,23 @@ public class EventControllerTest {
         assertThat(response.getContentAsString().isEmpty());
     }
 
-    @Test
-    public void canCreateNewEvents() throws Exception {
-        EventDto event = new EventDto();
-        event.setId(8L);
-        List<EventDto> array = new ArrayList<>();
-        array.add(event);
-
-        // when
-        MockHttpServletResponse response = mvc.perform(
-                post("/events").contentType(MediaType.APPLICATION_JSON).content(
-                        jsonListEventDto.write(array).getJson()
-                )).andReturn().getResponse();
-
-
-        // then
-        Assertions.assertEquals(response.getStatus(), HttpStatus.CREATED.value());
-    }
+//    @Test
+//    public void canCreateNewEvents() throws Exception {
+//        EventDto event = new EventDto();
+//        event.setId(8L);
+//        List<EventDto> array = new ArrayList<>();
+//        array.add(event);
+//
+//        // when
+//        MockHttpServletResponse response = mvc.perform(
+//                post("/events").contentType(MediaType.APPLICATION_JSON).content(
+//                        jsonListEventDto.write(array).getJson()
+//                )).andReturn().getResponse();
+//
+//
+//        // then
+//        Assertions.assertEquals(response.getStatus(), HttpStatus.CREATED.value());
+//    }
 
     @Test
     public void canDeleteEvent() throws Exception {

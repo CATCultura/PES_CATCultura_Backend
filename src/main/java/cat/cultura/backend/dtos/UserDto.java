@@ -10,21 +10,24 @@ public class UserDto {
     private String username;
     private String nameAndSurname;
     private String email;
-    private String pass;
     private String creationDate;
+
+    private String password;
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
+    }
+
     private int points;
 
     //    private List<Event> favourites = new ArrayList<>();
 //    private List<Trophy> trophies = new ArrayList<>();
 //    private List<Event> attendance = new ArrayList<>();
 //    private List<User> friends = new ArrayList<>();
-    public String getPass() {
-        return pass;
-    }
-
-    public void setPass(String pass) {
-        this.pass = pass;
-    }
 
     public Long getId() {
         return id;
@@ -56,14 +59,6 @@ public class UserDto {
 
     public void setEmail(String email) {
         this.email = email;
-    }
-
-    public String getPassword() {
-        return pass;
-    }
-
-    public void setPassword(String password) {
-        this.pass = password;
     }
 
     public String getCreationDate() {

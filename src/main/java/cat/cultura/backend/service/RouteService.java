@@ -10,6 +10,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 
 @Service
@@ -31,11 +33,12 @@ public class RouteService {
         Coordinate down = Coordinate.calcEndPoint(x,radius,270);
         Coordinate left = Coordinate.calcEndPoint(x,radius,180);
         Coordinate right = Coordinate.calcEndPoint(x,radius,0);
-        List<Event> events = eventRepo.
-                getEventsByDayAndLocation(day1, day2, up.getLat(), up.getLon(), down.getLat(), down.getLon(),
-                        left.getLat(), left.getLon(), right.getLat(), right.getLon());
-        //events.sortByNumberOfMatches(favouriteTags);
-        List<Event> result = events.subList(0,2);
-        return result;
+//        List<Event> events = eventRepo.
+//                getEventsByDayAndLocation(day1, day2, up.getLat(), up.getLon(), down.getLat(), down.getLon(),
+//                        left.getLat(), left.getLon(), right.getLat(), right.getLon());
+//        //events.sortByNumberOfMatches(favouriteTags);
+//        List<Event> result = events.subList(0,2);
+//        return result;
+        return Collections.emptyList();
     }
 }
