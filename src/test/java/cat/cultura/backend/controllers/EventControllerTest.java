@@ -1,4 +1,4 @@
-package cat.cultura.backend.unitTest.controllers;
+package cat.cultura.backend.controllers;
 
 import cat.cultura.backend.dtos.EventDto;
 import cat.cultura.backend.entity.Event;
@@ -78,7 +78,7 @@ public class EventControllerTest {
     @Test
     public void canCreateNewEvents() throws Exception {
         EventDto event = new EventDto();
-        event.setId(2L);
+        event.setId(8L);
         List<EventDto> array = new ArrayList<>();
         array.add(event);
 

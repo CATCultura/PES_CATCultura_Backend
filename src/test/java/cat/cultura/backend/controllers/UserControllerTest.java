@@ -1,4 +1,4 @@
-package cat.cultura.backend.unitTest.controllers;
+package cat.cultura.backend.controllers;
 
 import cat.cultura.backend.dtos.UserDto;
 import cat.cultura.backend.entity.User;

@@ -1,4 +1,4 @@
-package cat.cultura.backend.unitTest.services;
+package cat.cultura.backend.services;
 
 import cat.cultura.backend.entity.Trophy;
 import cat.cultura.backend.repository.TrophyJpaRepository;
