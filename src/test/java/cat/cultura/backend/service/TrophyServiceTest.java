@@ -1,4 +1,4 @@
-package cat.cultura.backend.unitTest.services;
+package cat.cultura.backend.service;
 
 import cat.cultura.backend.entity.Trophy;
 import cat.cultura.backend.repository.TrophyJpaRepository;
@@ -16,7 +16,7 @@ import java.util.List;
 import static org.mockito.BDDMockito.given;
 
 @SpringBootTest
-public class TrophyServiceTest {
+class TrophyServiceTest {
     @Autowired
     TrophyService trophyService;
 
@@ -24,7 +24,7 @@ public class TrophyServiceTest {
     TrophyJpaRepository trophyJpaRepository;
 
     @Test
-    public void saveTrophyTest() {
+    void saveTrophyTest() {
         Trophy trophy = new Trophy();
         trophy.setId(3L);
         given(trophyJpaRepository.save(trophy)).willReturn(trophy);
@@ -34,7 +34,7 @@ public class TrophyServiceTest {
     }
 
     @Test
-    public void getTrophiesTest() {
+    void getTrophiesTest() {
         Trophy trophy = new Trophy();
         trophy.setId(3L);
         List<Trophy> trophies = new ArrayList<>();

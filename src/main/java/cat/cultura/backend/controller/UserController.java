@@ -1,6 +1,7 @@
 package cat.cultura.backend.controller;
 
 import cat.cultura.backend.dtos.EventDto;
+import cat.cultura.backend.dtos.LoggedUserDto;
 import cat.cultura.backend.dtos.TrophyDto;
 import cat.cultura.backend.dtos.UserDto;
 import cat.cultura.backend.entity.Event;
@@ -17,9 +18,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
 @RestController
 public class UserController {
@@ -42,8 +41,35 @@ public class UserController {
     @Autowired
     private ModelMapper modelMapper;
 
-    //Post, Get, Put, and Delete for all UserDto properties (see class UserDto)
 
+    @GetMapping("/auth")
+    public ResponseEntity<LoggedUserDto> authenticate(@RequestHeader("Authorization") String credentials) {
+        User currentUser;
+        String[] s = credentials.split(",");
+        Map<String,String> credentialMap = new HashMap<>();
+        for (String field : s) {
+            String[] currentInfo = field.split("=");
+            assert currentInfo.length == 2;
+            credentialMap.put(currentInfo[0], currentInfo[1]);
+        }
+        try {
+        currentUser = userService.getUserByUsername(credentialMap.get("username"));
+        } catch (UserNotFoundException u) {
+            return new ResponseEntity<>(new LoggedUserDto(), HttpStatus.NOT_FOUND);
+        }
+        if (credentialMap.get("password").equals(currentUser.getPassword())) {
+            LoggedUserDto loggedUserDto = new LoggedUserDto();
+            loggedUserDto.setUserHash(currentUser.getUserHash());
+            return new ResponseEntity<>(loggedUserDto, HttpStatus.ACCEPTED);
+        }
+        else {
+            return new ResponseEntity<>(new LoggedUserDto(), HttpStatus.UNAUTHORIZED);
+        }
+
+    }
+
+
+    //Post, Get, Put, and Delete for all UserDto properties (see class UserDto)
     @PostMapping("/users")
     public ResponseEntity<UserDto> addUser(@RequestBody UserDto user) {
         User userEntity = convertUserDtoToEntity(user);

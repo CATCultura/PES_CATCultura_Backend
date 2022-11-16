@@ -1,4 +1,4 @@
-package cat.cultura.backend.unitTest.services;
+package cat.cultura.backend.service;
 
 
 import cat.cultura.backend.entity.Event;

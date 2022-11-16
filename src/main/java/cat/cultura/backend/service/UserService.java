@@ -9,6 +9,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 
@@ -23,14 +24,18 @@ public class UserService {
 
     public User createUser(User user) {
         user.setCreationDate(new SimpleDateFormat("dd/MM/yyyy HH:mm:ss").format(Calendar.getInstance().getTime()));
-        return userRepo.save(user);
+        User createdUser = userRepo.save(user);
+        createdUser.createUserHash();
+        userRepo.save(createdUser);
+        return createdUser;
     }
 
     public List<User> createUsers(List<User> users) {
+        List<User> result = new ArrayList<>();
         for(User user : users) {
-            user.setCreationDate(new SimpleDateFormat("dd/MM/yyyy HH:mm:ss").format(Calendar.getInstance().getTime()));
+            result.add(createUser(user));
         }
-        return userRepo.saveAll(users);
+        return result;
     }
 
     public User getUserById(Long id) {

@@ -8,7 +8,9 @@ import javax.persistence.*;
 import java.util.*;
 
 @Entity
-@Table(name = "User")
+@Table(name = "User", indexes = {
+        @Index(name = "idx_user_user_hash", columnList = "user_hash")
+})
 @JsonIgnoreProperties(ignoreUnknown=true)
 @JsonAutoDetect(fieldVisibility= JsonAutoDetect.Visibility.ANY)
 public class User {
@@ -20,14 +22,17 @@ public class User {
     @Column(name="username", unique = true)
     private String username;
 
+    @Column(name="user_hash", unique = true)
+    private int userHash;
+
     @Column(name="name_and_surname")
     private String nameAndSurname;
 
     @Column(name="email")
     private String email;
 
-    @Column(name="pass")
-    private String pass;
+    @Column(name="password")
+    private String password;
 
     @Column(name="creationDate")
     private String creationDate;
@@ -106,12 +111,12 @@ public class User {
         this.email = email;
     }
 
-    public String getPass() {
-        return pass;
+    public String getPassword() {
+        return password;
     }
 
-    public void setPass(String pass) {
-        this.pass = pass;
+    public void setPassword(String password) {
+        this.password = password;
     }
 
     public List<Event> getAttendance() { return attendance; }
@@ -265,4 +270,16 @@ public class User {
         }
         return users;
     }
+
+    public int createUserHash() {
+        if (this.id == null || this.username == null)
+            throw new AssertionError("Required fields are null");
+        this.userHash = this.id.hashCode() + this.username.hashCode();
+        return this.userHash;
+    }
+
+    public int getUserHash() {
+        return userHash;
+    }
+
 }
