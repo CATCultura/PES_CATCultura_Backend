@@ -29,6 +29,7 @@ public class Request {
         this.requestId = new RequestId(requester.getId(),friend.getId());
         this.requester = requester;
         this.friend = friend;
+
     }
 
     public User getRequester() {

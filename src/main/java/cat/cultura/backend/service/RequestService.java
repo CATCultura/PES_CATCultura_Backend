@@ -46,6 +46,7 @@ public class RequestService {
         userRepo.save(user);
         userRepo.save(friend);
         requestRepo.delete(f1);
+
     }
 
     public List<User> getRequestsTo(Long userId){

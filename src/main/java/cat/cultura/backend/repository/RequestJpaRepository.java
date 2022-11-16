@@ -9,4 +9,5 @@ import java.util.Optional;
 public interface RequestJpaRepository extends JpaRepository<Request, RequestId> {
 
     Optional<Request> findByRequestId(RequestId requestId);
+
 }

@@ -206,6 +206,7 @@ public class User {
     public void removeFriendRequestTo(Request fd) {
         if (!requestsTo.contains(fd)) throw new AssertionError("Request does not exist");
         requestsTo.remove(fd);
+
     }
 
     public void addFriendRequestFrom(Request fd) {
