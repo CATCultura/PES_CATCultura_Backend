@@ -35,10 +35,11 @@ class UserServiceTest {
     @Test
     void createUserTest() throws Exception {
         User manolo = new User("Manolo");
+        manolo.setId(12L);
         given(userRepo.save(manolo)).willReturn(manolo);
 
         User client = userService.createUser(manolo);
-        assertEquals("Manolo", client.getUsername());
+        assertEquals(manolo.getUsername(), client.getUsername());
     }
 
     @Test
