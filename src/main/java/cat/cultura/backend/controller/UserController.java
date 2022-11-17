@@ -228,6 +228,7 @@ public class UserController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(as.getMessage());
         }
         return ResponseEntity.status(HttpStatus.OK).body("Friend removed");
+
     }
 
     //Dto conversion functions

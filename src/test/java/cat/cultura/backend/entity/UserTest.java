@@ -205,8 +205,6 @@ class UserTest {
         Trophy t2 = new Trophy();
         t1.setName("TopTop");
         t2.setName("Horrible");
-        List<Trophy> expected = new ArrayList<>();
-        expected.add(t1);
         u.addTrophy(t1);
         u.addTrophy(t2);
         u.removeTrophy(t2);
