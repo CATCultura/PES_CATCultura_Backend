@@ -11,6 +11,9 @@ import java.util.*;
 @RestController
 public class TagController {
 
+    public static final String AMBITS = "ambits";
+    public static final String CATEGORIES = "categories";
+    public static final String ALTRES_CATEGORIES = "altresCategories";
     @Autowired
     private EventService eventService;
 
@@ -19,23 +22,19 @@ public class TagController {
         List<Event> eventList = eventService.getEvents();
         HashMap<String, Set<String>> tags = new HashMap<>();
 
-        String ambits = "ambits";
-        String categories = "categories";
-        String altresCategories = "altresCategories";
-
-        tags.put(ambits, new HashSet<>());
-        tags.put(categories, new HashSet<>());
-        tags.put(altresCategories, new HashSet<>());
+        tags.put(AMBITS, new HashSet<>());
+        tags.put(CATEGORIES, new HashSet<>());
+        tags.put(ALTRES_CATEGORIES, new HashSet<>());
 
         for (Event e : eventList) {
             for (String tag : e.getTagsAmbits())
-                tags.get(ambits).add(tag);
+                tags.get(AMBITS).add(tag);
 
             for (String tag : e.getTagsCateg())
-                tags.get(categories).add(tag);
+                tags.get(CATEGORIES).add(tag);
 
             for (String tag : e.getTagsAltresCateg())
-                tags.get(altresCategories).add(tag);
+                tags.get(ALTRES_CATEGORIES).add(tag);
         }
         return tags;
     }
