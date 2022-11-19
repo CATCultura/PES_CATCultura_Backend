@@ -12,6 +12,16 @@ public class UserDto {
     private String email;
     private String creationDate;
 
+    private String password;
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
+    }
+
     private int points;
 
     //    private List<Event> favourites = new ArrayList<>();

@@ -70,10 +70,10 @@ public class UserController {
 
     //Post, Get, Put, and Delete for all UserDto properties (see class UserDto)
     @PostMapping("/users")
-    public ResponseEntity<UserDto> addUser(@RequestBody UserDto user) {
+    public ResponseEntity<LoggedUserDto> addUser(@RequestBody UserDto user) {
         User userEntity = convertUserDtoToEntity(user);
         User userCreated = userService.createUser(userEntity);
-        return ResponseEntity.status(HttpStatus.CREATED).body(convertUserToDto(userCreated));
+        return ResponseEntity.status(HttpStatus.CREATED).body(convertUserToLoggedUserDto(userCreated));
     }
 
     @GetMapping("/users")
@@ -234,11 +234,13 @@ public class UserController {
 
     private UserDto convertUserToDto(User user) {
         UserDto userDto = modelMapper.map(user, UserDto.class);
+        userDto.setPassword(null);
         return userDto;
     }
 
     private LoggedUserDto convertUserToLoggedUserDto(User user) {
         LoggedUserDto userDto = modelMapper.map(user, LoggedUserDto.class);
+        userDto.setPassword(null);
         for (Event e : user.getFavourites()) {
             userDto.addFavourite(e.getId());
         }
