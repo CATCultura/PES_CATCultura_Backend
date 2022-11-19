@@ -8,8 +8,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import javax.xml.stream.Location;
-import java.util.ArrayList;
 import java.util.List;
 
 @Service

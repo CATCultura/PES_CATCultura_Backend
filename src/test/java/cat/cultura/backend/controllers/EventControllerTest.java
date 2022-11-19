@@ -11,6 +11,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.json.JacksonTester;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockHttpServletResponse;
@@ -28,7 +29,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 @AutoConfigureJsonTesters
 @SpringBootTest
 @AutoConfigureMockMvc
-public class EventControllerTest {
+class EventControllerTest {
     @Autowired
     private MockMvc mvc;
 
@@ -42,7 +43,7 @@ public class EventControllerTest {
     private JacksonTester<List<EventDto>> jsonListEventDto;
 
     @Test
-    public void canRetrieveByIdWhenExists() throws Exception {
+    void canRetrieveByIdWhenExists() throws Exception {
         // given
         Event event = new Event();
         event.setId(2L);
@@ -61,7 +62,7 @@ public class EventControllerTest {
     }
 
     @Test
-    public void canRetrieveByIdWhenDoesNotExist() throws Exception {
+    void canRetrieveByIdWhenDoesNotExist() throws Exception {
         // given
         given(eventService.getEventById(2L)).willThrow(new EventNotFoundException());
 
@@ -72,7 +73,7 @@ public class EventControllerTest {
 
         // then
         Assertions.assertEquals(response.getStatus(), HttpStatus.NOT_FOUND.value());
-        assertThat(response.getContentAsString().isEmpty());
+//        assertThat(response.getContentAsString().isEmpty());
     }
 
 //    @Test
@@ -94,23 +95,23 @@ public class EventControllerTest {
 //    }
 
     @Test
-    public void canDeleteEvent() throws Exception {
+    void canDeleteEvent() throws Exception {
         // when
         MockHttpServletResponse response = mvc.perform(
-                delete("/events/2").accept(MediaType.APPLICATION_JSON)).andReturn().getResponse();
+                delete("/events/2").accept(MediaType.APPLICATION_JSON).header(HttpHeaders.AUTHORIZATION,"somthg")).andReturn().getResponse();
 
         // then
         Assertions.assertEquals(response.getStatus(), HttpStatus.OK.value());
     }
 
     @Test
-    public void canDeleteEventWhenTheyDoNotExist() throws Exception {
+    void canDeleteEventWhenTheyDoNotExist() throws Exception {
         // given
         doThrow(new EventNotFoundException()).when(eventService).deleteEvent(800L);
 
         // when
         MockHttpServletResponse response = mvc.perform(
-                delete("/events/800").accept(MediaType.APPLICATION_JSON)).andReturn().getResponse();
+                delete("/events/800").accept(MediaType.APPLICATION_JSON).header(HttpHeaders.AUTHORIZATION,"somthg")).andReturn().getResponse();
 
         // then
         Assertions.assertEquals(response.getStatus(), HttpStatus.NOT_FOUND.value());

@@ -1,4 +1,4 @@
-package cat.cultura.backend.services;
+package cat.cultura.backend.service;
 
 import cat.cultura.backend.entity.Event;
 import cat.cultura.backend.entity.User;
@@ -6,6 +6,7 @@ import cat.cultura.backend.exceptions.UserNotFoundException;
 import cat.cultura.backend.repository.UserJpaRepository;
 import cat.cultura.backend.service.UserService;
 import org.junit.Before;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,23 +26,24 @@ import static org.junit.Assert.*;
 import static org.mockito.BDDMockito.given;
 
 @SpringBootTest
-public class UserServiceTest {
+class UserServiceTest {
     @Autowired
     private UserService userService;
     @MockBean
     private UserJpaRepository userRepo;
 
     @Test
-    public void createUserTest() throws Exception {
+    void createUserTest() throws Exception {
         User manolo = new User("Manolo");
+        manolo.setId(12L);
         given(userRepo.save(manolo)).willReturn(manolo);
 
         User client = userService.createUser(manolo);
-        assertEquals("Manolo", client.getUsername());
+        assertEquals(manolo.getUsername(), client.getUsername());
     }
 
     @Test
-    public void getUserByIdTest() throws Exception {
+    void getUserByIdTest() throws Exception {
         User manolo = new User("Manolo");
         manolo.setId(2L);
         given(userRepo.findById(2L)).willReturn(Optional.of(manolo));
@@ -51,7 +53,7 @@ public class UserServiceTest {
     }
 
     @Test
-    public void getUserByIdIfTheUserDoesNotExistTest() throws Exception {
+    void getUserByIdIfTheUserDoesNotExistTest() throws Exception {
         given(userRepo.findById(2L)).willReturn(Optional.empty());
 
         assertThrows(
@@ -61,7 +63,7 @@ public class UserServiceTest {
     }
 
     @Test
-    public void getUserByUsernameTest() throws Exception {
+    void getUserByUsernameTest() throws Exception {
         User manolo = new User("Manolo");
         manolo.setId(2L);
         given(userRepo.findByUsername("Manolo")).willReturn(Optional.of(manolo));
@@ -71,7 +73,7 @@ public class UserServiceTest {
     }
 
     @Test
-    public void getUserByUsernameIfTheUserDoesNotExistTest() throws Exception {
+    void getUserByUsernameIfTheUserDoesNotExistTest() throws Exception {
         given(userRepo.findByUsername("Manolo")).willReturn(Optional.empty());
 
         assertThrows(
@@ -81,7 +83,7 @@ public class UserServiceTest {
     }
 
     @Test
-    public void updateUserTest() throws Exception {
+    void updateUserTest() throws Exception {
         User manolo = new User("Manolo");
         given(userRepo.save(manolo)).willReturn(manolo);
 
@@ -90,7 +92,7 @@ public class UserServiceTest {
     }
 
     @Test
-    public void getFavouriteEventsByIdTest() throws Exception {
+    void getFavouriteEventsByIdTest() throws Exception {
         User manolo = new User("Manolo");
         manolo.setId(2L);
         Event favourite = new Event();
@@ -105,7 +107,7 @@ public class UserServiceTest {
     }
 
     @Test
-    public void getFavouriteEventsByIdIfTheUserDoesNotExistTest() throws Exception {
+    void getFavouriteEventsByIdIfTheUserDoesNotExistTest() throws Exception {
         Optional<User> result = Optional.empty();
         given(userRepo.findById(2L)).willReturn(result);
 
@@ -116,7 +118,7 @@ public class UserServiceTest {
     }
 
     @Test
-    public void getAttendanceEventsByIdTest() throws Exception {
+    void getAttendanceEventsByIdTest() throws Exception {
         User manolo = new User("Manolo");
         manolo.setId(2L);
         Event attendance = new Event();
@@ -131,7 +133,7 @@ public class UserServiceTest {
     }
 
     @Test
-    public void getAttendanceEventsByIdIfTheUserDoesNotExistTest() throws Exception {
+    void getAttendanceEventsByIdIfTheUserDoesNotExistTest() throws Exception {
         Optional<User> result = Optional.empty();
         given(userRepo.findById(2L)).willReturn(result);
 
@@ -142,7 +144,7 @@ public class UserServiceTest {
     }
 
     @Test
-    public void getUsersByQueryIdTest() throws Exception {
+    void getUsersByQueryIdTest() throws Exception {
         User manolo = new User("Manolo");
         manolo.setId(2L);
         List<User> users = new ArrayList<>();
@@ -156,7 +158,7 @@ public class UserServiceTest {
     }
 
     @Test
-    public void getUsersByQueryUsernameTest() throws Exception {
+    void getUsersByQueryUsernameTest() throws Exception {
         User manolo = new User("Manolo");
         manolo.setId(2L);
         List<User> users = new ArrayList<>();
@@ -170,7 +172,7 @@ public class UserServiceTest {
     }
 
     @Test
-    public void getUsersByQueryNameAndSurnameTest() throws Exception {
+    void getUsersByQueryNameAndSurnameTest() throws Exception {
         User manolo = new User("Manolo");
         manolo.setId(2L);
         manolo.setNameAndSurname("Manolo Eldelbombo");
@@ -185,7 +187,7 @@ public class UserServiceTest {
     }
 
     @Test
-    public void getUsersByQueryIfTheyDoNotExistTest() throws Exception {
+    void getUsersByQueryIfTheyDoNotExistTest() throws Exception {
         List<User> users = new ArrayList<>();
         Page<User> page = new PageImpl<>(users);
         Pageable pageable = PageRequest.of(0, 20);
@@ -194,6 +196,48 @@ public class UserServiceTest {
                 UserNotFoundException.class,
                 ()->userService.getUsersByQuery(null,null,"Manolo Eldelbombo",pageable)
         );
+    }
+
+    @Test
+    void createUser() {
+        User received = new User("pepitovadecurt");
+
+        User returnedAfterSave = new User("pepitovadecurt");
+        returnedAfterSave.setId(45L);
+
+        given(userRepo.save(received)).willReturn(returnedAfterSave);
+
+        User expected = new User("pepitovadecurt");
+        expected.setId(45L);
+        String h = expected.createUserHash();
+
+        User actualResult = userService.createUser(received);
+
+        Assertions.assertEquals(actualResult.getUserHash(), h);
+    }
+
+    @Test
+    void createUsers() {
+        User received = new User("pepitovadecurt");
+
+        User returnedAfterSave = new User("pepitovadecurt");
+        returnedAfterSave.setId(45L);
+
+        given(userRepo.save(received)).willReturn(returnedAfterSave);
+
+        List<User> usersReceived = new ArrayList<>();
+        usersReceived.add(received);
+        usersReceived.add(received);
+
+        User expected = new User("pepitovadecurt");
+        expected.setId(45L);
+        String h = expected.createUserHash();
+
+        List<User> actualResult = userService.createUsers(usersReceived);
+
+        for (User u : actualResult) {
+            Assertions.assertEquals(u.getUserHash(), h);
+        }
     }
 
 }

@@ -5,6 +5,7 @@ import cat.cultura.backend.entity.User;
 import cat.cultura.backend.service.FavouriteService;
 import cat.cultura.backend.service.RequestService;
 import cat.cultura.backend.service.UserService;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.json.AutoConfigureJsonTesters;
@@ -12,6 +13,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.json.JacksonTester;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockHttpServletResponse;
@@ -26,7 +28,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 @AutoConfigureJsonTesters
 @SpringBootTest
 @AutoConfigureMockMvc
-public class UserControllerTest {
+class UserControllerTest {
     @Autowired
     private MockMvc mvc;
 
@@ -46,7 +48,7 @@ public class UserControllerTest {
     private JacksonTester<List<UserDto>> jsonListUserDto;
 
     @Test
-    public void canRetrieveUser() throws Exception {
+    void canRetrieveUser() throws Exception {
         // given
         User user = new User();
         user.setId(2L);
@@ -54,13 +56,13 @@ public class UserControllerTest {
 
         // when
         MockHttpServletResponse response = mvc.perform(
-                        get("/users/2").accept(MediaType.APPLICATION_JSON))
+                        get("/users/2").accept(MediaType.APPLICATION_JSON).header(HttpHeaders.AUTHORIZATION,"somthg"))
                 .andReturn().getResponse();
 
         // then
-        assertEquals(response.getStatus(),HttpStatus.OK.value());
+        Assertions.assertEquals(response.getStatus(), HttpStatus.OK.value());
         UserDto userDto = new UserDto();
         userDto.setId(2L);
-        assertEquals(response.getContentAsString(),jsonUserDto.write(userDto).getJson());
+        Assertions.assertEquals(response.getContentAsString(), jsonUserDto.write(userDto).getJson());
     }
 }

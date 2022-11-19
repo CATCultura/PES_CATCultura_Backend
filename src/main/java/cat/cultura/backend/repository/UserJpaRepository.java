@@ -14,6 +14,9 @@ public interface UserJpaRepository extends JpaRepository<User, Long>{
 
     Optional<User> findByUsername(String username);
 
+    User findByUserHash(int userHash);
+
+
     @Query("select m from User m where " +
             "(?1 is null or m.id = ?1) " +
             "and (?2 is null or upper(m.username) like concat('%', upper(?2), '%'))" +

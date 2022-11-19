@@ -1,5 +1,6 @@
 package cat.cultura.backend.exceptions;
 
+
 public class TrophyNotFoundException extends RuntimeException {
 
     public TrophyNotFoundException() {
