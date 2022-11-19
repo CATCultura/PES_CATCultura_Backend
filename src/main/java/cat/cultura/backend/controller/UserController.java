@@ -58,9 +58,8 @@ public class UserController {
             return new ResponseEntity<>(new LoggedUserDto(), HttpStatus.NOT_FOUND);
         }
         if (credentialMap.get("password").equals(currentUser.getPassword())) {
-            LoggedUserDto loggedUserDto = new LoggedUserDto();
-            loggedUserDto.setUserHash(currentUser.getUserHash());
-            return new ResponseEntity<>(loggedUserDto, HttpStatus.ACCEPTED);
+            LoggedUserDto loggedUserDto = convertUserToLoggedUserDto(currentUser);
+            return new ResponseEntity<>(loggedUserDto, HttpStatus.OK);
         }
         else {
             return new ResponseEntity<>(new LoggedUserDto(), HttpStatus.UNAUTHORIZED);
@@ -235,7 +234,24 @@ public class UserController {
 
     private UserDto convertUserToDto(User user) {
         UserDto userDto = modelMapper.map(user, UserDto.class);
-        userDto.setPassword(null);
+        return userDto;
+    }
+
+    private LoggedUserDto convertUserToLoggedUserDto(User user) {
+        LoggedUserDto userDto = modelMapper.map(user, LoggedUserDto.class);
+        for (Event e : user.getFavourites()) {
+            userDto.addFavourite(e.getId());
+        }
+        for (Event e : user.getAttendance()) {
+            userDto.addAttendance(e.getId());
+        }
+        for (User u : user.getFriends()) {
+            userDto.addFriend(u.getId());
+        }
+        for (Trophy t : user.getTrophies()) {
+            userDto.addTrophy(t.getId());
+        }
+
         return userDto;
     }
 

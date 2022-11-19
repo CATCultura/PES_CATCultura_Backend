@@ -5,6 +5,9 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 
 import javax.persistence.*;
+import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.*;
 
 @Entity
@@ -23,7 +26,7 @@ public class User {
     private String username;
 
     @Column(name="user_hash", unique = true)
-    private int userHash;
+    private String userHash;
 
     @Column(name="name_and_surname")
     private String nameAndSurname;
@@ -272,15 +275,35 @@ public class User {
         return users;
     }
 
-    public int createUserHash() {
+    public String createUserHash() {
         if (this.id == null || this.username == null)
             throw new AssertionError("Required fields are null");
-        this.userHash = this.id.hashCode() + this.username.hashCode();
+        MessageDigest digest;
+        try {
+            digest = MessageDigest.getInstance("SHA3-256");
+        } catch (NoSuchAlgorithmException e) {
+            throw new RuntimeException(e);
+        }
+        String toHash = this.id.toString()+this.username;
+        this.userHash = bytesToHex(digest.digest(toHash.getBytes(StandardCharsets.UTF_8)));
+        
         return this.userHash;
     }
 
-    public int getUserHash() {
+    public String getUserHash() {
         return userHash;
+    }
+
+    private static String bytesToHex(byte[] hash) {
+        StringBuilder hexString = new StringBuilder(2 * hash.length);
+        for (int i = 0; i < hash.length; i++) {
+            String hex = Integer.toHexString(0xff & hash[i]);
+            if(hex.length() == 1) {
+                hexString.append('0');
+            }
+            hexString.append(hex);
+        }
+        return hexString.toString();
     }
 
 }

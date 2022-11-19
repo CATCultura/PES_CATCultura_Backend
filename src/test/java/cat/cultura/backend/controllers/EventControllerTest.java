@@ -11,6 +11,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.json.JacksonTester;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockHttpServletResponse;
@@ -72,7 +73,7 @@ class EventControllerTest {
 
         // then
         Assertions.assertEquals(response.getStatus(), HttpStatus.NOT_FOUND.value());
-        assertThat(response.getContentAsString().isEmpty());
+//        assertThat(response.getContentAsString().isEmpty());
     }
 
 //    @Test
@@ -97,7 +98,7 @@ class EventControllerTest {
     void canDeleteEvent() throws Exception {
         // when
         MockHttpServletResponse response = mvc.perform(
-                delete("/events/2").accept(MediaType.APPLICATION_JSON)).andReturn().getResponse();
+                delete("/events/2").accept(MediaType.APPLICATION_JSON).header(HttpHeaders.AUTHORIZATION,"somthg")).andReturn().getResponse();
 
         // then
         Assertions.assertEquals(response.getStatus(), HttpStatus.OK.value());
@@ -110,7 +111,7 @@ class EventControllerTest {
 
         // when
         MockHttpServletResponse response = mvc.perform(
-                delete("/events/800").accept(MediaType.APPLICATION_JSON)).andReturn().getResponse();
+                delete("/events/800").accept(MediaType.APPLICATION_JSON).header(HttpHeaders.AUTHORIZATION,"somthg")).andReturn().getResponse();
 
         // then
         Assertions.assertEquals(response.getStatus(), HttpStatus.NOT_FOUND.value());

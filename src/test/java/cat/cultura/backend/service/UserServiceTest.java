@@ -209,7 +209,7 @@ class UserServiceTest {
 
         User expected = new User("pepitovadecurt");
         expected.setId(45L);
-        int h = expected.createUserHash();
+        String h = expected.createUserHash();
 
         User actualResult = userService.createUser(received);
 
@@ -231,7 +231,7 @@ class UserServiceTest {
 
         User expected = new User("pepitovadecurt");
         expected.setId(45L);
-        int h = expected.createUserHash();
+        String h = expected.createUserHash();
 
         List<User> actualResult = userService.createUsers(usersReceived);
 
