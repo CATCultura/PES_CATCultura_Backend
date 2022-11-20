@@ -2,6 +2,8 @@ package cat.cultura.backend.service;
 
 import cat.cultura.backend.entity.Request;
 import cat.cultura.backend.entity.User;
+import cat.cultura.backend.exceptions.FriendAlreadyAddedException;
+import cat.cultura.backend.exceptions.RequestAlreadyAddedException;
 import cat.cultura.backend.exceptions.RequestNotFoundException;
 import cat.cultura.backend.exceptions.UserNotFoundException;
 import cat.cultura.backend.repository.RequestJpaRepository;
@@ -25,28 +27,34 @@ public class RequestService {
     }
 
     @Transactional(rollbackFor=Exception.class)
-    public void addFriendRequestsTo(Long userId, Long friendId) {
+    public void addFriend(Long userId, Long friendId) {
         User user = userRepo.findById(userId).orElseThrow(UserNotFoundException::new);
         User friend = userRepo.findById(friendId).orElseThrow(UserNotFoundException::new);
-        Request f1 = new Request(user,friend);
-        user.addFriendRequestTo(f1);
-        friend.addFriendRequestFrom(f1);
-        requestRepo.save(f1);
-        userRepo.save(user);
-        userRepo.save(friend);
+        if (user.hasFriend(friend)) throw new FriendAlreadyAddedException();
+
+        Request r = requestRepo.findByRequestId(new RequestId(friendId,userId)).orElse(null);
+        if (r == null) {
+            if (requestRepo.findByRequestId(new RequestId(userId,friendId)).orElse(null) == null) {
+                Request f1 = new Request(user, friend);
+                requestRepo.save(f1);
+            }
+            else throw new RequestAlreadyAddedException();
+        }
+        else {
+            requestRepo.delete(r);
+            user.addFriend(friend);
+        }
     }
 
     @Transactional(rollbackFor=Exception.class)
     public void removeFriendRequestsTo(Long userId, Long friendId) {
         User user = userRepo.findById(userId).orElseThrow(UserNotFoundException::new);
         User friend = userRepo.findById(friendId).orElseThrow(UserNotFoundException::new);
-        Request f1 = requestRepo.findByRequestId(new RequestId(userId,friendId)).orElseThrow(RequestNotFoundException::new);
-        user.removeFriendRequestTo(f1);
-        friend.removeFriendRequestFrom(f1);
-        userRepo.save(user);
-        userRepo.save(friend);
-        requestRepo.delete(f1);
-
+        if (user.hasFriend(friend)) user.removeFriend(friend);
+        else {
+            Request f1 = requestRepo.findByRequestId(new RequestId(userId,friendId)).orElseThrow(RequestNotFoundException::new);
+            requestRepo.delete(f1);
+        }
     }
 
     public List<User> getRequestsTo(Long userId){
