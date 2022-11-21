@@ -25,6 +25,7 @@ public class User {
     @Column(name="username", unique = true)
     private String username;
 
+    @Lob
     @Column(name="user_hash", unique = true)
     private String userHash;
 
