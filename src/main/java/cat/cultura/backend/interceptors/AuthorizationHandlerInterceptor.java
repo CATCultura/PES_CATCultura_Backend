@@ -10,6 +10,7 @@ public class AuthorizationHandlerInterceptor implements HandlerInterceptor {
 
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws UnauthorizedException{
+        if (request.getRequestURI().contains("/documentation") || request.getRequestURI().contains("/swagger") || request.getRequestURI().contains("api-docs")) return true;
         if (request.getRequestURI().endsWith("/insert")) return true;
         if ((request.getRequestURI().contains("/events") || request.getRequestURI().contains("/tags")) && request.getMethod().equals("GET")) return true;
         else if (request.getRequestURI().endsWith("/users") && request.getMethod().equals("POST")) return true;
