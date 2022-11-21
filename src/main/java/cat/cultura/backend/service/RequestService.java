@@ -30,6 +30,7 @@ public class RequestService {
     public void addFriend(Long userId, Long friendId) {
         User user = userRepo.findById(userId).orElseThrow(UserNotFoundException::new);
         User friend = userRepo.findById(friendId).orElseThrow(UserNotFoundException::new);
+
         if (user.hasFriend(friend)) throw new FriendAlreadyAddedException();
 
         Request r = requestRepo.findByRequestId(new RequestId(friendId,userId)).orElse(null);
