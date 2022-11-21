@@ -211,5 +211,74 @@ class UserTest {
         Assertions.assertThrows(AssertionError.class, () -> u.removeTrophy(t2));
     }
 
+    @Test
+    void hasFriendFalseTest() {
+        User u1 = new User("Joan");
+        User u2 = new User("Pep");
+
+        Assertions.assertFalse(u1.hasFriend(u2));
+    }
+
+    @Test
+    void hasFriendTrueTest() {
+        User u1 = new User("Joan");
+        User u2 = new User("Pep");
+
+        u1.addFriend(u2);
+
+        Assertions.assertTrue(u1.hasFriend(u2));
+    }
+
+    @Test
+    void addFriendOkTest() {
+        User u1 = new User("Joan");
+        User u2 = new User("Pep");
+
+        u1.addFriend(u2);
+
+        Assertions.assertTrue(u1.hasFriend(u2) && u2.hasFriend(u1));
+    }
+
+    @Test
+    void addFriendSeveralTimesTest() {
+        User u1 = new User("Joan");
+        User u2 = new User("Pep");
+
+        u1.addFriend(u2);
+        u1.addFriend(u2);
+        u1.addFriend(u2);
+        u1.addFriend(u2);
+
+        Assertions.assertEquals(1,u1.getFriends().size());
+    }
+
+    @Test
+    void addSelfFriendTest() {
+        User u1 = new User("Joan");
+
+        Assertions.assertThrows(AssertionError.class, () -> u1.addFriend(u1));
+    }
+
+    @Test
+    void removeFriendTest() {
+        User u1 = new User("Joan");
+        User u2 = new User("Pep");
+
+        u1.addFriend(u2);
+        u1.removeFriend(u2);
+
+        Assertions.assertFalse(u1.hasFriend(u2) && u2.hasFriend(u1));
+    }
+
+    @Test
+    void removeNotFriendTest() {
+        User u1 = new User("Joan");
+        User u2 = new User("Pep");
+
+        u1.removeFriend(u2);
+
+        Assertions.assertFalse(u1.hasFriend(u2) && u2.hasFriend(u1));
+    }
+
 
 }

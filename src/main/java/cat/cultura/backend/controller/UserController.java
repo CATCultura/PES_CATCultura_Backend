@@ -202,7 +202,7 @@ public class UserController {
     @PutMapping("/users/{id}/friends/{friendId}")
     public ResponseEntity<String> addRequestsTo(@PathVariable Long id, @PathVariable Long friendId) {
         try {
-            requestService.addFriendRequestsTo(id,friendId);
+            requestService.addFriend(id,friendId);
         } catch (AssertionError as) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(as.getMessage());
         }
