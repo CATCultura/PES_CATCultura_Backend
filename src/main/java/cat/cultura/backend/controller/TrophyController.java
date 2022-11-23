@@ -39,7 +39,7 @@ public class TrophyController {
     @DeleteMapping("/trophies/{id}")
     public ResponseEntity<String> removeTrophy(@PathVariable Long id){
         trophyService.deleteTrophy(id);
-        return ResponseEntity.status(HttpStatus.OK).body("Trophy with id " + id + " deleted.");
+        return ResponseEntity.status(HttpStatus.OK).build();
     }
 
     private TrophyDto convertTrophyToDto(Trophy trophy) {

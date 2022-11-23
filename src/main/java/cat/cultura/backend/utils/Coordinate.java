@@ -4,9 +4,9 @@ public class Coordinate {
     private double lon;
     private double lat;
 
-    public Coordinate(double v, double v1) {
-        lon = v;
-        lat = v1;
+    public Coordinate(double lon, double lat) {
+        this.lon = lon;
+        this.lat = lat;
     }
 
     public double getLat() {
@@ -40,7 +40,7 @@ public class Coordinate {
         lon2 = lon1 + Math.atan2(Math.sin(radbear)*Math.sin(distance / R)*Math.cos(lat1),
                 Math.cos(distance/R)-Math.sin(lat1)*Math.sin(lat2));
 
-        // System.out.println("lat2="+lat2*DEGREES + ",lon2="+lon2*DEGREES);
+        //System.out.println("lat2="+lat2*DEGREES + ",lon2="+lon2*DEGREES);
 
         gp = new Coordinate( lon2*DEGREES, lat2*DEGREES);
 
