@@ -14,18 +14,6 @@ import java.util.List;
 @JsonAutoDetect(fieldVisibility= JsonAutoDetect.Visibility.ANY)
 public class Event {
 
-//    @Basic
-//    @Temporal(TemporalType.DATE)
-//    private Date sqlDate;
-//
-//    public void setUtilDate(String sqlDate) throws ParseException {
-//        this.sqlDate = new SimpleDateFormat("yyyy-MM-dd").parse(sqlDate);
-//    }
-//
-//    public Date getUtilDate() throws ParseException {
-//        return sqlDate;
-//    }
-
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;

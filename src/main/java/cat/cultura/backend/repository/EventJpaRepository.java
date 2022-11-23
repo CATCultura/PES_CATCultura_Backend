@@ -22,13 +22,10 @@ public interface EventJpaRepository extends JpaRepository<Event, Long> {
     List<Event> findByDenominacioLikeIgnoreCaseAllIgnoreCase(String denominacio);
 
     @Query("select m from Event m where " +
-            "(m.dataInici <= ?1) and" +
-            "(m.dataInici >= ?2) and" +
-            "((m.latitud <= ?3 and m.longitud <= ?4) or" +
-            "(m.latitud >= ?5 and m.longitud >= ?6) or" +
-            "(m.latitud <= ?7 and m.longitud <= ?8) or" +
-            "(m.latitud >= ?9 and m.longitud >= ?10))")
-    List<Event> getEventsByDayAndLocation(String day1, String day2, double lat, double lon, double lat1,
-                                          double lon1, double lat2, double lon2, double lat3, double lon3);
+            "(m.dataInici = ?1) and " +
+            "(m.longitud <= ?2 and m.longitud >= ?3) and " +
+            "(m.latitud >= ?4 and m.latitud <= ?5) "
+    )
+    List<Event> getEventsByDayAndLocation(String day1, double lon, double lon1, double lat2, double lat3);
 
 }
