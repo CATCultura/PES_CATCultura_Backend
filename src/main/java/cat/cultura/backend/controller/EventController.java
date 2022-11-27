@@ -90,6 +90,13 @@ public class EventController {
         return ResponseEntity.status(HttpStatus.OK).body(events.stream().map(this::convertEventToDto).toList());
     }
 
+    @GetMapping("/allevents")
+    public ResponseEntity<List<EventDto>> getAllEvents() {
+        List<Event> allEvents = eventService.getEvents();
+        if(allEvents.isEmpty()) throw new EventNotFoundException();
+        return ResponseEntity.status(HttpStatus.OK).body(allEvents.stream().map(this::convertEventToDto).toList());
+    }
+
     @GetMapping("/events/{id}")
     public ResponseEntity<EventDto> getEventById(@PathVariable Long id) {
         Event event = eventService.getEventById(id);
