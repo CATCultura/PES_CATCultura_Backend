@@ -2,9 +2,7 @@ package cat.cultura.backend.controller;
 
 import cat.cultura.backend.dtos.EventDto;
 import cat.cultura.backend.entity.Event;
-
 import cat.cultura.backend.exceptions.EventAlreadyCreatedException;
-import cat.cultura.backend.exceptions.EventNotFoundException;
 import cat.cultura.backend.exceptions.MissingRequiredParametersException;
 import cat.cultura.backend.service.EventService;
 import cat.cultura.backend.service.RouteService;
@@ -31,35 +29,7 @@ public class EventController {
     @Autowired
     private ModelMapper modelMapper;
 
-    @PostMapping("/insert")
-    public ResponseEntity<String> updateDB(@RequestHeader("auth-token") String authToken, @RequestBody List<EventDto> ev) {
-        if (authToken.equals("my-hash")) {
-            List<Event> eventsEntities = new ArrayList<>();
-            for (EventDto eventDto : ev) {
-                Event event = null;
-                try {
-                    event = convertEventDtoToEntity(eventDto);
-                }
-                catch (MissingRequiredParametersException ignored) {
 
-                }
-                if (event != null)
-                    eventsEntities.add(event);
-            }
-            for (Event e: eventsEntities) {
-                try {
-                    eventService.saveEvent(e);
-                }
-                catch (EventAlreadyCreatedException ignored) {
-
-                }
-            }
-            return new ResponseEntity<>("All ok", HttpStatus.OK);
-        }
-        else {
-            return new ResponseEntity<>("You've done fucked up", HttpStatus.FORBIDDEN);
-        }
-    }
 
     @PostMapping("/events")
     public ResponseEntity<List<EventDto>> addEvent(@RequestBody List<EventDto> ev) {
