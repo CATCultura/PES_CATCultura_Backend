@@ -84,7 +84,6 @@ public class UserController {
             Pageable pageable
     ) {
         Page<User> users = userService.getUsersByQuery(id, username, nameAndSurname, pageable);
-        if(users.isEmpty()) throw new UserNotFoundException();
         return ResponseEntity.status(HttpStatus.OK).body(users.stream().map(this::convertUserToDto).toList());
     }
 
@@ -110,7 +109,7 @@ public class UserController {
     @DeleteMapping("/users/{id}")
     public ResponseEntity<String> deleteUser(@PathVariable Long id){
         userService.deleteUserById(id);
-        return ResponseEntity.status(HttpStatus.OK).body("User removed");
+        return ResponseEntity.status(HttpStatus.OK).build();
     }
 
     //Put, Get and Delete for attendance of a user
@@ -138,7 +137,7 @@ public class UserController {
         } catch (AssertionError as) {
             ResponseEntity.status(HttpStatus.BAD_REQUEST).body(as.getMessage());
         }
-        return ResponseEntity.status(HttpStatus.OK).body("Event attendance removed");
+        return ResponseEntity.status(HttpStatus.OK).build();
     }
 
     //Put, Get and Delete for favourites of a user
@@ -166,7 +165,7 @@ public class UserController {
         } catch (AssertionError as) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(as.getMessage());
         }
-        return ResponseEntity.status(HttpStatus.OK).body("Favourite removed");
+        return ResponseEntity.status(HttpStatus.OK).build();
     }
 
     //Put, Get and Delete for trophies of a user
@@ -194,7 +193,7 @@ public class UserController {
         } catch (AssertionError as) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(as.getMessage());
         }
-        return ResponseEntity.status(HttpStatus.OK).body("Trophies removed");
+        return ResponseEntity.status(HttpStatus.OK).build();
     }
 
     //Put, Get and Delete for the friend requests to other users of a user
@@ -215,18 +214,17 @@ public class UserController {
         if(Objects.equals(status, "requested")) users = requestService.getRequestsTo(id);
         else if(Objects.equals(status, "received")) users = requestService.getRequestFrom(id);
         else if(Objects.equals(status, "accepted")) users = requestService.getFriends(id);
-        if(users.isEmpty()) throw new UserNotFoundException();
         return ResponseEntity.status(HttpStatus.OK).body(users.stream().map(this::convertUserToDto).toList());
     }
 
     @DeleteMapping("/users/{id}/friends/{friendId}")
-    public ResponseEntity<String> removeRequestsTo(@PathVariable Long id, @PathVariable Long friendId) {
+    public ResponseEntity removeRequestsTo(@PathVariable Long id, @PathVariable Long friendId) {
         try {
             requestService.removeFriendRequestsTo(id,friendId);
         } catch (AssertionError as) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(as.getMessage());
         }
-        return ResponseEntity.status(HttpStatus.OK).body("Friend removed");
+        return ResponseEntity.status(HttpStatus.OK).build();
 
     }
 

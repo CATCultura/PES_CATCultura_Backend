@@ -7,6 +7,7 @@ import cat.cultura.backend.exceptions.EventAlreadyCreatedException;
 import cat.cultura.backend.exceptions.EventNotFoundException;
 import cat.cultura.backend.exceptions.MissingRequiredParametersException;
 import cat.cultura.backend.service.EventService;
+import cat.cultura.backend.service.RouteService;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -23,6 +24,9 @@ public class EventController {
 
     @Autowired
     private EventService eventService;
+
+    @Autowired
+    private RouteService routeService;
 
     @Autowired
     private ModelMapper modelMapper;
@@ -86,7 +90,17 @@ public class EventController {
             Pageable pageable
     ) {
         Page<Event> events = eventService.getByQuery(id, pageable);
-        if(events.isEmpty()) throw new EventNotFoundException();
+        return ResponseEntity.status(HttpStatus.OK).body(events.stream().map(this::convertEventToDto).toList());
+    }
+
+    @GetMapping("/events/route")
+    public ResponseEntity<List<EventDto>> getEventsRoute(
+            @RequestParam(required = true) double lat,
+            @RequestParam(required = true) double lon,
+            @RequestParam(required = true) int radius,
+            @RequestParam(required = true) String day1
+    ) {
+        List<Event> events = routeService.getRouteByQuery(lat, lon, radius, day1);
         return ResponseEntity.status(HttpStatus.OK).body(events.stream().map(this::convertEventToDto).toList());
     }
 
@@ -113,7 +127,7 @@ public class EventController {
     @DeleteMapping("/events/{id}")
     public ResponseEntity<String> deleteEvent(@PathVariable Long id){
         eventService.deleteEvent(id);
-        return ResponseEntity.status(HttpStatus.OK).body("Event with id " + id + " deleted.");
+        return ResponseEntity.status(HttpStatus.OK).build();
     }
 
     private EventDto convertEventToDto(Event event) {
