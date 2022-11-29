@@ -3,6 +3,7 @@ package cat.cultura.backend.controller;
 import cat.cultura.backend.dtos.EventDto;
 import cat.cultura.backend.entity.Event;
 
+import cat.cultura.backend.entity.User;
 import cat.cultura.backend.exceptions.EventAlreadyCreatedException;
 import cat.cultura.backend.exceptions.EventNotFoundException;
 import cat.cultura.backend.exceptions.MissingRequiredParametersException;
@@ -14,6 +15,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
@@ -89,6 +91,7 @@ public class EventController {
             @RequestParam(value = "id", required = false) Long id,
             Pageable pageable
     ) {
+        Object o = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         Page<Event> events = eventService.getByQuery(id, pageable);
         return ResponseEntity.status(HttpStatus.OK).body(events.stream().map(this::convertEventToDto).toList());
     }

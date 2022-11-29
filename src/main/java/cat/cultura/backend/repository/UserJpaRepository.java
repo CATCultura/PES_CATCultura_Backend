@@ -14,7 +14,7 @@ public interface UserJpaRepository extends JpaRepository<User, Long>{
 
     Optional<User> findByUsername(String username);
 
-    User findByUserHash(int userHash);
+    User findByUserHash(String userHash);
 
 
     @Query("select m from User m where " +

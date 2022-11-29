@@ -8,18 +8,28 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-public class CurrentUser extends User implements UserDetails {
+public class CurrentUser implements UserDetails {
 
+    private final User user;
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         List<GrantedAuthority> auth = new ArrayList<>();
-        auth.add(new GrantedAuthority() {
-            @Override
-            public String getAuthority() {
-                return "USER";
-            }
-        });
+        auth.add((GrantedAuthority) () -> "USER");
         return auth;
+    }
+
+    @Override
+    public String getPassword() {
+        return user.getPassword();
+    }
+
+    @Override
+    public String getUsername() {
+        return user.getUsername();
+    }
+
+    public CurrentUser(User user) {
+        this.user = user;
     }
 
     @Override
@@ -41,4 +51,10 @@ public class CurrentUser extends User implements UserDetails {
     public boolean isEnabled() {
         return true;
     }
+
+
+    public User getUser() {
+        return this.user;
+    }
+
 }
