@@ -33,35 +33,7 @@ public class EventController {
     @Autowired
     private ModelMapper modelMapper;
 
-    @PostMapping("/insert")
-    public ResponseEntity<String> updateDB(@RequestHeader("auth-token") String authToken, @RequestBody List<EventDto> ev) {
-        if (authToken.equals("my-hash")) {
-            List<Event> eventsEntities = new ArrayList<>();
-            for (EventDto eventDto : ev) {
-                Event event = null;
-                try {
-                    event = convertEventDtoToEntity(eventDto);
-                }
-                catch (MissingRequiredParametersException ignored) {
 
-                }
-                if (event != null)
-                    eventsEntities.add(event);
-            }
-            for (Event e: eventsEntities) {
-                try {
-                    eventService.saveEvent(e);
-                }
-                catch (EventAlreadyCreatedException ignored) {
-
-                }
-            }
-            return new ResponseEntity<>("All ok", HttpStatus.OK);
-        }
-        else {
-            return new ResponseEntity<>("You've done fucked up", HttpStatus.FORBIDDEN);
-        }
-    }
 
     @PostMapping("/events")
     public ResponseEntity<List<EventDto>> addEvent(@RequestBody List<EventDto> ev) {
@@ -91,7 +63,6 @@ public class EventController {
             @RequestParam(value = "id", required = false) Long id,
             Pageable pageable
     ) {
-        Object o = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         Page<Event> events = eventService.getByQuery(id, pageable);
         return ResponseEntity.status(HttpStatus.OK).body(events.stream().map(this::convertEventToDto).toList());
     }
@@ -105,13 +76,6 @@ public class EventController {
     ) {
         List<Event> events = routeService.getRouteByQuery(lat, lon, radius, day1);
         return ResponseEntity.status(HttpStatus.OK).body(events.stream().map(this::convertEventToDto).toList());
-    }
-
-    @GetMapping("/allevents")
-    public ResponseEntity<List<EventDto>> getAllEvents() {
-        List<Event> allEvents = eventService.getEvents();
-        if(allEvents.isEmpty()) throw new EventNotFoundException();
-        return ResponseEntity.status(HttpStatus.OK).body(allEvents.stream().map(this::convertEventToDto).toList());
     }
 
     @GetMapping("/events/{id}")
