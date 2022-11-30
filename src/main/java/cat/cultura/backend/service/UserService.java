@@ -4,7 +4,6 @@ import cat.cultura.backend.entity.Event;
 import cat.cultura.backend.entity.User;
 import cat.cultura.backend.exceptions.UserNotFoundException;
 import cat.cultura.backend.repository.UserJpaRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;

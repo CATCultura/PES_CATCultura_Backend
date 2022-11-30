@@ -1,5 +1,6 @@
 package cat.cultura.backend.interceptors;
 
+import cat.cultura.backend.entity.Role;
 import cat.cultura.backend.repository.UserJpaRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -36,18 +37,25 @@ import static org.springframework.security.config.Customizer.withDefaults;
 @EnableWebSecurity
 public class SecurityConfig {
 
+    public static final String EVENTENDPOINT = "/events";
     @Autowired
     private UserJpaRepository userJpaRepository;
+
+    private String organizer = Role.ORGANIZER.toString();
+
+    private String service = Role.SERVICE.toString();
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http.cors().disable().csrf().disable()
                 .authorizeHttpRequests()
-                        .antMatchers(HttpMethod.GET,"/events").permitAll().and().authorizeHttpRequests()
+                        .antMatchers(HttpMethod.GET, EVENTENDPOINT).permitAll().and().authorizeHttpRequests()
                         .antMatchers(HttpMethod.POST,"/users").permitAll().and().authorizeHttpRequests()
-                        .antMatchers(HttpMethod.GET,"/users").hasAuthority("ADMIN").and().authorizeHttpRequests()
-                        .antMatchers("/allevents").permitAll().and().authorizeHttpRequests()
-                        .antMatchers(HttpMethod.POST,"/insert").permitAll().and().authorizeHttpRequests()
+                        .antMatchers(HttpMethod.POST, EVENTENDPOINT).hasAuthority(organizer).and().authorizeHttpRequests()
+                        .antMatchers(HttpMethod.PUT, EVENTENDPOINT).hasAuthority(organizer).and().authorizeHttpRequests()
+                        .antMatchers(HttpMethod.DELETE, EVENTENDPOINT).hasAuthority(organizer).and().authorizeHttpRequests()
+                        .antMatchers(HttpMethod.GET, "/allevents").hasAuthority(service).and().authorizeHttpRequests()
+                        .antMatchers(HttpMethod.POST,"/insert").hasAuthority(service).and().authorizeHttpRequests()
                         .antMatchers("/auth").permitAll().and().authorizeHttpRequests()
                         .anyRequest().authenticated().and().httpBasic();
 

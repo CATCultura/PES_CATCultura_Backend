@@ -1,5 +1,6 @@
 package cat.cultura.backend.interceptors;
 
+import cat.cultura.backend.entity.Role;
 import cat.cultura.backend.entity.User;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -10,11 +11,37 @@ import java.util.List;
 
 public class CurrentUser implements UserDetails {
 
+    private List<String> extractAuthorities(Role r) {
+        List<String> a = new ArrayList<>();
+        switch(r) {
+            case USER -> {
+             a.add("USER");
+            }
+            case ADMIN -> {
+                a.add("USER");
+                a.add("ADMIN");
+                a.add("ORGANIZER");
+                a.add("SERVICE");
+            }
+            case SERVICE -> {
+                a.add("USER");
+                a.add("SERVICE");
+            }
+            case ORGANIZER -> {
+                a.add("USER");
+                a.add("ORGANIZER");
+            }
+        }
+        return a;
+    }
     private final User user;
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         List<GrantedAuthority> auth = new ArrayList<>();
-        auth.add((GrantedAuthority) () -> user.getRole().toString());
+        List<String> authorities = extractAuthorities(user.getRole());
+        for (String s : authorities) {
+            auth.add((GrantedAuthority) () -> s);
+        }
         return auth;
     }
 
