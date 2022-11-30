@@ -4,6 +4,7 @@ import cat.cultura.backend.repository.UserJpaRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -40,18 +41,22 @@ public class SecurityConfig {
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        http
-                .authorizeHttpRequests((requests) -> requests
-                        .antMatchers("/", "/events").permitAll()
-                        .anyRequest().authenticated()
-                ).httpBasic();
+        http.cors().disable().csrf().disable()
+                .authorizeHttpRequests()
+                        .antMatchers(HttpMethod.GET,"/events").permitAll().and().authorizeHttpRequests()
+                        .antMatchers(HttpMethod.POST,"/users").permitAll().and().authorizeHttpRequests()
+                        .antMatchers(HttpMethod.GET,"/users").hasAuthority("ADMIN").and().authorizeHttpRequests()
+                        .antMatchers("/allevents").permitAll().and().authorizeHttpRequests()
+                        .antMatchers(HttpMethod.POST,"/insert").permitAll().and().authorizeHttpRequests()
+                        .antMatchers("/auth").permitAll().and().authorizeHttpRequests()
+                        .anyRequest().authenticated().and().httpBasic();
 
         return http.build();
     }
 
     @Bean
     public PasswordEncoder passwordEncoder() {
-        return NoOpPasswordEncoder.getInstance();
+        return new BCryptPasswordEncoder();
     }
 
     @Bean

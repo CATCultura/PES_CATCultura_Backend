@@ -14,7 +14,7 @@ public class CurrentUser implements UserDetails {
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         List<GrantedAuthority> auth = new ArrayList<>();
-        auth.add((GrantedAuthority) () -> "USER");
+        auth.add((GrantedAuthority) () -> user.getRole().toString());
         return auth;
     }
 

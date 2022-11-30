@@ -28,6 +28,8 @@ public class User {
     @Column(name="username", unique = true)
     private String username;
 
+    @Column(name="role")
+    private Role role = Role.USER;
     @Lob
     @Column(name="user_hash", unique = true)
     private String userHash;
@@ -353,4 +355,11 @@ public class User {
         }
     }
 
+    public Role getRole() {
+        return role;
+    }
+
+    public void setRole(Role role) {
+        this.role = role;
+    }
 }

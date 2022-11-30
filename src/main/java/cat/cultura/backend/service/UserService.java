@@ -4,8 +4,10 @@ import cat.cultura.backend.entity.Event;
 import cat.cultura.backend.entity.User;
 import cat.cultura.backend.exceptions.UserNotFoundException;
 import cat.cultura.backend.repository.UserJpaRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.text.SimpleDateFormat;
@@ -16,6 +18,8 @@ import java.util.List;
 @Service
 public class UserService {
 
+
+    private BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
     private final UserJpaRepository userRepo;
 
     public UserService(UserJpaRepository userRepo) {
@@ -24,6 +28,7 @@ public class UserService {
 
     public User createUser(User user) {
         user.setCreationDate(new SimpleDateFormat("dd/MM/yyyy HH:mm:ss").format(Calendar.getInstance().getTime()));
+        user.setPassword(passwordEncoder.encode(user.getPassword()));
         User createdUser = userRepo.save(user);
         createdUser.createUserHash();
         userRepo.save(createdUser);
