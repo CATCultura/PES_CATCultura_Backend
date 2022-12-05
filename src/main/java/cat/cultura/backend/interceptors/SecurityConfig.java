@@ -26,11 +26,14 @@ public class SecurityConfig {
 
     private String service = Role.SERVICE.toString();
 
+
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http.cors().disable().csrf().disable()
                 .authorizeHttpRequests()
                         .antMatchers(HttpMethod.GET, EVENTENDPOINT).permitAll().and().authorizeHttpRequests()
+                        .antMatchers(HttpMethod.GET, CONCRETEEVENT).permitAll().and().authorizeHttpRequests()
+                        .antMatchers(HttpMethod.GET, "/tags").permitAll().and().authorizeHttpRequests()
                         .antMatchers(HttpMethod.POST,"/users").permitAll().and().authorizeHttpRequests()
                         .antMatchers(HttpMethod.POST, EVENTENDPOINT).hasAuthority(organizer).and().authorizeHttpRequests()
                         .antMatchers(HttpMethod.PUT, CONCRETEEVENT).hasAuthority(organizer).and().authorizeHttpRequests()

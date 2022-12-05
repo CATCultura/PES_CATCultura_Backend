@@ -65,7 +65,6 @@ class EventControllerTest {
     }
 
     @Test
-//    @WithMockUser(username = "admin", authorities = { "USER"})
     void canRetrieveEventsAnonymous() throws Exception {
         // given
         Event event = new Event();
@@ -88,6 +87,27 @@ class EventControllerTest {
 
         // then
         Assertions.assertEquals(response.getStatus(), HttpStatus.OK.value());
+    }
+
+    @Test
+    void canRetrieveSingleEventAnonymous() throws Exception {
+        // given
+        Event event = new Event();
+        event.setId(8L);
+        event.setDenominacio("titol");
+        event.setDataInici("ahir");
+        event.setUbicacio("BCN");
+        event.setEspai("can pistraus");
+        event.setAdreca("C/Pixa");
+        given(eventService.getEventById(8L)).willReturn(event);
+
+        // when
+        MockHttpServletResponse response = mvc.perform(
+                        get("/events/8").accept(MediaType.APPLICATION_JSON))
+                .andReturn().getResponse();
+
+        // then
+        Assertions.assertEquals(HttpStatus.OK.value(), response.getStatus());
     }
 
     @Test
