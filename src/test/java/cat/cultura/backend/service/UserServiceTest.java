@@ -36,6 +36,7 @@ class UserServiceTest {
     void createUserTest() throws Exception {
         User manolo = new User("Manolo");
         manolo.setId(12L);
+        manolo.setPassword("1234");
         given(userRepo.save(manolo)).willReturn(manolo);
 
         User client = userService.createUser(manolo);
@@ -201,8 +202,9 @@ class UserServiceTest {
     @Test
     void createUser() {
         User received = new User("pepitovadecurt");
-
+        received.setPassword("1234");
         User returnedAfterSave = new User("pepitovadecurt");
+        returnedAfterSave.setPassword("1234");
         returnedAfterSave.setId(45L);
 
         given(userRepo.save(received)).willReturn(returnedAfterSave);
@@ -219,8 +221,10 @@ class UserServiceTest {
     @Test
     void createUsers() {
         User received = new User("pepitovadecurt");
+        received.setPassword("1234");
 
         User returnedAfterSave = new User("pepitovadecurt");
+        returnedAfterSave.setPassword("1234");
         returnedAfterSave.setId(45L);
 
         given(userRepo.save(received)).willReturn(returnedAfterSave);

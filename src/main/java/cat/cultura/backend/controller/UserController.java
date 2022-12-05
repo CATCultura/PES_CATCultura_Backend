@@ -7,16 +7,14 @@ import cat.cultura.backend.dtos.UserDto;
 import cat.cultura.backend.entity.Event;
 import cat.cultura.backend.entity.Trophy;
 import cat.cultura.backend.entity.User;
-import cat.cultura.backend.service.*;
-import cat.cultura.backend.service.AttendanceService;
 import cat.cultura.backend.exceptions.UserNotFoundException;
+import cat.cultura.backend.service.*;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.*;
@@ -84,7 +82,7 @@ public class UserController {
             @RequestParam(value = "name-and-surname", required = false) String nameAndSurname,
             Pageable pageable
     ) {
-        Object o = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+//        Object o = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         Page<User> users = userService.getUsersByQuery(id, username, nameAndSurname, pageable);
         return ResponseEntity.status(HttpStatus.OK).body(users.stream().map(this::convertUserToDto).toList());
     }

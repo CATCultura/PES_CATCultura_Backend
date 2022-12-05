@@ -17,17 +17,20 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockHttpServletResponse;
+import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
+
 
 import java.util.List;
 
-import static org.junit.Assert.*;
 import static org.mockito.BDDMockito.given;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 
 @AutoConfigureJsonTesters
 @SpringBootTest
 @AutoConfigureMockMvc
+@ContextConfiguration
 class UserControllerTest {
     @Autowired
     private MockMvc mvc;
@@ -47,7 +50,9 @@ class UserControllerTest {
     @Autowired
     private JacksonTester<List<UserDto>> jsonListUserDto;
 
+
     @Test
+    @WithMockUser(username = "admin", authorities = { "USER"})
     void canRetrieveUser() throws Exception {
         // given
         User user = new User();
