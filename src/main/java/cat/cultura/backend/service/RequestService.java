@@ -48,7 +48,7 @@ public class RequestService {
     }
 
     @Transactional(rollbackFor=Exception.class)
-    public void removeFriendRequestsTo(Long userId, Long friendId) {
+    public void removeFriend(Long userId, Long friendId) {
         User user = userRepo.findById(userId).orElseThrow(UserNotFoundException::new);
         User friend = userRepo.findById(friendId).orElseThrow(UserNotFoundException::new);
         if (user.hasFriend(friend)) user.removeFriend(friend);

@@ -1,7 +1,9 @@
 package cat.cultura.backend.controller;
 
-import cat.cultura.backend.entity.Event;
+import cat.cultura.backend.entity.tag.Tag;
+import cat.cultura.backend.entity.tag.Type;
 import cat.cultura.backend.service.EventService;
+import cat.cultura.backend.service.TagService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -11,30 +13,24 @@ import java.util.*;
 @RestController
 public class TagController {
 
-    public static final String AMBITS = "ambits";
-    public static final String CATEGORIES = "categories";
-    public static final String ALTRES_CATEGORIES = "altresCategories";
+
     @Autowired
     private EventService eventService;
 
+    @Autowired
+    private TagService tagService;
+
     @GetMapping("/tags")
     public Map<String, Set<String>> getAllTags() {
-        List<Event> eventList = eventService.getEvents();
+        List<Tag> tagList = tagService.getAllTags();
         HashMap<String, Set<String>> tags = new HashMap<>();
 
-        tags.put(AMBITS, new HashSet<>());
-        tags.put(CATEGORIES, new HashSet<>());
-        tags.put(ALTRES_CATEGORIES, new HashSet<>());
+        tags.put(Type.AMBITS.toString(), new HashSet<>());
+        tags.put(Type.CATEGORIES.toString(), new HashSet<>());
+        tags.put(Type.ALTRES_CATEGORIES.toString(), new HashSet<>());
 
-        for (Event e : eventList) {
-            for (String tag : e.getTagsAmbits())
-                tags.get(AMBITS).add(tag);
-
-            for (String tag : e.getTagsCateg())
-                tags.get(CATEGORIES).add(tag);
-
-            for (String tag : e.getTagsAltresCateg())
-                tags.get(ALTRES_CATEGORIES).add(tag);
+        for (Tag t : tagList) {
+            tags.get(t.getType().toString()).add(t.getValue());
         }
         return tags;
     }

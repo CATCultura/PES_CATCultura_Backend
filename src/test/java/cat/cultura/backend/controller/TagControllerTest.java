@@ -2,7 +2,12 @@ package cat.cultura.backend.controller;
 
 import cat.cultura.backend.dtos.EventDto;
 import cat.cultura.backend.entity.Event;
+import cat.cultura.backend.entity.tag.Tag;
+import cat.cultura.backend.entity.tag.TagAltresCategories;
+import cat.cultura.backend.entity.tag.TagAmbits;
+import cat.cultura.backend.entity.tag.TagCategories;
 import cat.cultura.backend.service.EventService;
+import cat.cultura.backend.service.TagService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -34,51 +39,28 @@ class TagControllerTest {
     private MockMvc mockMvc;
 
     @MockBean
-    private EventService eventService;
-
-    @Autowired
-    private JacksonTester<Map<String, Set<String>>> jsonMap;
-
-    @Autowired
-    private JacksonTester<List<EventDto>> jsonListEventDto;
-
+    private TagService tagService;
 
     @Test
     void getAllTagsWhenAnonymous() throws Exception {
-        Event event = new Event();
-        event.setDenominacio("titol");
-        event.setDataInici("ahir");
-        event.setUbicacio("BCN");
-        event.setEspai("can pistraus");
-        event.setAdreca("C/Pixa");
-        List<String> tagsAmbits = new ArrayList<>();
-        tagsAmbits.add("concert");
-        event.setTagsAmbits(tagsAmbits);
 
-        List<String> tagsCateg = new ArrayList<>();
-        tagsCateg.add("nadal");
+        List<Tag> returnedTags = new ArrayList<>();
+        returnedTags.add(new TagAmbits("concerts"));
+        returnedTags.add(new TagCategories("nadal"));
+        returnedTags.add(new TagAltresCategories("pastorets"));
 
-        event.setTagsCateg(tagsCateg);
+        given(tagService.getAllTags()).willReturn(returnedTags);
 
-        List<String> tagsAltresCateg = new ArrayList<>();
-        tagsAltresCateg.add("pastorets");
-
-        event.setTagsAltresCateg(tagsAltresCateg);
-
-
-        List<Event> eventList = new ArrayList<>();
-        eventList.add(event);
-        given(eventService.getEvents()).willReturn(eventList);
         Map<String, Set<String>> expected = new LinkedHashMap<>();
         Set<String> ambs = new HashSet<>();
-        ambs.add("concert");
+        ambs.add("concerts");
         Set<String> categs = new HashSet<>();
         categs.add("nadal");
         Set<String> altresCategs = new HashSet<>();
         altresCategs.add("pastorets");
-        expected.put("ambits", ambs);
-        expected.put("altresCategories", altresCategs);
-        expected.put("categories", categs);
+        expected.put("AMBITS", ambs);
+        expected.put("ALTRES_CATEGORIES", altresCategs);
+        expected.put("CATEGORIES", categs);
         MockHttpServletResponse response = mockMvc.perform(
                 get("/tags").contentType(MediaType.APPLICATION_JSON)).andReturn().getResponse();
         Assertions.assertEquals(HttpStatus.OK.value(), response.getStatus());
