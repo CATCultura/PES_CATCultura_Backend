@@ -222,7 +222,7 @@ public class UserController {
     @DeleteMapping("/users/{id}/friends/{friendId}")
     public ResponseEntity removeRequestsTo(@PathVariable Long id, @PathVariable Long friendId) {
         try {
-            requestService.removeFriendRequestsTo(id,friendId);
+            requestService.removeFriend(id,friendId);
         } catch (AssertionError as) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(as.getMessage());
         }

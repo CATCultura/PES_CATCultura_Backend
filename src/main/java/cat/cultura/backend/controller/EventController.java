@@ -7,9 +7,11 @@ import cat.cultura.backend.exceptions.MissingRequiredParametersException;
 import cat.cultura.backend.mappers.EventMapper;
 import cat.cultura.backend.service.EventService;
 import cat.cultura.backend.service.RouteService;
+import cat.cultura.backend.service.TagService;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -32,7 +34,8 @@ public class EventController {
 
     @Autowired
     private EventMapper eventMapper;
-
+    @Autowired
+    private TagService tagService;
 
 
     @PostMapping("/events")
@@ -61,9 +64,18 @@ public class EventController {
     @GetMapping("/events")
     public ResponseEntity<List<EventDto>> getEventsByQuery(
             @RequestParam(value = "id", required = false) Long id,
+            @RequestParam(value = "tag", required = false) String tag,
             Pageable pageable
     ) {
-        Page<Event> events = eventService.getByQuery(id, pageable);
+        Page<Event> events;
+        if (tag != null) {
+            events = new PageImpl<>(tagService.getTagByName(tag).getEventList().stream().toList().subList(pageable.getPageNumber()*pageable.getPageSize(),
+                    (pageable.getPageNumber()+1)*pageable.getPageSize()),pageable, pageable.getPageSize());
+        }
+        else {
+            events = eventService.getByQuery(id, pageable);
+        }
+
         return ResponseEntity.status(HttpStatus.OK).body(events.stream().map(eventMapper::convertEventToDto).toList());
     }
 
