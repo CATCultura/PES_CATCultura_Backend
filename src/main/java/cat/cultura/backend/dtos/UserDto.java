@@ -1,5 +1,6 @@
 package cat.cultura.backend.dtos;
 
+import cat.cultura.backend.entity.Role;
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
@@ -11,6 +12,8 @@ public class UserDto {
     private String nameAndSurname;
     private String email;
     private String creationDate;
+
+    private Role role = Role.USER;
 
     private String password;
 
@@ -75,6 +78,14 @@ public class UserDto {
 
     public void setPoints(int points) {
         this.points = points;
+    }
+
+    public Role getRole() {
+        return role;
+    }
+
+    public void setRole(Role role) {
+        this.role = role;
     }
 
 //    public List<Event> getFavourites() {

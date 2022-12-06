@@ -71,29 +71,13 @@ class EntryPointControllerTest {
         List<EventDto> array = new ArrayList<>();
         array.add(event);
         MockHttpServletResponse response = mockMvc.perform(
-                post("/insert").contentType(MediaType.APPLICATION_JSON).header("auth-token", "my-hash").content(
+                post("/insert").contentType(MediaType.APPLICATION_JSON).content(
                         jsonListEventDto.write(array).getJson()
                 )).andReturn().getResponse();
         Assertions.assertEquals(HttpStatus.OK.value(), response.getStatus());
     }
 
-    @Test
-    @WithMockUser(username = "admin", authorities = { "SERVICE"})
-    void updateDBShouldFailForServiceBadToken() throws Exception {
-        EventDto event = new EventDto();
-        event.setDenominacio("titol");
-        event.setDataInici("ahir");
-        event.setUbicacio("BCN");
-        event.setEspai("can pistraus");
-        event.setAdreca("C/Pixa");
-        List<EventDto> array = new ArrayList<>();
-        array.add(event);
-        MockHttpServletResponse response = mockMvc.perform(
-                post("/insert").contentType(MediaType.APPLICATION_JSON).header("auth-token", "auth-token").content(
-                        jsonListEventDto.write(array).getJson()
-                )).andReturn().getResponse();
-        Assertions.assertEquals(HttpStatus.FORBIDDEN.value(), response.getStatus());
-    }
+
 
     @Test
     @WithMockUser(username = "admin", authorities = { "USER"})

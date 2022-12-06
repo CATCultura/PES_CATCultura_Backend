@@ -33,6 +33,24 @@ public class EventDto {
     private String imgApp;
     private boolean cancelado;
 
+    private String nomOrganitzador;
+
+    private String urlOrganitzador;
+
+    private String telefonOrganitzador;
+
+    private String emailOrganitzador;
+
+    public Long getIdOrganitzador() {
+        return idOrganitzador;
+    }
+
+    public void setIdOrganitzador(Long idOrganitzador) {
+        this.idOrganitzador = idOrganitzador;
+    }
+
+    private Long idOrganitzador;
+
     public Long getId() {
         return id;
     }
@@ -262,5 +280,37 @@ public class EventDto {
 
     public void setUbicacio(String ubicacio) {
         this.ubicacio = ubicacio;
+    }
+
+    public String getNomOrganitzador() {
+        return nomOrganitzador;
+    }
+
+    public void setNomOrganitzador(String nomOrganitzador) {
+        this.nomOrganitzador = nomOrganitzador;
+    }
+
+    public String getUrlOrganitzador() {
+        return urlOrganitzador;
+    }
+
+    public void setUrlOrganitzador(String urlOrganitzador) {
+        this.urlOrganitzador = urlOrganitzador;
+    }
+
+    public String getTelefonOrganitzador() {
+        return telefonOrganitzador;
+    }
+
+    public void setTelefonOrganitzador(String telefonOrganitzador) {
+        this.telefonOrganitzador = telefonOrganitzador;
+    }
+
+    public String getEmailOrganitzador() {
+        return emailOrganitzador;
+    }
+
+    public void setEmailOrganitzador(String emailOrganitzador) {
+        this.emailOrganitzador = emailOrganitzador;
     }
 }

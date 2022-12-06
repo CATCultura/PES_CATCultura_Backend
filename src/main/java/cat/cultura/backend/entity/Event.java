@@ -108,9 +108,11 @@ public class Event {
     @Column(name="imgApp")
     private String imgApp;
 
-
     @Column(name="cancelado")
     private boolean cancelado;
+
+    @ManyToOne
+    private Organizer organizer;
 
     public Long getId() {
         return id;
@@ -360,4 +362,11 @@ public class Event {
         return hash;
     }
 
+    public Organizer getOrganizer() {
+        return organizer;
+    }
+
+    public void setOrganizer(Organizer organizer) {
+        this.organizer = organizer;
+    }
 }
