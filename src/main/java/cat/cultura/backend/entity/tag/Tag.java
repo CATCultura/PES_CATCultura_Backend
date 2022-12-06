@@ -55,14 +55,8 @@ public abstract class Tag {
     @Column(name ="type")
     private Type type;
 
-    public Set<Event> getEventList() {
-        return eventList;
-    }
+    public abstract Set<Event> getEventList();
 
-    public void setEventList(Set<Event> eventList) {
-        this.eventList = eventList;
-    }
+    public abstract void setEventList(Set<Event> eventList);
 
-    @ManyToMany
-    private Set<Event> eventList;
 }

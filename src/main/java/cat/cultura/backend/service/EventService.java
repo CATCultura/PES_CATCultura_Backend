@@ -29,6 +29,19 @@ public class EventService {
         return true;
     }
 
+    private List<Tag> persistTags(List<Tag> tags) {
+        List<Tag> res = new ArrayList<>();
+        for (Tag t : tags) {
+            if (!tagRepo.existsByValue(t.getValue())) {
+                res.add(tagRepo.save(t));
+            }
+            else {
+                res.add(tagRepo.findByValue(t.getValue()).orElse(null));
+            }
+        }
+        return res;
+    }
+
     public EventService(EventJpaRepository eventRepo, TagJpaRepository tagRepo) {
         this.eventRepo = eventRepo;
         this.tagRepo = tagRepo;
@@ -44,18 +57,6 @@ public class EventService {
         throw new EventAlreadyCreatedException();
     }
 
-    private List<Tag> persistTags(List<Tag> tags) {
-        List<Tag> res = new ArrayList<>();
-        for (Tag t : tags) {
-            if (!tagRepo.existsByValue(t.getValue())) {
-                res.add(tagRepo.save(t));
-            }
-            else {
-                res.add(tagRepo.findByValue(t.getValue()).orElse(null));
-            }
-        }
-        return res;
-    }
 
     public List<Event> saveEvents(List<Event> evs) {
         for (Event e : evs) {
