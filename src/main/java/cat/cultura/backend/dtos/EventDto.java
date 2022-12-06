@@ -1,5 +1,6 @@
 package cat.cultura.backend.dtos;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class EventDto {
@@ -14,9 +15,9 @@ public class EventDto {
     private String entrades;
     private String horari;
     private String subtitol;
-    private List<String> tagsAmbits;
-    private List<String> tagsCateg;
-    private List<String> tagsAltresCateg;
+    private List<String> tagsAmbits = new ArrayList<>();
+    private List<String> tagsCateg = new ArrayList<>();
+    private List<String> tagsAltresCateg = new ArrayList<>();
     private String links;
     private String documents;
     private List<String> imatges;

@@ -1,19 +1,24 @@
 package cat.cultura.backend.service;
 
 import cat.cultura.backend.entity.Event;
+import cat.cultura.backend.entity.tag.Tag;
 import cat.cultura.backend.exceptions.EventAlreadyCreatedException;
 import cat.cultura.backend.exceptions.EventNotFoundException;
 import cat.cultura.backend.repository.EventJpaRepository;
+import cat.cultura.backend.repository.TagJpaRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
 public class EventService {
 
     private final EventJpaRepository eventRepo;
+
+    private final TagJpaRepository tagRepo;
 
     private boolean isUniqueInDB(Event ev) {
         List<Event> sameDenominacioEvents = eventRepo.findByDenominacioLikeIgnoreCaseAllIgnoreCase(ev.getDenominacio());
@@ -24,13 +29,32 @@ public class EventService {
         return true;
     }
 
-    public EventService(EventJpaRepository eventRepo) {
+    public EventService(EventJpaRepository eventRepo, TagJpaRepository tagRepo) {
         this.eventRepo = eventRepo;
+        this.tagRepo = tagRepo;
     }
 
     public Event saveEvent(Event ev) {
-        if (isUniqueInDB(ev)) return eventRepo.save(ev);
+        if (isUniqueInDB(ev)) {
+            ev.setTagsAmbits(persistTags(ev.getTagsAmbits()));
+            ev.setTagsCateg(persistTags(ev.getTagsCateg()));
+            ev.setTagsAltresCateg(persistTags(ev.getTagsAltresCateg()));
+            return eventRepo.save(ev);
+        }
         throw new EventAlreadyCreatedException();
+    }
+
+    private List<Tag> persistTags(List<Tag> tags) {
+        List<Tag> res = new ArrayList<>();
+        for (Tag t : tags) {
+            if (!tagRepo.existsByValue(t.getValue())) {
+                res.add(tagRepo.save(t));
+            }
+            else {
+                res.add(tagRepo.findByValue(t.getValue()).orElse(null));
+            }
+        }
+        return res;
     }
 
     public List<Event> saveEvents(List<Event> evs) {

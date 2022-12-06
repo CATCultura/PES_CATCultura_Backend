@@ -6,6 +6,7 @@ import cat.cultura.backend.dtos.TrophyDto;
 import cat.cultura.backend.dtos.UserDto;
 import cat.cultura.backend.entity.*;
 import cat.cultura.backend.exceptions.UserNotFoundException;
+import cat.cultura.backend.mappers.EventMapper;
 import cat.cultura.backend.service.*;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,6 +35,9 @@ public class UserController {
 
     @Autowired
     private RequestService requestService;
+
+    @Autowired
+    private EventMapper eventMapper;
 
     @Autowired
     private ModelMapper modelMapper;
@@ -125,7 +129,7 @@ public class UserController {
     @GetMapping("/user/{id}/attendance")
     public ResponseEntity<List<EventDto>> getAttendance(@PathVariable Long id) {
         List<Event> events = userService.getAttendanceEventsById(id);
-        return ResponseEntity.status(HttpStatus.OK).body(events.stream().map(this::convertEventToDto).toList());
+        return ResponseEntity.status(HttpStatus.OK).body(events.stream().map(eventMapper::convertEventToDto).toList());
     }
 
     @DeleteMapping("/users/{id}/assistance/{eventId}")
@@ -153,7 +157,7 @@ public class UserController {
     @GetMapping("/users/{id}/favourites")
     public ResponseEntity<List<EventDto>> getFavourites(@PathVariable Long id) {
         List<Event> events = userService.getFavouriteEventsById(id);
-        return ResponseEntity.status(HttpStatus.OK).body(events.stream().map(this::convertEventToDto).toList());
+        return ResponseEntity.status(HttpStatus.OK).body(events.stream().map(eventMapper::convertEventToDto).toList());
     }
 
     @DeleteMapping("/users/{id}/favourites/{eventId}")
@@ -253,11 +257,6 @@ public class UserController {
         return userDto;
     }
 
-    private EventDto convertEventToDto(Event event) {
-        EventDto eventDto = modelMapper.map(event, EventDto.class);
-        //....modifications....
-        return eventDto;
-    }
 
     private User convertUserDtoToEntity(UserDto userDto) {
         if (userDto.getRole() == Role.ORGANIZER) {
@@ -268,11 +267,6 @@ public class UserController {
 
     }
 
-    private Event convertEventDtoToEntity(EventDto eventDto) {
-        Event event = modelMapper.map(eventDto, Event.class);
-        //....modifications....
-        return event;
-    }
 
     private TrophyDto convertTrophyToDto(Trophy trophy) {
         TrophyDto trophyDto = modelMapper.map(trophy, TrophyDto.class);
