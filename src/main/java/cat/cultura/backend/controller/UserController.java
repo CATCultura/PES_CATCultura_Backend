@@ -4,9 +4,7 @@ import cat.cultura.backend.dtos.EventDto;
 import cat.cultura.backend.dtos.LoggedUserDto;
 import cat.cultura.backend.dtos.TrophyDto;
 import cat.cultura.backend.dtos.UserDto;
-import cat.cultura.backend.entity.Event;
-import cat.cultura.backend.entity.Trophy;
-import cat.cultura.backend.entity.User;
+import cat.cultura.backend.entity.*;
 import cat.cultura.backend.exceptions.UserNotFoundException;
 import cat.cultura.backend.service.*;
 import org.modelmapper.ModelMapper;
@@ -82,7 +80,7 @@ public class UserController {
             @RequestParam(value = "name-and-surname", required = false) String nameAndSurname,
             Pageable pageable
     ) {
-//        Object o = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+//
         Page<User> users = userService.getUsersByQuery(id, username, nameAndSurname, pageable);
         return ResponseEntity.status(HttpStatus.OK).body(users.stream().map(this::convertUserToDto).toList());
     }
@@ -262,9 +260,12 @@ public class UserController {
     }
 
     private User convertUserDtoToEntity(UserDto userDto) {
-        User user = modelMapper.map(userDto, User.class);
+        if (userDto.getRole() == Role.ORGANIZER) {
+            return  modelMapper.map(userDto, Organizer.class);
+        }
+        else return modelMapper.map(userDto, User.class);
         //....modifications....
-        return user;
+
     }
 
     private Event convertEventDtoToEntity(EventDto eventDto) {

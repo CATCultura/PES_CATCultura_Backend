@@ -2,10 +2,7 @@ package cat.cultura.backend.controller;
 
 import cat.cultura.backend.dtos.EventDto;
 import cat.cultura.backend.entity.Event;
-
-import cat.cultura.backend.entity.User;
 import cat.cultura.backend.exceptions.EventAlreadyCreatedException;
-import cat.cultura.backend.exceptions.EventNotFoundException;
 import cat.cultura.backend.exceptions.MissingRequiredParametersException;
 import cat.cultura.backend.service.EventService;
 import cat.cultura.backend.service.RouteService;
@@ -15,7 +12,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
@@ -99,6 +95,14 @@ public class EventController {
 
     private EventDto convertEventToDto(Event event) {
         EventDto eventDto = modelMapper.map(event, EventDto.class);
+        if (event.getOrganizer() != null) {
+            eventDto.setEmailOrganitzador(event.getOrganizer().getEmail());
+            eventDto.setUrlOrganitzador(event.getOrganizer().getUrl());
+            eventDto.setTelefonOrganitzador(event.getOrganizer().getTelefon());
+            eventDto.setNomOrganitzador(event.getOrganizer().getUsername());
+            eventDto.setIdOrganitzador(event.getOrganizer().getId());
+        }
+
         //....modifications....
         return eventDto;
     }

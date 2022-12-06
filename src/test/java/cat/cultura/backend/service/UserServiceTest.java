@@ -1,6 +1,8 @@
 package cat.cultura.backend.service;
 
 import cat.cultura.backend.entity.Event;
+import cat.cultura.backend.entity.Organizer;
+import cat.cultura.backend.entity.Role;
 import cat.cultura.backend.entity.User;
 import cat.cultura.backend.exceptions.UserNotFoundException;
 import cat.cultura.backend.repository.UserJpaRepository;
@@ -216,6 +218,27 @@ class UserServiceTest {
         User actualResult = userService.createUser(received);
 
         Assertions.assertEquals(actualResult.getUserHash(), h);
+    }
+
+    @Test
+    void createOrganizer() {
+        Organizer received = new Organizer("pepitovadecurt");
+        received.setPassword("1234");
+        Organizer returnedAfterSave = new Organizer("pepitovadecurt");
+        returnedAfterSave.setPassword("1234");
+        returnedAfterSave.setId(45L);
+        returnedAfterSave.setRole(Role.ORGANIZER);
+
+        given(userRepo.save(received)).willReturn(returnedAfterSave);
+
+        User expected = new User("pepitovadecurt");
+        expected.setId(45L);
+        String h = expected.createUserHash();
+
+        User actualResult = userService.createOrganizer(received);
+
+        Assertions.assertEquals(actualResult.getUserHash(), h);
+        Assertions.assertEquals(Role.ORGANIZER, actualResult.getRole());
     }
 
     @Test
