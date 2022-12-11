@@ -65,12 +65,16 @@ public class EventController {
     public ResponseEntity<List<EventDto>> getEventsByQuery(
             @RequestParam(value = "id", required = false) Long id,
             @RequestParam(value = "tag", required = false) String tag,
+            @RequestParam(value = "q", required = false) String query,
             Pageable pageable
     ) {
         Page<Event> events;
         if (tag != null) {
             events = new PageImpl<>(tagService.getTagByName(tag).getEventList().stream().toList().subList(pageable.getPageNumber()*pageable.getPageSize(),
                     (pageable.getPageNumber()+1)*pageable.getPageSize()),pageable, pageable.getPageSize());
+        }
+        else if (query != null) {
+            events = eventService.getBySemanticSimilarity(query);
         }
         else {
             events = eventService.getByQuery(id, pageable);
