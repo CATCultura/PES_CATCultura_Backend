@@ -6,6 +6,7 @@ import cat.cultura.backend.dtos.TrophyDto;
 import cat.cultura.backend.dtos.UserDto;
 import cat.cultura.backend.entity.*;
 import cat.cultura.backend.exceptions.UserNotFoundException;
+import cat.cultura.backend.interceptors.CurrentUser;
 import cat.cultura.backend.mappers.EventMapper;
 import cat.cultura.backend.service.*;
 import org.modelmapper.ModelMapper;
@@ -14,6 +15,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.*;
@@ -43,29 +45,12 @@ public class UserController {
     private ModelMapper modelMapper;
 
 
-    @GetMapping("/auth")
-    public ResponseEntity<LoggedUserDto> authenticate(@RequestHeader("Authorization") String credentials) {
-        User currentUser;
-        String[] s = credentials.split(",");
-        Map<String,String> credentialMap = new HashMap<>();
-        for (String field : s) {
-            String[] currentInfo = field.split("=");
-            assert currentInfo.length == 2;
-            credentialMap.put(currentInfo[0], currentInfo[1]);
-        }
-        try {
-        currentUser = userService.getUserByUsername(credentialMap.get("username"));
-        } catch (UserNotFoundException u) {
-            return new ResponseEntity<>(new LoggedUserDto(), HttpStatus.NOT_FOUND);
-        }
-        if (credentialMap.get("password").equals(currentUser.getPassword())) {
-            LoggedUserDto loggedUserDto = convertUserToLoggedUserDto(currentUser);
-            return new ResponseEntity<>(loggedUserDto, HttpStatus.OK);
-        }
-        else {
-            return new ResponseEntity<>(new LoggedUserDto(), HttpStatus.UNAUTHORIZED);
-        }
-
+    @GetMapping("/login")
+    public ResponseEntity<LoggedUserDto> authenticate() {
+        CurrentUser currentUser = (CurrentUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        User u = userService.getUserByUsername(currentUser.getUsername());
+        LoggedUserDto loggedUserDto = convertUserToLoggedUserDto(u);
+        return new ResponseEntity<>(loggedUserDto,HttpStatus.OK);
     }
 
 
