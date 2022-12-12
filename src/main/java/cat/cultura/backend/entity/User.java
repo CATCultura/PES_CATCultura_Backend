@@ -13,10 +13,10 @@ import java.util.List;
 import java.util.Set;
 
 @Entity
-@Table(name = "User", indexes = {
-        @Index(name = "idx_user_user_hash", columnList = "user_hash")
-})
+@Table(name = "User")
+@Inheritance(strategy = InheritanceType.TABLE_PER_CLASS)
 @JsonIgnoreProperties(ignoreUnknown=true)
+@DiscriminatorColumn(name="role")
 @JsonAutoDetect(fieldVisibility= JsonAutoDetect.Visibility.ANY)
 public class User {
 
@@ -28,6 +28,8 @@ public class User {
     @Column(name="username", unique = true)
     private String username;
 
+    @Column(name="role")
+    private Role role = Role.USER;
     @Lob
     @Column(name="user_hash", unique = true)
     private String userHash;
@@ -35,6 +37,11 @@ public class User {
     @Column(name="name_and_surname")
     private String nameAndSurname;
 
+    @Column(name="telefon")
+    private String telefon;
+
+    @Column(name="url")
+    private String url;
     @Column(name="email")
     private String email;
 
@@ -353,4 +360,27 @@ public class User {
         }
     }
 
+    public Role getRole() {
+        return role;
+    }
+
+    public void setRole(Role role) {
+        this.role = role;
+    }
+
+    public String getTelefon() {
+        return telefon;
+    }
+
+    public void setTelefon(String telefon) {
+        this.telefon = telefon;
+    }
+
+    public String getUrl() {
+        return url;
+    }
+
+    public void setUrl(String url) {
+        this.url = url;
+    }
 }

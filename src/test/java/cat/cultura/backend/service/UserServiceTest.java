@@ -1,6 +1,8 @@
 package cat.cultura.backend.service;
 
 import cat.cultura.backend.entity.Event;
+import cat.cultura.backend.entity.Organizer;
+import cat.cultura.backend.entity.Role;
 import cat.cultura.backend.entity.User;
 import cat.cultura.backend.exceptions.UserNotFoundException;
 import cat.cultura.backend.repository.UserJpaRepository;
@@ -36,6 +38,7 @@ class UserServiceTest {
     void createUserTest() throws Exception {
         User manolo = new User("Manolo");
         manolo.setId(12L);
+        manolo.setPassword("1234");
         given(userRepo.save(manolo)).willReturn(manolo);
 
         User client = userService.createUser(manolo);
@@ -201,8 +204,9 @@ class UserServiceTest {
     @Test
     void createUser() {
         User received = new User("pepitovadecurt");
-
+        received.setPassword("1234");
         User returnedAfterSave = new User("pepitovadecurt");
+        returnedAfterSave.setPassword("1234");
         returnedAfterSave.setId(45L);
 
         given(userRepo.save(received)).willReturn(returnedAfterSave);
@@ -217,10 +221,33 @@ class UserServiceTest {
     }
 
     @Test
+    void createOrganizer() {
+        Organizer received = new Organizer("pepitovadecurt");
+        received.setPassword("1234");
+        Organizer returnedAfterSave = new Organizer("pepitovadecurt");
+        returnedAfterSave.setPassword("1234");
+        returnedAfterSave.setId(45L);
+        returnedAfterSave.setRole(Role.ORGANIZER);
+
+        given(userRepo.save(received)).willReturn(returnedAfterSave);
+
+        User expected = new User("pepitovadecurt");
+        expected.setId(45L);
+        String h = expected.createUserHash();
+
+        User actualResult = userService.createOrganizer(received);
+
+        Assertions.assertEquals(actualResult.getUserHash(), h);
+        Assertions.assertEquals(Role.ORGANIZER, actualResult.getRole());
+    }
+
+    @Test
     void createUsers() {
         User received = new User("pepitovadecurt");
+        received.setPassword("1234");
 
         User returnedAfterSave = new User("pepitovadecurt");
+        returnedAfterSave.setPassword("1234");
         returnedAfterSave.setId(45L);
 
         given(userRepo.save(received)).willReturn(returnedAfterSave);

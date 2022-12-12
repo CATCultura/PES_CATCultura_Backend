@@ -2,15 +2,24 @@ package cat.cultura.backend.controller;
 
 import cat.cultura.backend.dtos.EventDto;
 import cat.cultura.backend.entity.Event;
+import cat.cultura.backend.entity.Organizer;
+import cat.cultura.backend.entity.Role;
 import cat.cultura.backend.exceptions.EventAlreadyCreatedException;
 import cat.cultura.backend.exceptions.EventNotFoundException;
 import cat.cultura.backend.exceptions.MissingRequiredParametersException;
+import cat.cultura.backend.exceptions.UserNotFoundException;
+import cat.cultura.backend.mappers.EventMapper;
 import cat.cultura.backend.service.EventService;
-import org.modelmapper.ModelMapper;
+import cat.cultura.backend.service.UserService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -22,56 +31,60 @@ public class EntryPointController {
     private EventService eventService;
 
     @Autowired
-    private ModelMapper modelMapper;
+    private EventMapper eventMapper;
+
+    @Autowired
+    private UserService userService;
+
+    private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
 
     @PostMapping("/insert")
-    public ResponseEntity<String> updateDB(@RequestHeader("auth-token") String authToken, @RequestBody List<EventDto> ev) {
-        if (authToken.equals("my-hash")) {
-            List<Event> eventsEntities = new ArrayList<>();
-            for (EventDto eventDto : ev) {
-                Event event = null;
-                try {
-                    event = convertEventDtoToEntity(eventDto);
-                }
-                catch (MissingRequiredParametersException ignored) {
-
-                }
-                if (event != null)
-                    eventsEntities.add(event);
+    public ResponseEntity<String> updateDB(@RequestBody List<EventDto> ev) {
+        List<Event> eventEntities = new ArrayList<>();
+        for (EventDto eventDto : ev) {
+            Event event = null;
+            try {
+                event = eventMapper.convertEventDtoToEntity(eventDto);
             }
-            for (Event e: eventsEntities) {
+            catch (MissingRequiredParametersException ignored) {
+                logger.info(String.format("Missing parameter for dto with name: %s",eventDto.getDenominacio()));
+            }
+            if (event != null)
+                eventEntities.add(event);
+        }
+        for (Event e: eventEntities) {
+            if (e.getOrganizer() != null) {
                 try {
-                    eventService.saveEvent(e);
+                    e.setOrganizer( (Organizer) userService.getUserByUsername(e.getOrganizer().getUsername(), Role.ORGANIZER));
                 }
-                catch (EventAlreadyCreatedException ignored) {
-
+                catch (UserNotFoundException ex) {
+                    userService.createOrganizer(e.getOrganizer());
+                    logger.info(String.format("Created new organizer for event %s",e.getDenominacio()));
                 }
             }
-            return new ResponseEntity<>("All ok", HttpStatus.OK);
+
+            try {
+                eventService.saveEvent(e);
+                logger.info(String.format("Saved event %s",e.getDenominacio()));
+            }
+            catch (EventAlreadyCreatedException ignored) {
+                logger.info(String.format("Event %s already created",e.getDenominacio()));
+
+            }
         }
-        else {
-            return new ResponseEntity<>("You've done fucked up", HttpStatus.FORBIDDEN);
-        }
+        logger.info("Insertion OK");
+        return new ResponseEntity<>("All ok", HttpStatus.OK);
     }
 
     @GetMapping("/allevents")
     public ResponseEntity<List<EventDto>> getAllEvents() {
         List<Event> allEvents = eventService.getEvents();
-        if(allEvents.isEmpty()) throw new EventNotFoundException();
-        return ResponseEntity.status(HttpStatus.OK).body(allEvents.stream().map(this::convertEventToDto).toList());
+        if (allEvents.isEmpty())
+            throw new EventNotFoundException();
+        List<EventDto> result = allEvents.stream().map(eventMapper::convertEventToDto).toList();
+        return ResponseEntity.status(HttpStatus.OK).body(result);
     }
 
 
-    private EventDto convertEventToDto(Event event) {
-        return modelMapper.map(event, EventDto.class);
-    }
-
-    private Event convertEventDtoToEntity(EventDto eventDto) {
-        if (eventDto.getDenominacio() == null) throw new MissingRequiredParametersException();
-        if (eventDto.getDataInici() == null) throw new MissingRequiredParametersException();
-        if (eventDto.getUbicacio() == null) throw new MissingRequiredParametersException();
-        //....modifications....
-        return modelMapper.map(eventDto, Event.class);
-    }
 }

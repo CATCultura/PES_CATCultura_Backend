@@ -1,6 +1,9 @@
 package cat.cultura.backend;
 
+import cat.cultura.backend.dtos.EventDto;
+import cat.cultura.backend.entity.Event;
 import org.modelmapper.ModelMapper;
+import org.modelmapper.PropertyMap;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
@@ -17,7 +20,17 @@ public class BackendApplication  implements WebMvcConfigurer {
 
 	@Bean
 	public ModelMapper modelMapper() {
-		return new ModelMapper();
+		ModelMapper modelMapper = new ModelMapper();
+		PropertyMap<EventDto, Event> propertyMap = new PropertyMap<EventDto, Event>() {
+			@Override
+			protected void configure() {
+				skip(destination.getTagsAmbits());
+				skip(destination.getTagsAltresCateg());
+				skip(destination.getTagsCateg());
+			}
+		};
+		modelMapper.addMappings(propertyMap);
+		return modelMapper;
 	}
 
 }

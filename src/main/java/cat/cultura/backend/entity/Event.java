@@ -1,9 +1,11 @@
 package cat.cultura.backend.entity;
 
+import cat.cultura.backend.entity.tag.Tag;
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import javax.persistence.*;
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -47,20 +49,14 @@ public class Event {
     @Column(name="subtitol")
     private String subtitol;
 
-    @ElementCollection
-    @CollectionTable(name="tagsAmbits", joinColumns=@JoinColumn(name="id"))
-    @Column(name="tagsAmbits")
-    private List<String> tagsAmbits;
+    @ManyToMany
+    private List<Tag> tagsAmbits = new ArrayList<>();
 
-    @ElementCollection
-    @CollectionTable(name="tagsCateg", joinColumns=@JoinColumn(name="id"))
-    @Column(name="tagsCateg")
-    private List<String> tagsCateg;
+    @ManyToMany
+    private List<Tag> tagsCateg = new ArrayList<>();
 
-    @ElementCollection
-    @CollectionTable(name="tagsAltresCateg", joinColumns=@JoinColumn(name="id"))
-    @Column(name="tagsAltresCateg")
-    private List<String> tagsAltresCateg;
+    @ManyToMany
+    private List<Tag> tagsAltresCateg = new ArrayList<>();
 
     @Lob
     @Column(name="links")
@@ -108,9 +104,11 @@ public class Event {
     @Column(name="imgApp")
     private String imgApp;
 
-
     @Column(name="cancelado")
     private boolean cancelado;
+
+    @ManyToOne
+    private Organizer organizer;
 
     public Long getId() {
         return id;
@@ -192,27 +190,27 @@ public class Event {
         this.subtitol = subtitol;
     }
 
-    public List<String> getTagsAmbits() {
+    public List<Tag> getTagsAmbits() {
         return tagsAmbits;
     }
 
-    public void setTagsAmbits(List<String> tagsAmbits) {
+    public void setTagsAmbits(List<Tag> tagsAmbits) {
         this.tagsAmbits = tagsAmbits;
     }
 
-    public List<String> getTagsCateg() {
+    public List<Tag> getTagsCateg() {
         return tagsCateg;
     }
 
-    public void setTagsCateg(List<String> tagsCateg) {
+    public void setTagsCateg(List<Tag> tagsCateg) {
         this.tagsCateg = tagsCateg;
     }
 
-    public List<String> getTagsAltresCateg() {
+    public List<Tag> getTagsAltresCateg() {
         return tagsAltresCateg;
     }
 
-    public void setTagsAltresCateg(List<String> tagsAltresCateg) {
+    public void setTagsAltresCateg(List<Tag> tagsAltresCateg) {
         this.tagsAltresCateg = tagsAltresCateg;
     }
 
@@ -360,4 +358,11 @@ public class Event {
         return hash;
     }
 
+    public Organizer getOrganizer() {
+        return organizer;
+    }
+
+    public void setOrganizer(Organizer organizer) {
+        this.organizer = organizer;
+    }
 }

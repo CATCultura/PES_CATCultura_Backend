@@ -4,18 +4,18 @@ import cat.cultura.backend.dtos.EventDto;
 import cat.cultura.backend.dtos.LoggedUserDto;
 import cat.cultura.backend.dtos.TrophyDto;
 import cat.cultura.backend.dtos.UserDto;
-import cat.cultura.backend.entity.Event;
-import cat.cultura.backend.entity.Trophy;
-import cat.cultura.backend.entity.User;
-import cat.cultura.backend.service.*;
-import cat.cultura.backend.service.AttendanceService;
+import cat.cultura.backend.entity.*;
 import cat.cultura.backend.exceptions.UserNotFoundException;
+import cat.cultura.backend.interceptors.CurrentUser;
+import cat.cultura.backend.mappers.EventMapper;
+import cat.cultura.backend.service.*;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.*;
@@ -39,32 +39,18 @@ public class UserController {
     private RequestService requestService;
 
     @Autowired
+    private EventMapper eventMapper;
+
+    @Autowired
     private ModelMapper modelMapper;
 
 
-    @GetMapping("/auth")
-    public ResponseEntity<LoggedUserDto> authenticate(@RequestHeader("Authorization") String credentials) {
-        User currentUser;
-        String[] s = credentials.split(",");
-        Map<String,String> credentialMap = new HashMap<>();
-        for (String field : s) {
-            String[] currentInfo = field.split("=");
-            assert currentInfo.length == 2;
-            credentialMap.put(currentInfo[0], currentInfo[1]);
-        }
-        try {
-        currentUser = userService.getUserByUsername(credentialMap.get("username"));
-        } catch (UserNotFoundException u) {
-            return new ResponseEntity<>(new LoggedUserDto(), HttpStatus.NOT_FOUND);
-        }
-        if (credentialMap.get("password").equals(currentUser.getPassword())) {
-            LoggedUserDto loggedUserDto = convertUserToLoggedUserDto(currentUser);
-            return new ResponseEntity<>(loggedUserDto, HttpStatus.OK);
-        }
-        else {
-            return new ResponseEntity<>(new LoggedUserDto(), HttpStatus.UNAUTHORIZED);
-        }
-
+    @GetMapping("/login")
+    public ResponseEntity<LoggedUserDto> authenticate() {
+        CurrentUser currentUser = (CurrentUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        User u = userService.getUserByUsername(currentUser.getUsername());
+        LoggedUserDto loggedUserDto = convertUserToLoggedUserDto(u);
+        return new ResponseEntity<>(loggedUserDto,HttpStatus.OK);
     }
 
 
@@ -83,6 +69,7 @@ public class UserController {
             @RequestParam(value = "name-and-surname", required = false) String nameAndSurname,
             Pageable pageable
     ) {
+//
         Page<User> users = userService.getUsersByQuery(id, username, nameAndSurname, pageable);
         return ResponseEntity.status(HttpStatus.OK).body(users.stream().map(this::convertUserToDto).toList());
     }
@@ -127,7 +114,7 @@ public class UserController {
     @GetMapping("/user/{id}/attendance")
     public ResponseEntity<List<EventDto>> getAttendance(@PathVariable Long id) {
         List<Event> events = userService.getAttendanceEventsById(id);
-        return ResponseEntity.status(HttpStatus.OK).body(events.stream().map(this::convertEventToDto).toList());
+        return ResponseEntity.status(HttpStatus.OK).body(events.stream().map(eventMapper::convertEventToDto).toList());
     }
 
     @DeleteMapping("/users/{id}/assistance/{eventId}")
@@ -155,7 +142,7 @@ public class UserController {
     @GetMapping("/users/{id}/favourites")
     public ResponseEntity<List<EventDto>> getFavourites(@PathVariable Long id) {
         List<Event> events = userService.getFavouriteEventsById(id);
-        return ResponseEntity.status(HttpStatus.OK).body(events.stream().map(this::convertEventToDto).toList());
+        return ResponseEntity.status(HttpStatus.OK).body(events.stream().map(eventMapper::convertEventToDto).toList());
     }
 
     @DeleteMapping("/users/{id}/favourites/{eventId}")
@@ -220,7 +207,7 @@ public class UserController {
     @DeleteMapping("/users/{id}/friends/{friendId}")
     public ResponseEntity removeRequestsTo(@PathVariable Long id, @PathVariable Long friendId) {
         try {
-            requestService.removeFriendRequestsTo(id,friendId);
+            requestService.removeFriend(id,friendId);
         } catch (AssertionError as) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(as.getMessage());
         }
@@ -255,23 +242,16 @@ public class UserController {
         return userDto;
     }
 
-    private EventDto convertEventToDto(Event event) {
-        EventDto eventDto = modelMapper.map(event, EventDto.class);
-        //....modifications....
-        return eventDto;
-    }
 
     private User convertUserDtoToEntity(UserDto userDto) {
-        User user = modelMapper.map(userDto, User.class);
+        if (userDto.getRole() == Role.ORGANIZER) {
+            return  modelMapper.map(userDto, Organizer.class);
+        }
+        else return modelMapper.map(userDto, User.class);
         //....modifications....
-        return user;
+
     }
 
-    private Event convertEventDtoToEntity(EventDto eventDto) {
-        Event event = modelMapper.map(eventDto, Event.class);
-        //....modifications....
-        return event;
-    }
 
     private TrophyDto convertTrophyToDto(Trophy trophy) {
         TrophyDto trophyDto = modelMapper.map(trophy, TrophyDto.class);
