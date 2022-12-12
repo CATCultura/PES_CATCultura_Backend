@@ -2,40 +2,74 @@ package cat.cultura.backend.dtos;
 
 public class ChatMessageDto {
 
-    private String from;
+    private Long eventId;
 
-    private String text;
+    private Long id;
 
-    private String date;
-
-    public ChatMessageDto(String from, String text, String time) {
-        this.from = from;
-        this.text = text;
-        this.date = time;
+    public Long getEventId() {
+        return eventId;
     }
 
-    public String getFrom() {
-        return from;
+    public void setEventId(Long eventId) {
+        this.eventId = eventId;
     }
 
-    public void setFrom(String from) {
-        this.from = from;
+    public Long getId() {
+        return id;
     }
 
-    public String getText() {
-        return text;
+    public void setId(Long id) {
+        this.id = id;
     }
 
-    public void setText(String text) {
-        this.text = text;
+    public String getUserId() {
+        return userId;
     }
 
-    public String getDate() {
-        return date;
+    public void setUserId(String userId) {
+        this.userId = userId;
     }
 
-    public void setDate(String date) {
-        this.date = date;
+    private String userId;
+
+    private String userName;
+
+    private String content;
+
+    private String timeSent;
+
+    public ChatMessageDto(String userName, String content, String time) {
+        this.userName = userName;
+        this.content = content;
+        this.timeSent = time;
+    }
+
+    public ChatMessageDto() {
+
+    }
+
+    public String getUserName() {
+        return userName;
+    }
+
+    public void setUserName(String userName) {
+        this.userName = userName;
+    }
+
+    public String getContent() {
+        return content;
+    }
+
+    public void setContent(String content) {
+        this.content = content;
+    }
+
+    public String getTimeSent() {
+        return timeSent;
+    }
+
+    public void setTimeSent(String timeSent) {
+        this.timeSent = timeSent;
     }
 
 

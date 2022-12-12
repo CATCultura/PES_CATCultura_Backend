@@ -47,7 +47,7 @@
                 var room = document.getElementById('eventid').value;
 	        	var from = document.getElementById('from').value;
 	            var text = document.getElementById('text').value;
-	            stompClient.send("/app/chat/"+room, {}, JSON.stringify({'from':from, 'text':text}));
+	            stompClient.send("/app/chat/"+room, {}, JSON.stringify({'userName':from, 'content':text, 'eventId': room}));
 	        }
 
 	        function showMessageOutput(messageOutput) {
@@ -55,7 +55,7 @@
 	            var response = document.getElementById('response');
 	            var p = document.createElement('p');
 	            p.style.wordWrap = 'break-word';
-	            p.appendChild(document.createTextNode(messageOutput.from + ": " + messageOutput.text + " (" + messageOutput.date + ")"));
+	            p.appendChild(document.createTextNode(messageOutput.userName + ": " + messageOutput.content + " (" + messageOutput.timeSent + ")"));
 	            response.appendChild(p);
 	        }
 

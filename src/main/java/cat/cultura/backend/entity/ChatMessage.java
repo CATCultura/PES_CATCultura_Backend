@@ -1,38 +1,50 @@
 package cat.cultura.backend.entity;
 
-import cat.cultura.backend.utils.ChatId;
-
 import javax.persistence.*;
+import javax.validation.constraints.NotNull;
 
 @Entity
 public class ChatMessage {
-    @EmbeddedId
-    private ChatId chatId;
 
-    @MapsId("eventId")
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    private Long id;
+
+    @NotNull
     @ManyToOne
+    @JoinColumn(name = "event_id", updatable = false)
     private Event event;
 
-    @MapsId("userId")
+    @NotNull
     @ManyToOne
+    @JoinColumn(name = "user_id", updatable = false)
     private User user;
 
-    public ChatId getChatId() {
-        return chatId;
+    @Lob
+    @Column(name="content")
+    private String content;
+
+    @Column(name="timeSent")
+    private String timeSent;
+
+
+
+    public Long getId() {
+        return id;
     }
 
-    public void setChatId(ChatId chatId) {
-        this.chatId = chatId;
+    public void setId(Long id) {
+        this.id = id;
     }
 
-    public Event getEventChatRoom() {
+    public Event getEvent() {
         return event;
     }
 
-    public void setEventChatRoom(Event event) {
+    public void setEvent(Event event) {
         this.event = event;
     }
-
     public User getUser() {
         return user;
     }
@@ -57,12 +69,7 @@ public class ChatMessage {
         this.timeSent = timeSent;
     }
 
-    @Lob
-    @Column(name="content")
-    private String content;
 
-    @Column(name="timeSent")
-    private String timeSent;
 
 
 }
