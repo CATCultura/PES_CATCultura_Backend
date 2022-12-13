@@ -11,6 +11,8 @@ import cat.cultura.backend.service.user.*;
 import cat.cultura.backend.interceptors.CurrentUser;
 import cat.cultura.backend.mappers.EventMapper;
 import org.modelmapper.ModelMapper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -63,10 +65,13 @@ public class UserController {
     @Autowired
     private UserTagService userTagService;
 
+    private final Logger logger = LoggerFactory.getLogger(this.getClass());
+
     @GetMapping("/login")
     public ResponseEntity<LoggedUserDto> authenticate() {
         CurrentUser currentUser = (CurrentUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         User u = userService.getUserByUsername(currentUser.getUsername());
+        logger.info("Logging attempt by user {}",currentUser.getUsername());
         LoggedUserDto loggedUserDto = convertUserToLoggedUserDto(u);
         return new ResponseEntity<>(loggedUserDto,HttpStatus.OK);
     }
@@ -75,8 +80,10 @@ public class UserController {
     //Post, Get, Put, and Delete for all UserDto properties (see class UserDto)
     @PostMapping("/users")
     public ResponseEntity<LoggedUserDto> addUser(@RequestBody UserDto user) {
+        logger.info("Received request to create user with username {}",user.getUsername());
         User userEntity = convertUserDtoToEntity(user);
         User userCreated = userService.createUser(userEntity);
+        logger.info("User {} created successfully",user.getUsername());
         return ResponseEntity.status(HttpStatus.CREATED).body(convertUserToLoggedUserDto(userCreated));
     }
 
@@ -140,7 +147,7 @@ public class UserController {
         return ResponseEntity.status(HttpStatus.OK).body(events.stream().map(eventMapper::convertEventToDto).toList());
     }
 
-    @DeleteMapping("/users/{id}/assistance/{eventId}")
+    @DeleteMapping("/users/{id}/attendance/{eventId}")
     public ResponseEntity<String> removeAttendance(@PathVariable Long id, @PathVariable Long eventId) {
         if(!isCurrentUser(id)) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
@@ -430,7 +437,7 @@ public class UserController {
     private boolean isCurrentUser(Long userId) {
         CurrentUser currentUser = (CurrentUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         User u = userService.getUserByUsername(currentUser.getUsername());
-        return u.getId()==userId;
+        return Objects.equals(u.getId(), userId);
     }
 
 }
