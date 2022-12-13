@@ -5,20 +5,19 @@ import cat.cultura.backend.dtos.ReviewDto;
 import cat.cultura.backend.entity.Event;
 
 import cat.cultura.backend.entity.Review;
-import cat.cultura.backend.entity.User;
 import cat.cultura.backend.exceptions.EventAlreadyCreatedException;
 import cat.cultura.backend.exceptions.MissingRequiredParametersException;
-import cat.cultura.backend.interceptors.CurrentUser;
 import cat.cultura.backend.mappers.EventMapper;
 import cat.cultura.backend.mappers.ReviewMapper;
 import cat.cultura.backend.service.*;
+import cat.cultura.backend.service.user.UserService;
+import cat.cultura.backend.service.user.UserTrophyService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;

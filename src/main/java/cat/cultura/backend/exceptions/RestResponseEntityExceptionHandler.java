@@ -9,9 +9,14 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExcep
 @ControllerAdvice
 public class RestResponseEntityExceptionHandler extends ResponseEntityExceptionHandler {
 
-    @ExceptionHandler(value = { UserNotFoundException.class, EventNotFoundException.class, RequestNotFoundException.class })
+    @ExceptionHandler(value = { UserNotFoundException.class, TagNotFoundException.class, EventNotFoundException.class, RequestNotFoundException.class })
     public final ResponseEntity<String> handleException(Exception ex) {
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ex.getMessage());
+    }
+
+    @ExceptionHandler(value = { TagAlreadyAddedException.class, TagNotPresentException.class, RequestAlreadyAddedException.class, FriendAlreadyAddedException.class, MissingRequiredParametersException.class })
+    public final ResponseEntity<String> handleConflicts(Exception ex) {
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(ex.getMessage());
     }
 
 }

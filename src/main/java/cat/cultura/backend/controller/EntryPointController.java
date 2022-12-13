@@ -10,7 +10,7 @@ import cat.cultura.backend.exceptions.MissingRequiredParametersException;
 import cat.cultura.backend.exceptions.UserNotFoundException;
 import cat.cultura.backend.mappers.EventMapper;
 import cat.cultura.backend.service.EventService;
-import cat.cultura.backend.service.UserService;
+import cat.cultura.backend.service.user.UserService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;

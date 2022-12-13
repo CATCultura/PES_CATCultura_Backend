@@ -1,8 +1,7 @@
-package cat.cultura.backend.service;
+package cat.cultura.backend.service.user;
 
 import cat.cultura.backend.entity.Trophy;
 import cat.cultura.backend.entity.User;
-import cat.cultura.backend.exceptions.TrophyNotFoundException;
 import cat.cultura.backend.exceptions.UserNotFoundException;
 import cat.cultura.backend.repository.TrophyJpaRepository;
 import cat.cultura.backend.repository.UserJpaRepository;

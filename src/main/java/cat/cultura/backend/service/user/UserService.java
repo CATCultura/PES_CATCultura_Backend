@@ -1,4 +1,4 @@
-package cat.cultura.backend.service;
+package cat.cultura.backend.service.user;
 
 import cat.cultura.backend.entity.Event;
 import cat.cultura.backend.entity.Organizer;

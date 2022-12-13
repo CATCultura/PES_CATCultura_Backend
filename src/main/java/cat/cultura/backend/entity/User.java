@@ -1,6 +1,8 @@
 package cat.cultura.backend.entity;
 
 import cat.cultura.backend.entity.tag.Tag;
+import cat.cultura.backend.exceptions.TagAlreadyAddedException;
+import cat.cultura.backend.exceptions.TagNotPresentException;
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
@@ -152,35 +154,40 @@ public class User {
         this.tagsAltresCateg = tagsAltresCateg;
     }
 
-    public void addTagsAmbits(Tag tagAmbits) {
-        if(tagsAmbits.contains(tagAmbits)) throw new AssertionError("Tag already added");
-        tagsAmbits.add(tagAmbits);
+    public void addTag(Tag tag) {
+        switch (tag.getType()) {
+            case CATEGORIES -> {
+                if (tagsCateg.contains(tag)) throw new TagAlreadyAddedException();
+                tagsCateg.add(tag);
+            }
+            case AMBITS -> {
+                if (tagsAmbits.contains(tag)) throw new TagAlreadyAddedException();
+                tagsAmbits.add(tag);
+            }
+            case ALTRES_CATEGORIES -> {
+                if (tagsAltresCateg.contains(tag)) throw new TagAlreadyAddedException();
+                tagsAltresCateg.add(tag);
+            }
+        }
     }
 
-    public void removeTagsAmbits(Tag tagAmbits) {
-        if(!tagsAmbits.contains(tagAmbits)) throw new AssertionError("This tag doesn´t belong here");
-        tagsAmbits.remove(tagAmbits);
+    public void removeTag(Tag tag) {
+        switch (tag.getType()) {
+            case CATEGORIES -> {
+                if (!tagsCateg.contains(tag)) throw new TagNotPresentException();
+                tagsCateg.remove(tag);
+            }
+            case AMBITS -> {
+                if (!tagsAmbits.contains(tag)) throw new TagNotPresentException();
+                tagsAmbits.remove(tag);
+            }
+            case ALTRES_CATEGORIES -> {
+                if (!tagsAltresCateg.contains(tag)) throw new TagNotPresentException();
+                tagsAltresCateg.remove(tag);
+            }
+        }
     }
 
-    public void addTagsCateg(Tag tagCateg) {
-        if(tagsCateg.contains(tagCateg)) throw new AssertionError("Tag already added");
-        tagsCateg.add(tagCateg);
-    }
-
-    public void removeTagsCateg(Tag tagCateg) {
-        if(!tagsCateg.contains(tagCateg)) throw new AssertionError("This tag doesn´t belong here");
-        tagsCateg.remove(tagCateg);
-    }
-
-    public void addTagsAltresCateg(Tag tagAltresCateg) {
-        if(tagsAltresCateg.contains(tagAltresCateg)) throw new AssertionError("Tag already added");
-        tagsAltresCateg.add(tagAltresCateg);
-    }
-
-    public void removeTagsAltresCateg(Tag tagAltresCateg) {
-        if(!tagsAltresCateg.contains(tagAltresCateg)) throw new AssertionError("This tag doesn´t belong here");
-        tagsAltresCateg.remove(tagAltresCateg);
-    }
 
     public User(){}
 
@@ -485,4 +492,6 @@ public class User {
     public void setUrl(String url) {
         this.url = url;
     }
+
+
 }

@@ -2,11 +2,12 @@ package cat.cultura.backend.controller;
 
 import cat.cultura.backend.dtos.*;
 import cat.cultura.backend.entity.*;
+import cat.cultura.backend.entity.tag.Tag;
 import cat.cultura.backend.mappers.ReviewMapper;
 import cat.cultura.backend.mappers.RouteMapper;
 import cat.cultura.backend.mappers.TrophyMapper;
 import cat.cultura.backend.service.*;
-import cat.cultura.backend.service.AttendanceService;
+import cat.cultura.backend.service.user.*;
 import cat.cultura.backend.interceptors.CurrentUser;
 import cat.cultura.backend.mappers.EventMapper;
 import org.modelmapper.ModelMapper;
@@ -59,6 +60,8 @@ public class UserController {
     @Autowired
     private RouteService routeService;
 
+    @Autowired
+    private UserTagService userTagService;
 
     @GetMapping("/login")
     public ResponseEntity<LoggedUserDto> authenticate() {
@@ -359,6 +362,35 @@ public class UserController {
         }
     }
 
+
+    @GetMapping("/users/{userId}/tags")
+    public ResponseEntity<Map<String,List<String>>> getTags(@PathVariable Long userId) {
+        List<Tag> tagList = userTagService.getTags(userId);
+        Map<String, List<String>> result = new HashMap<>();
+        for (Tag t : tagList) {
+            if (!result.containsKey(t.getType().toString())){
+                result.put(t.getType().toString(),new ArrayList<>());
+            }
+            result.get(t.getType().toString()).add(t.getValue());
+        }
+        return ResponseEntity.status(HttpStatus.OK).body(result);
+    }
+
+    @PostMapping("/users/{userId}/tags")
+    public ResponseEntity<String> addTags(@PathVariable Long userId, @RequestBody List<String> tags) {
+        userTagService.addTags(userId,tags);
+        return ResponseEntity.status(HttpStatus.CREATED).body(null);
+    }
+
+    @DeleteMapping("/users/{userId}/tags")
+    public ResponseEntity<String> removeTags(@PathVariable Long userId, @RequestBody List<String> tags) {
+        userTagService.removeTags(userId,tags);
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
+    }
+
+
+
+
     //Dto conversion functions
 
     private UserDto convertUserToDto(User user) {
@@ -382,6 +414,7 @@ public class UserController {
         for (Trophy t : user.getTrophies()) {
             userDto.addTrophy(t.getId());
         }
+
 
         return userDto;
     }
