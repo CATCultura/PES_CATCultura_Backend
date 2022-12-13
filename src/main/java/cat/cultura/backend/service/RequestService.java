@@ -61,21 +61,18 @@ public class RequestService {
     public List<User> getRequestsTo(Long userId){
         User user = userRepo.findById(userId).orElseThrow(UserNotFoundException::new);
         List<User> users = user.getRequestTo();
-        if(users.isEmpty()) throw new UserNotFoundException("You do not have any requests to other users.");
         return users;
     }
 
     public List<User> getRequestFrom(Long userId){
         User user = userRepo.findById(userId).orElseThrow(UserNotFoundException::new);
         List<User> users = user.getRequestFrom();
-        if(users.isEmpty()) throw new UserNotFoundException("You do not have any requests from other users.");
         return users;
     }
 
     public List<User> getFriends(Long userId) {
         User user = userRepo.findById(userId).orElseThrow(UserNotFoundException::new);
         List<User> users = user.getFriends();
-        if(users.isEmpty()) throw new UserNotFoundException("You do not have any friends.");
         return users;
     }
 

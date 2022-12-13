@@ -1,5 +1,6 @@
 package cat.cultura.backend.entity;
 
+import cat.cultura.backend.entity.tag.Tag;
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
@@ -93,6 +94,93 @@ public class User {
             inverseJoinColumns = {@JoinColumn(name = "friendId")}
     )
     private List<User> friends = new ArrayList<>();
+
+    @ManyToMany
+    private List<Tag> tagsAmbits = new ArrayList<>();
+
+    @ManyToMany
+    private List<Tag> tagsCateg = new ArrayList<>();
+
+    @ManyToMany
+    private List<Tag> tagsAltresCateg = new ArrayList<>();
+
+    @OneToMany
+    @CollectionTable(name="Routes", joinColumns=@JoinColumn(name="id"))
+    @Column(name="Routes")
+    private List<Route> routes;
+
+    public List<Route> getRoutes() {
+        return routes;
+    }
+
+    public void setRoutes(List<Route> routes) {
+        this.routes = routes;
+    }
+
+    public void addRoute(Route route) {
+        this.routes.add(route);
+    }
+
+    public void setUserHash(String userHash) {
+        this.userHash = userHash;
+    }
+
+    public void setFriends(List<User> friends) {
+        this.friends = friends;
+    }
+
+    public List<Tag> getTagsAmbits() {
+        return tagsAmbits;
+    }
+    public void setTagsAmbits(List<Tag> tagsAmbits) {
+        this.tagsAmbits = tagsAmbits;
+    }
+
+    public List<Tag> getTagsCateg() {
+        return tagsCateg;
+    }
+
+    public void setTagsCateg(List<Tag> tagsCateg) {
+        this.tagsCateg = tagsCateg;
+    }
+
+    public List<Tag> getTagsAltresCateg() {
+        return tagsAltresCateg;
+    }
+
+    public void setTagsAltresCateg(List<Tag> tagsAltresCateg) {
+        this.tagsAltresCateg = tagsAltresCateg;
+    }
+
+    public void addTagsAmbits(Tag tagAmbits) {
+        if(tagsAmbits.contains(tagAmbits)) throw new AssertionError("Tag already added");
+        tagsAmbits.add(tagAmbits);
+    }
+
+    public void removeTagsAmbits(Tag tagAmbits) {
+        if(!tagsAmbits.contains(tagAmbits)) throw new AssertionError("This tag doesn´t belong here");
+        tagsAmbits.remove(tagAmbits);
+    }
+
+    public void addTagsCateg(Tag tagCateg) {
+        if(tagsCateg.contains(tagCateg)) throw new AssertionError("Tag already added");
+        tagsCateg.add(tagCateg);
+    }
+
+    public void removeTagsCateg(Tag tagCateg) {
+        if(!tagsCateg.contains(tagCateg)) throw new AssertionError("This tag doesn´t belong here");
+        tagsCateg.remove(tagCateg);
+    }
+
+    public void addTagsAltresCateg(Tag tagAltresCateg) {
+        if(tagsAltresCateg.contains(tagAltresCateg)) throw new AssertionError("Tag already added");
+        tagsAltresCateg.add(tagAltresCateg);
+    }
+
+    public void removeTagsAltresCateg(Tag tagAltresCateg) {
+        if(!tagsAltresCateg.contains(tagAltresCateg)) throw new AssertionError("This tag doesn´t belong here");
+        tagsAltresCateg.remove(tagAltresCateg);
+    }
 
     public User(){}
 
@@ -218,11 +306,13 @@ public class User {
     public void addTrophy(Trophy t) {
         if (trophies.contains(t)) throw new AssertionError("Trophy with id: " + t.getId() + " already in trophies");
         trophies.add(t);
+        points = points + t.getPoints();
     }
 
     public void removeTrophy(Trophy t) {
         if (!trophies.contains(t)) throw new AssertionError("Trophy with id: " + t.getId() +  " is not in trophies");
         trophies.remove(t);
+        points = points - t.getPoints();
     }
 
     public void addFriendRequestTo(Request fd) {
@@ -360,6 +450,18 @@ public class User {
         }
     }
 
+    public void deleteRoute(Route route) {
+        if(!routes.contains(route)) throw new AssertionError("Route with id: " + route.getRouteId() + " doesn't belong to this user");
+        routes.remove(route);
+    }
+
+    public void addPoints(int points) {
+        this.points += points;
+    }
+
+    public void removePoints(int points) {
+        this.points -= points;
+    }
     public Role getRole() {
         return role;
     }
