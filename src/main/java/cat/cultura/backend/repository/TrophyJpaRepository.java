@@ -8,7 +8,6 @@ import java.util.Optional;
 
 @Repository
 public interface TrophyJpaRepository extends JpaRepository<Trophy, Long> {
-
     Optional<Trophy> findByName(String name);
 
 }

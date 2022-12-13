@@ -1,14 +1,17 @@
 package cat.cultura.backend.controller;
 
 import cat.cultura.backend.dtos.EventDto;
+import cat.cultura.backend.dtos.ReviewDto;
 import cat.cultura.backend.entity.Event;
+
+import cat.cultura.backend.entity.Review;
 import cat.cultura.backend.exceptions.EventAlreadyCreatedException;
 import cat.cultura.backend.exceptions.MissingRequiredParametersException;
 import cat.cultura.backend.mappers.EventMapper;
-import cat.cultura.backend.service.EventService;
-import cat.cultura.backend.service.RouteService;
-import cat.cultura.backend.service.TagService;
-import org.modelmapper.ModelMapper;
+import cat.cultura.backend.mappers.ReviewMapper;
+import cat.cultura.backend.service.*;
+import cat.cultura.backend.service.user.UserService;
+import cat.cultura.backend.service.user.UserTrophyService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -30,13 +33,22 @@ public class EventController {
     private RouteService routeService;
 
     @Autowired
-    private ModelMapper modelMapper;
+    private UserService userService;
+
+    @Autowired
+    private UserTrophyService userTrophyService;
+
+    @Autowired
+    private ReviewService reviewService;
 
     @Autowired
     private EventMapper eventMapper;
+
+    @Autowired
+    private ReviewMapper reviewMapper;
+
     @Autowired
     private TagService tagService;
-
 
     @PostMapping("/events")
     public ResponseEntity<List<EventDto>> addEvent(@RequestBody List<EventDto> ev) {
@@ -57,7 +69,6 @@ public class EventController {
         } catch (EventAlreadyCreatedException eac) {
             return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
         }
-
         return ResponseEntity.status(HttpStatus.CREATED).body(events.stream().map(eventMapper::convertEventToDto).toList());
     }
 
@@ -83,17 +94,6 @@ public class EventController {
         return ResponseEntity.status(HttpStatus.OK).body(events.stream().map(eventMapper::convertEventToDto).toList());
     }
 
-    @GetMapping("/events/route")
-    public ResponseEntity<List<EventDto>> getEventsRoute(
-            @RequestParam(required = true) double lat,
-            @RequestParam(required = true) double lon,
-            @RequestParam(required = true) int radius,
-            @RequestParam(required = true) String day1
-    ) {
-        List<Event> events = routeService.getRouteByQuery(lat, lon, radius, day1);
-        return ResponseEntity.status(HttpStatus.OK).body(events.stream().map(eventMapper::convertEventToDto).toList());
-    }
-
     @GetMapping("/events/{id}")
     public ResponseEntity<EventDto> getEventById(@PathVariable Long id) {
         Event event = eventService.getEventById(id);
@@ -111,6 +111,29 @@ public class EventController {
     public ResponseEntity<String> deleteEvent(@PathVariable Long id){
         eventService.deleteEvent(id);
         return ResponseEntity.status(HttpStatus.OK).build();
+    }
+
+    @PutMapping("/events/outdated")
+    public ResponseEntity<List<EventDto>> updateEvent() {
+        List<Event> pe = eventService.updateEvents();
+        return ResponseEntity.status(HttpStatus.CREATED).body(pe.stream().map(eventMapper::convertEventToDto).toList());
+    }
+
+    @GetMapping("/events/outdated")
+    public ResponseEntity<List<EventDto>> getPastEvents() {
+        List<Event> pe = eventService.getPastEvents();
+        return ResponseEntity.status(HttpStatus.OK).body(pe.stream().map(eventMapper::convertEventToDto).toList());
+    }
+
+    @GetMapping("/events/{id}/reviews")
+    public ResponseEntity<List<ReviewDto>> getEventsByQuery(@PathVariable Long id) {
+        List<Review> reviews;
+        try {
+            reviews = reviewService.getReviewsByEvent(id);
+        } catch (AssertionError as) {
+            return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
+        }
+        return ResponseEntity.status(HttpStatus.OK).body(reviews.stream().map(reviewMapper::convertReviewToDto).toList());
     }
 
 }

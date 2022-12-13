@@ -2,9 +2,9 @@ package cat.cultura.backend.controllers;
 
 import cat.cultura.backend.dtos.UserDto;
 import cat.cultura.backend.entity.User;
-import cat.cultura.backend.service.FavouriteService;
-import cat.cultura.backend.service.RequestService;
-import cat.cultura.backend.service.UserService;
+import cat.cultura.backend.service.user.FavouriteService;
+import cat.cultura.backend.service.user.RequestService;
+import cat.cultura.backend.service.user.UserService;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;

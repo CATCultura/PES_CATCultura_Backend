@@ -1,5 +1,11 @@
 package cat.cultura.backend.entity;
 
+import cat.cultura.backend.entity.tag.Tag;
+import cat.cultura.backend.entity.tag.TagAltresCategories;
+import cat.cultura.backend.entity.tag.TagAmbits;
+import cat.cultura.backend.entity.tag.TagCategories;
+import cat.cultura.backend.exceptions.TagAlreadyAddedException;
+import cat.cultura.backend.exceptions.TagNotPresentException;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -279,6 +285,113 @@ class UserTest {
 
         Assertions.assertFalse(u1.hasFriend(u2) && u2.hasFriend(u1));
     }
+
+    @Test
+    void addAmbitsTagOk() {
+        User u = new User("JoanJosep");
+        Tag t = new TagAmbits("arts-visuals");
+        u.addTag(t);
+
+        List<Tag> tagList = u.getTagsAmbits();
+        Assertions.assertTrue(tagList.contains(t));
+
+    }
+
+    @Test
+    void addAmbitsTagRepeated() {
+        User u = new User("JoanJosep");
+        Tag t = new TagAmbits("arts-visuals");
+        u.addTag(t);
+
+        Assertions.assertThrows(TagAlreadyAddedException.class, () -> u.addTag(t));
+    }
+
+    @Test
+    void addCategTagOk() {
+        User u = new User("JoanJosep");
+        Tag t = new TagCategories("arts-visuals");
+        u.addTag(t);
+
+        List<Tag> tagList = u.getTagsCateg();
+        Assertions.assertTrue(tagList.contains(t));
+
+    }
+
+    @Test
+    void addCategTagRepeated() {
+        User u = new User("JoanJosep");
+        Tag t = new TagCategories("arts-visuals");
+        u.addTag(t);
+
+        Assertions.assertThrows(TagAlreadyAddedException.class, () -> u.addTag(t));
+    }
+
+    @Test
+    void addAltresCategTagOk() {
+        User u = new User("JoanJosep");
+        Tag t = new TagAltresCategories("arts-visuals");
+        u.addTag(t);
+
+        List<Tag> tagList = u.getTagsAltresCateg();
+        Assertions.assertTrue(tagList.contains(t));
+
+    }
+
+    @Test
+    void addAltresCategTagRepeated() {
+        User u = new User("JoanJosep");
+        Tag t = new TagAltresCategories("arts-visuals");
+        u.addTag(t);
+
+        Assertions.assertThrows(TagAlreadyAddedException.class, () -> u.addTag(t));
+    }
+
+    //remove tags
+
+    @Test
+    void removeAmbitsTagOk() {
+        User u = new User("JoanJosep");
+        Tag t = new TagAmbits("arts-visuals");
+        u.addTag(t);
+
+        List<Tag> tagList = u.getTagsAmbits();
+        Assertions.assertTrue(tagList.contains(t));
+        u.removeTag(t);
+        Assertions.assertFalse(tagList.contains(t));
+    }
+
+    @Test
+    void removeTagNotPresent() {
+        User u = new User("JoanJosep");
+        Tag t = new TagAmbits("arts-visuals");
+
+        Assertions.assertThrows(TagNotPresentException.class, () -> u.removeTag(t));
+    }
+
+    @Test
+    void removeCategTagOk() {
+        User u = new User("JoanJosep");
+        Tag t = new TagCategories("arts-visuals");
+        u.addTag(t);
+
+        List<Tag> tagList = u.getTagsCateg();
+        Assertions.assertTrue(tagList.contains(t));
+        u.removeTag(t);
+        Assertions.assertFalse(tagList.contains(t));
+    }
+
+    @Test
+    void removeAltresCategTagOk() {
+        User u = new User("JoanJosep");
+        Tag t = new TagAltresCategories("arts-visuals");
+        u.addTag(t);
+        List<Tag> tagList = u.getTagsAltresCateg();
+        Assertions.assertTrue(tagList.contains(t));
+        u.removeTag(t);
+        Assertions.assertFalse(tagList.contains(t));
+    }
+
+
 
 
 }

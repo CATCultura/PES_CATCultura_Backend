@@ -6,13 +6,8 @@ import java.util.List;
 public class LoggedUserDto extends UserDto {
 
     private String userHash;
-
-
     private List<Long> favouriteEvents = new ArrayList<>();
     private List<Long> trophiesReceived = new ArrayList<>();
-
-
-
     private List<Long> eventsAttendance = new ArrayList<>();
     private List<Long> friendIds = new ArrayList<>();
 
