@@ -126,22 +126,6 @@ public class EventController {
         return ResponseEntity.status(HttpStatus.OK).body(pe.stream().map(eventMapper::convertEventToDto).toList());
     }
 
-    @PostMapping("/events/{id}/reviews")
-    public ResponseEntity<ReviewDto> addEvent(@PathVariable Long id, @RequestBody ReviewDto ev) {
-        ReviewDto reviewDto;
-        CurrentUser currentUser = (CurrentUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        User u = userService.getUserByUsername(currentUser.getUsername());
-        try {
-            Review aux = reviewMapper.convertReviewDtoToEntity(ev);
-            aux = reviewService.addReview(id, aux, u);
-            reviewDto = reviewMapper.convertReviewToDto(aux);
-        } catch (AssertionError as) {
-            return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
-        }
-        userTrophyService.firstReview(u.getId());
-        return ResponseEntity.status(HttpStatus.CREATED).body(reviewDto);
-    }
-
     @GetMapping("/events/{id}/reviews")
     public ResponseEntity<List<ReviewDto>> getEventsByQuery(@PathVariable Long id) {
         List<Review> reviews;
@@ -151,16 +135,6 @@ public class EventController {
             return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
         }
         return ResponseEntity.status(HttpStatus.OK).body(reviews.stream().map(reviewMapper::convertReviewToDto).toList());
-    }
-
-    @DeleteMapping("/events/{eventId}/reviews/{reviewId}")
-    public ResponseEntity<String> getEventById(@PathVariable Long eventId, @PathVariable Long reviewId) {
-        try{
-            reviewService.deleteReview(reviewId);
-        }catch (AssertionError as) {
-            return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
-        }
-        return ResponseEntity.status(HttpStatus.OK).body(null);
     }
 
 }

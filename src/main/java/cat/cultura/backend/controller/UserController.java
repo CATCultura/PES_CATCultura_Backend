@@ -324,6 +324,41 @@ public class UserController {
         return ResponseEntity.status(HttpStatus.OK).body(reviews.stream().map(reviewMapper::convertReviewToDto).toList());
     }
 
+    @PostMapping("/users/{userId}/reviews")
+    public ResponseEntity<ReviewDto> addEvent(
+            @PathVariable Long userId,
+            @RequestParam(required = true) Long eventId,
+            @RequestBody ReviewDto ev) {
+        ReviewDto reviewDto;
+        if(!isCurrentUser(userId)) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+        } else {
+            try {
+                Review aux = reviewMapper.convertReviewDtoToEntity(ev);
+                aux = reviewService.addReview(eventId, aux, userId);
+                reviewDto = reviewMapper.convertReviewToDto(aux);
+            } catch (AssertionError as) {
+                return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
+            }
+            userTrophyService.firstReview(userId);
+            return ResponseEntity.status(HttpStatus.CREATED).body(reviewDto);
+        }
+    }
+
+    @DeleteMapping("/users/{userId}/reviews/{reviewId}")
+    public ResponseEntity<String> getEventById(@PathVariable Long userId, @PathVariable Long reviewId) {
+        if(!isCurrentUser(userId)) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+        } else {
+            try {
+                reviewService.deleteReview(reviewId);
+            } catch (AssertionError as) {
+                return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
+            }
+            return ResponseEntity.status(HttpStatus.OK).body(null);
+        }
+    }
+
     //Dto conversion functions
 
     private UserDto convertUserToDto(User user) {
