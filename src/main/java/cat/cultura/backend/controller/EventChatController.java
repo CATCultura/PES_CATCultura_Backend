@@ -7,7 +7,7 @@ import cat.cultura.backend.entity.User;
 import cat.cultura.backend.mappers.ChatMessageMapper;
 import cat.cultura.backend.service.ChatService;
 import cat.cultura.backend.service.EventService;
-import cat.cultura.backend.service.UserService;
+import cat.cultura.backend.service.user.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.handler.annotation.MessageMapping;
