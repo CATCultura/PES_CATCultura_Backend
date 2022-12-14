@@ -140,7 +140,7 @@ public class UserController {
         return ResponseEntity.status(HttpStatus.OK).body(events.stream().map(eventMapper::convertEventToDto).toList());
     }
 
-    @DeleteMapping("/users/{id}/assistance/{eventId}")
+    @DeleteMapping("/users/{id}/attendance/{eventId}")
     public ResponseEntity<String> removeAttendance(@PathVariable Long id, @PathVariable Long eventId) {
         if(!isCurrentUser(id)) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
