@@ -5,6 +5,7 @@ import cat.cultura.backend.entity.User;
 import cat.cultura.backend.exceptions.RequestAlreadyAddedException;
 import cat.cultura.backend.repository.RequestJpaRepository;
 import cat.cultura.backend.repository.UserJpaRepository;
+import cat.cultura.backend.service.user.RequestService;
 import cat.cultura.backend.utils.RequestId;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -14,7 +15,6 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.BDDMockito.given;
 
 @SpringBootTest

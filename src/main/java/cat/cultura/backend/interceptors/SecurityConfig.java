@@ -42,7 +42,6 @@ public class SecurityConfig {
 //                .antMatchers(HttpMethod.DELETE, "/events/2").hasAuthority(organizer).and().authorizeHttpRequests()
                         .antMatchers(HttpMethod.GET, "/allevents").hasAuthority(service).and().authorizeHttpRequests()
                         .antMatchers(HttpMethod.POST,"/insert").hasAuthority(service).and().authorizeHttpRequests()
-                        .antMatchers("/auth").permitAll().and().authorizeHttpRequests()
                         .anyRequest().authenticated().and().httpBasic();
 
         return http.build();

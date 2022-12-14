@@ -33,6 +33,7 @@ public class EventDto {
     private String ubicacio;
     private String imgApp;
     private boolean cancelado;
+    private boolean outdated;
 
     private String nomOrganitzador;
 
@@ -204,8 +205,6 @@ public class EventDto {
         this.codiPostal = codiPostal;
     }
 
-
-
     public String getEmail() {
         return email;
     }
@@ -230,8 +229,6 @@ public class EventDto {
         this.latitud = latitud;
     }
 
-
-
     public double getLongitud() {
         return longitud;
     }
@@ -239,7 +236,6 @@ public class EventDto {
     public void setLongitud(double longitud) {
         this.longitud = longitud;
     }
-
 
     public String getTelf() {
         return telf;
@@ -263,16 +259,6 @@ public class EventDto {
 
     public void setImgApp(String imgApp) {
         this.imgApp = imgApp;
-    }
-
-
-
-    public boolean isCancelado() {
-        return cancelado;
-    }
-
-    public void setCancelado(boolean cancelado) {
-        this.cancelado = cancelado;
     }
 
     public String getUbicacio() {
@@ -313,5 +299,21 @@ public class EventDto {
 
     public void setEmailOrganitzador(String emailOrganitzador) {
         this.emailOrganitzador = emailOrganitzador;
+    }
+
+    public boolean isCancelado() {
+        return cancelado;
+    }
+
+    public void setCancelado(boolean cancelado) {
+        this.cancelado = cancelado;
+    }
+
+    public boolean isOutdated() {
+        return outdated;
+    }
+
+    public void setOutdated(boolean outdated) {
+        this.outdated = outdated;
     }
 }

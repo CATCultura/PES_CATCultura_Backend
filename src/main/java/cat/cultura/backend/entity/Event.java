@@ -3,15 +3,17 @@ package cat.cultura.backend.entity;
 import cat.cultura.backend.entity.tag.Tag;
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import org.hibernate.annotations.ColumnDefault;
 
 import javax.persistence.*;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 @Entity
-@Table(name = "Event", uniqueConstraints = {
-
-})
+@Table(name = "Event", uniqueConstraints = {})
+@Inheritance(strategy = InheritanceType.SINGLE_TABLE)
 @JsonIgnoreProperties(ignoreUnknown=true)
 @JsonAutoDetect(fieldVisibility= JsonAutoDetect.Visibility.ANY)
 public class Event {
@@ -109,6 +111,10 @@ public class Event {
 
     @ManyToOne
     private Organizer organizer;
+
+    @Column(name="outdated")
+    @ColumnDefault("false")
+    private boolean outdated;
 
     public Long getId() {
         return id;
@@ -336,6 +342,20 @@ public class Event {
 
     public void setUbicacio(String ubicacio) {
         this.ubicacio = ubicacio;
+    }
+
+    public boolean isOutdated() {
+        return outdated;
+    }
+
+    public void setOutdated(boolean outdated) {
+        this.outdated = outdated;
+    }
+
+    public boolean isPastEvent() {
+        SimpleDateFormat formatter= new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'.000'");
+        Date date = new Date(System.currentTimeMillis());
+        return dataInici.compareTo(formatter.format(date)) < 0;
     }
 
     @Override

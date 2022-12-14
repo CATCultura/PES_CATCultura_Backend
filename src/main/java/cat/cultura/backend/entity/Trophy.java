@@ -20,6 +20,9 @@ public class Trophy {
     @Column(name="description")
     private String description;
 
+    @Column(name="points")
+    private int points;
+
     public Long getId() {
         return id;
     }
@@ -43,4 +46,13 @@ public class Trophy {
     public void setDescription(String description) {
         this.description = description;
     }
+
+    public int getPoints() {
+        return points;
+    }
+
+    public void setPoints(int points) {
+        this.points = points;
+    }
+
 }

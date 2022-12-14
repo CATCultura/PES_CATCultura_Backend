@@ -118,4 +118,20 @@ public class EventService {
         }
         return new PageImpl<>(new ArrayList<>());
     }
+    public List<Event> updateEvents() {
+        List<Event> events = eventRepo.findAll();
+        List<Event> updatedEvents = new ArrayList<>();
+        for(Event e : events) {
+            if(e.isPastEvent()) {
+                e.setOutdated(true);
+                updatedEvents.add(e);
+            }
+        }
+        return eventRepo.saveAll(updatedEvents);
+    }
+
+    public List<Event> getPastEvents() {
+        return eventRepo.getPastEvents();
+    }
+
 }
