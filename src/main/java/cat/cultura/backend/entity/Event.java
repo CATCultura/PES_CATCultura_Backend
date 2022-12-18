@@ -1,6 +1,7 @@
 package cat.cultura.backend.entity;
 
 import cat.cultura.backend.entity.tag.Tag;
+import cat.cultura.backend.utils.RandomString;
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import org.hibernate.annotations.ColumnDefault;
@@ -115,6 +116,9 @@ public class Event {
     @Column(name="outdated")
     @ColumnDefault("false")
     private boolean outdated;
+
+    @Column(name="attendanceCode")
+    private String attendanceCode;
 
     public Long getId() {
         return id;
@@ -350,6 +354,19 @@ public class Event {
 
     public void setOutdated(boolean outdated) {
         this.outdated = outdated;
+    }
+
+    public String getAttendanceCode() {
+        return attendanceCode;
+    }
+
+    public void setAttendanceCode(String attendanceCode) {
+        this.attendanceCode = attendanceCode;
+    }
+
+    public String generateAttendanceCode() {
+        attendanceCode = RandomString.generate();
+        return attendanceCode;
     }
 
     public boolean isPastEvent() {

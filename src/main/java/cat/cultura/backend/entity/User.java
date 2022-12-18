@@ -78,6 +78,13 @@ public class User {
     )
     private List<Event> attendance = new ArrayList<>();
 
+    @ManyToMany
+    @JoinTable(name="attended",
+            joinColumns = {@JoinColumn(name = "id") },
+            inverseJoinColumns = {@JoinColumn(name = "eventId")}
+    )
+    private List<Event> attended = new ArrayList<>();
+
     /**
      * Set of Friend requests where requester=this and friend=other user
      */
@@ -111,16 +118,31 @@ public class User {
     @Column(name="Routes")
     private List<Route> routes;
 
-    public List<Route> getRoutes() {
-        return routes;
+    @OneToMany
+    @CollectionTable(name="upvotedReviews", joinColumns=@JoinColumn(name="id"))
+    @Column(name="Review")
+    private List<Review> upvotedReviews;
+
+    public void setAttended(List<Event> attended) {
+        this.attended = attended;
     }
 
-    public void setRoutes(List<Route> routes) {
-        this.routes = routes;
+    public List<Review> getUpvotedReviews() {
+        return upvotedReviews;
     }
 
-    public void addRoute(Route route) {
-        this.routes.add(route);
+    public void setUpvotedReviews(List<Review> upvotedReviews) {
+        this.upvotedReviews = upvotedReviews;
+    }
+
+    public void removeUpvote(Review review) {
+        if(!upvotedReviews.contains(review)) throw new AssertionError("Review with id " + review.getId() + " is not in upvoted reviews");
+        else upvotedReviews.remove(review);
+    }
+
+    public void addUpvote(Review review) {
+        if(upvotedReviews.contains(review)) throw new AssertionError("Review with id " + review.getId() + " is already in upvoted reviews");
+        else upvotedReviews.add(review);
     }
 
     public void setUserHash(String userHash) {
@@ -242,10 +264,22 @@ public class User {
         attendance.add(e);
     }
 
-
     public void removeAttendance(Event e) {
         if (!attendance.contains(e)) throw new AssertionError(EVENT_WITH_ID + e.getId() + " is not in attendance");
         attendance.remove(e);
+    }
+
+    public List<Event> getAttended() { return attended; }
+
+    public void addAttended(Event e) {
+
+        if(attended.contains(e)) throw new AssertionError(EVENT_WITH_ID + e.getId() + " already in attended");
+        attended.add(e);
+    }
+
+    public void removeAttended(Event e) {
+        if (!attended.contains(e)) throw new AssertionError(EVENT_WITH_ID + e.getId() + " is not in attended");
+        attended.remove(e);
     }
 
     public String getCreationDate() {
@@ -455,6 +489,18 @@ public class User {
             this.friends.remove(friend);
             friend.removeFriend(this);
         }
+    }
+
+    public List<Route> getRoutes() {
+        return routes;
+    }
+
+    public void setRoutes(List<Route> routes) {
+        this.routes = routes;
+    }
+
+    public void addRoute(Route route) {
+        this.routes.add(route);
     }
 
     public void deleteRoute(Route route) {

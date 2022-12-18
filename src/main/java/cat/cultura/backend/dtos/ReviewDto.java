@@ -10,6 +10,8 @@ public class ReviewDto {
     private int stars;
     private String date;
 
+    private int upvotes;
+
     public Long getId() {
         return id;
     }
@@ -72,5 +74,13 @@ public class ReviewDto {
 
     public void setTitle(String title) {
         this.title = title;
+    }
+
+    public int getUpvotes() {
+        return upvotes;
+    }
+
+    public void setUpvotes(int upvotes) {
+        this.upvotes = upvotes;
     }
 }

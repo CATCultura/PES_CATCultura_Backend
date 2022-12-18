@@ -134,4 +134,15 @@ public class EventService {
         return eventRepo.getPastEvents();
     }
 
+    public String getAttendanceCode(Long eventId) {
+        Event event = eventRepo.findById(eventId).orElseThrow(()-> new EventNotFoundException("Event with id: " + eventId + " not found"));
+        return event.getAttendanceCode();
+    }
+
+    public String generateAttendanceCode(Long eventId) {
+        Event event = eventRepo.findById(eventId).orElseThrow(()-> new EventNotFoundException("Event with id: " + eventId + " not found"));
+        String code = event.generateAttendanceCode();
+        eventRepo.save(event);
+        return code;
+    }
 }
