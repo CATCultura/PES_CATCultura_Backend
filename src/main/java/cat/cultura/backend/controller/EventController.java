@@ -136,4 +136,14 @@ public class EventController {
         return ResponseEntity.status(HttpStatus.OK).body(reviews.stream().map(reviewMapper::convertReviewToDto).toList());
     }
 
+    @GetMapping("/events/{id}/attendanceCode")
+    public ResponseEntity<String> getAttendanceCode(@PathVariable Long id) {
+        return ResponseEntity.status(HttpStatus.OK).body(eventService.getAttendanceCode(id));
+    }
+
+    @PostMapping("/events/{id}/attendanceCode")
+    public ResponseEntity<String> generateAttendanceCode(@PathVariable Long id) {
+        return ResponseEntity.status(HttpStatus.OK).body(eventService.generateAttendanceCode(id));
+    }
+
 }

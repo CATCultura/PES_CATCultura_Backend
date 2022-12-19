@@ -91,4 +91,8 @@ public class UserService {
         else return result;
     }
 
+    public List<Event> getAttendedEventsById(Long id) {
+        User existingUser = userRepo.findById(id).orElseThrow(() -> new UserNotFoundException("User with id: " + id + " not found"));
+        return existingUser.getAttended();
+    }
 }

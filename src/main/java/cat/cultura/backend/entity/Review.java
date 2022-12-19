@@ -27,6 +27,8 @@ public class Review {
     private int stars;
     private String date;
 
+    private int upvotes = 0;
+
     public String getReview() {
         return review;
     }
@@ -82,5 +84,21 @@ public class Review {
 
     public void setTitle(String title) {
         this.title = title;
+    }
+
+    public int getUpvotes() {
+        return upvotes;
+    }
+
+    public void setUpvotes(int upvotes) {
+        this.upvotes = upvotes;
+    }
+
+    public void upvote(){
+        ++this.upvotes;
+    }
+
+    public void removeUpvote() {
+        --this.upvotes;
     }
 }

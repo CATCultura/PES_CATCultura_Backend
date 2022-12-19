@@ -63,6 +63,9 @@ public class UserController {
     @Autowired
     private UserTagService userTagService;
 
+    @Autowired
+    private AttendedService attendedService;
+
     @GetMapping("/login")
     public ResponseEntity<LoggedUserDto> authenticate() {
         CurrentUser currentUser = (CurrentUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
@@ -77,6 +80,7 @@ public class UserController {
     public ResponseEntity<LoggedUserDto> addUser(@RequestBody UserDto user) {
         User userEntity = convertUserDtoToEntity(user);
         User userCreated = userService.createUser(userEntity);
+        userTrophyService.firstRoute(userCreated.getId());
         return ResponseEntity.status(HttpStatus.CREATED).body(convertUserToLoggedUserDto(userCreated));
     }
 
@@ -127,7 +131,7 @@ public class UserController {
             try {
                 attendanceService.addAttendance(id, eventId);
             } catch (AssertionError as) {
-                ResponseEntity.status(HttpStatus.BAD_REQUEST).body(as.getMessage());
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(as.getMessage());
             }
             userTrophyService.firstAttendance(id);
             return ResponseEntity.status(HttpStatus.CREATED).body("Event attendance added");
@@ -148,7 +152,41 @@ public class UserController {
             try {
                 attendanceService.removeAttendance(id, eventId);
             } catch (AssertionError as) {
-                ResponseEntity.status(HttpStatus.BAD_REQUEST).body(as.getMessage());
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(as.getMessage());
+            }
+            return ResponseEntity.status(HttpStatus.OK).build();
+        }
+    }
+
+    @PutMapping("/users/{id}/attended/{eventId}")
+    public ResponseEntity<String> confirmAttendance(@PathVariable Long id, @PathVariable Long eventId, @RequestParam String code) {
+        if(!isCurrentUser(id)) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+        } else {
+            try {
+                attendedService.confirmAttendance(id, eventId, code);
+            } catch (AssertionError as) {
+                return ResponseEntity.status(HttpStatus.CONFLICT).body(as.getMessage());
+            }
+            return ResponseEntity.status(HttpStatus.OK).build();
+        }
+    }
+
+    @GetMapping("/users/{id}/attended")
+    public ResponseEntity<List<EventDto>> getAttended(@PathVariable Long id) {
+        List<Event> events = userService.getAttendedEventsById(id);
+        return ResponseEntity.status(HttpStatus.OK).body(events.stream().map(eventMapper::convertEventToDto).toList());
+    }
+
+    @DeleteMapping("/users/{id}/attended/{eventId}")
+    public ResponseEntity<String> removeAttended(@PathVariable Long id, @PathVariable Long eventId) {
+        if(!isCurrentUser(id)) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+        } else {
+            try {
+                attendedService.removeAttended(id, eventId);
+            } catch (AssertionError as) {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(as.getMessage());
             }
             return ResponseEntity.status(HttpStatus.OK).build();
         }
@@ -296,7 +334,7 @@ public class UserController {
         }
     }
 
-    @PostMapping("/users/{id}/routes")
+    @PutMapping("/users/{id}/routes")
     public ResponseEntity<RouteDto> saveRoute(@PathVariable Long id, @RequestBody List<EventDto> events) {
         if(!isCurrentUser(id)) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
@@ -388,6 +426,49 @@ public class UserController {
         return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
     }
 
+    @GetMapping("/users/{userId}/upvotes")
+    public ResponseEntity<List<ReviewDto>> getEventById(@PathVariable Long userId) {
+        List<Review> reviews;
+        if(!isCurrentUser(userId)) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+        } else {
+            try {
+                reviews = reviewService.getUpvotes(userId);
+            } catch (AssertionError as) {
+                return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
+            }
+            return ResponseEntity.status(HttpStatus.OK).body(reviews.stream().map(reviewMapper::convertReviewToDto).toList());
+        }
+    }
+
+    @PostMapping("/users/{userId}/upvotes/{reviewId}")
+    public ResponseEntity<String> upvoteReview(@PathVariable Long userId, @PathVariable Long reviewId) {
+        if(!isCurrentUser(userId)) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+        } else {
+            try {
+                reviewService.upvote(userId,reviewId);
+            } catch (AssertionError as) {
+                return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
+            }
+            return ResponseEntity.status(HttpStatus.OK).body(null);
+        }
+    }
+
+    @DeleteMapping("/users/{userId}/upvotes/{reviewId}")
+    public ResponseEntity<String> unvoteReview(@PathVariable Long userId, @PathVariable Long reviewId) {
+        List<Review> reviews;
+        if(!isCurrentUser(userId)) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+        } else {
+            try {
+                reviewService.unvote(userId,reviewId);
+            } catch (AssertionError as) {
+                return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
+            }
+            return ResponseEntity.status(HttpStatus.OK).body(null);
+        }
+    }
 
 
 
@@ -408,14 +489,18 @@ public class UserController {
         for (Event e : user.getAttendance()) {
             userDto.addAttendance(e.getId());
         }
+        for (Event e : user.getAttended()) {
+            userDto.addAttended(e.getId());
+        }
         for (User u : user.getFriends()) {
             userDto.addFriend(u.getId());
+        }
+        for (Review r : user.getUpvotedReviews()) {
+            userDto.addUpvotedReviews(r.getId());
         }
         for (Trophy t : user.getTrophies()) {
             userDto.addTrophy(t.getId());
         }
-
-
         return userDto;
     }
 

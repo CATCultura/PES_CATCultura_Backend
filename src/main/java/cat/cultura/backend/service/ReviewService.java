@@ -51,4 +51,28 @@ public class ReviewService {
         reviewRepo.delete(review);
     }
 
+    public void upvote(Long userId, Long reviewId) {
+        User user = userRepo.findById(userId).orElseThrow(UserNotFoundException::new);
+        Review review = reviewRepo.findById(reviewId).orElseThrow(ReviewNotFoundException::new);
+        user.addUpvote(review);
+        review.upvote();
+        reviewRepo.save(review);
+        userRepo.save(user);
+    }
+
+    public void unvote(Long userId, Long reviewId) {
+        User user = userRepo.findById(userId).orElseThrow(UserNotFoundException::new);
+        Review review = reviewRepo.findById(reviewId).orElseThrow(ReviewNotFoundException::new);
+        user.removeUpvote(review);
+        review.removeUpvote();
+        reviewRepo.save(review);
+        userRepo.save(user);
+    }
+
+    public List<Review> getUpvotes(Long userId) {
+        User user = userRepo.findById(userId).orElseThrow(UserNotFoundException::new);
+        return user.getUpvotedReviews();
+    }
+
+
 }
