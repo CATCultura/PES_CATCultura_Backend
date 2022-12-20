@@ -24,10 +24,6 @@ public class ChatService {
     @Autowired
     private EventJpaRepository eventRepo;
 
-
-
-
-
     public ChatMessage saveMessage(ChatMessage message) {
         message.setTimeSent(new SimpleDateFormat("dd/MM/yyyy HH:mm:ss").format(Calendar.getInstance().getTime()));
         return repo.save(message);

@@ -10,6 +10,7 @@ import cat.cultura.backend.exceptions.MissingRequiredParametersException;
 import cat.cultura.backend.mappers.EventMapper;
 import cat.cultura.backend.mappers.ReviewMapper;
 import cat.cultura.backend.service.*;
+import cat.cultura.backend.service.user.ReviewService;
 import cat.cultura.backend.service.user.UserService;
 import cat.cultura.backend.service.user.UserTrophyService;
 import org.springframework.beans.factory.annotation.Autowired;

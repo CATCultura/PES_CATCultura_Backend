@@ -1,4 +1,4 @@
-package cat.cultura.backend.service;
+package cat.cultura.backend.service.user;
 
 import cat.cultura.backend.entity.Event;
 import cat.cultura.backend.entity.Review;
@@ -27,13 +27,13 @@ public class ReviewService {
         this.userRepo = userRepo;
     }
 
-    public Review addReview(Long eventId, Review review, Long userId) {
+    public List<Review> addReview(Long eventId, Review review, Long userId) {
         Event event = eventRepo.findById(eventId).orElseThrow(EventNotFoundException::new);
         User user = userRepo.findById(userId).orElseThrow(UserNotFoundException::new);
         review.setDate(new SimpleDateFormat("dd/MM/yyyy HH:mm:ss").format(Calendar.getInstance().getTime()));
         review.setAuthor(user);
         review.setEvent(event);
-        return reviewRepo.save(review);
+        return reviewRepo.findByUser(user);
     }
 
     public List<Review> getReviewsByEvent(Long eventId) {
@@ -46,27 +46,31 @@ public class ReviewService {
         return reviewRepo.findByUser(user);
     }
 
-    public void deleteReview(Long reviewId) {
+    public List<Review> deleteReview(Long reviewId) {
         Review review = reviewRepo.findById(reviewId).orElseThrow(ReviewNotFoundException::new);
+        User user = review.getAuthor();
         reviewRepo.delete(review);
+        return reviewRepo.findByUser(user);
     }
 
-    public void upvote(Long userId, Long reviewId) {
+    public List<Review> upvote(Long userId, Long reviewId) {
         User user = userRepo.findById(userId).orElseThrow(UserNotFoundException::new);
         Review review = reviewRepo.findById(reviewId).orElseThrow(ReviewNotFoundException::new);
         user.addUpvote(review);
         review.upvote();
         reviewRepo.save(review);
         userRepo.save(user);
+        return user.getUpvotedReviews();
     }
 
-    public void unvote(Long userId, Long reviewId) {
+    public List<Review> unvote(Long userId, Long reviewId) {
         User user = userRepo.findById(userId).orElseThrow(UserNotFoundException::new);
         Review review = reviewRepo.findById(reviewId).orElseThrow(ReviewNotFoundException::new);
         user.removeUpvote(review);
         review.removeUpvote();
         reviewRepo.save(review);
         userRepo.save(user);
+        return user.getUpvotedReviews();
     }
 
     public List<Review> getUpvotes(Long userId) {

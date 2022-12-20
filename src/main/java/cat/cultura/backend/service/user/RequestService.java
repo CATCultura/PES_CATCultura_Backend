@@ -27,7 +27,7 @@ public class RequestService {
     }
 
     @Transactional(rollbackFor=Exception.class)
-    public void addFriend(Long userId, Long friendId) {
+    public List<User> addFriend(Long userId, Long friendId) {
         User user = userRepo.findById(userId).orElseThrow(UserNotFoundException::new);
         User friend = userRepo.findById(friendId).orElseThrow(UserNotFoundException::new);
 
@@ -45,10 +45,11 @@ public class RequestService {
             requestRepo.delete(r);
             user.addFriend(friend);
         }
+        return user.getFriends();
     }
 
     @Transactional(rollbackFor=Exception.class)
-    public void removeFriend(Long userId, Long friendId) {
+    public List<User> removeFriend(Long userId, Long friendId) {
         User user = userRepo.findById(userId).orElseThrow(UserNotFoundException::new);
         User friend = userRepo.findById(friendId).orElseThrow(UserNotFoundException::new);
         if (user.hasFriend(friend)) user.removeFriend(friend);
@@ -56,24 +57,22 @@ public class RequestService {
             Request f1 = requestRepo.findByRequestId(new RequestId(userId,friendId)).orElseThrow(RequestNotFoundException::new);
             requestRepo.delete(f1);
         }
+        return user.getFriends();
     }
 
     public List<User> getRequestsTo(Long userId){
         User user = userRepo.findById(userId).orElseThrow(UserNotFoundException::new);
-        List<User> users = user.getRequestTo();
-        return users;
+        return user.getRequestTo();
     }
 
     public List<User> getRequestFrom(Long userId){
         User user = userRepo.findById(userId).orElseThrow(UserNotFoundException::new);
-        List<User> users = user.getRequestFrom();
-        return users;
+        return user.getRequestFrom();
     }
 
     public List<User> getFriends(Long userId) {
         User user = userRepo.findById(userId).orElseThrow(UserNotFoundException::new);
-        List<User> users = user.getFriends();
-        return users;
+        return user.getFriends();
     }
 
 }

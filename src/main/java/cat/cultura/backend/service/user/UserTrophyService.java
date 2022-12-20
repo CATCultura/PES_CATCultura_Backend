@@ -21,18 +21,20 @@ public class UserTrophyService {
         this.trophyRepo = trophyRepo;
     }
 
-    public User addTrophy(Long userId, List<Long> trophyIds) {
+    public List<Trophy> addTrophy(Long userId, List<Long> trophyIds) {
         User user = userRepo.findById(userId).orElseThrow(UserNotFoundException::new);
         List<Trophy> trophies = trophyRepo.findAllById(trophyIds);
         for (Trophy t : trophies) user.addTrophy(t);
-        return userRepo.save(user);
+        userRepo.save(user);
+        return user.getTrophies();
     }
 
-    public User removeTrophy(Long userId, List<Long> trophyIds) {
+    public List<Trophy> removeTrophy(Long userId, List<Long> trophyIds) {
         User user = userRepo.findById(userId).orElseThrow(UserNotFoundException::new);
         List<Trophy> trophies = trophyRepo.findAllById(trophyIds);
         for (Trophy t : trophies) user.removeTrophy(t);
-        return userRepo.save(user);
+        userRepo.save(user);
+        return user.getTrophies();
     }
 
     public List<Trophy> getTrophiesById(Long userId) {

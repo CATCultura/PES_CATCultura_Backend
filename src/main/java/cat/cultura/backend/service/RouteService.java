@@ -27,21 +27,6 @@ public class RouteService {
         this.routeRepo = routeRepo;
     }
 
-    public Route saveRoute(List<Event> routeEvents, Long userId) {
-        User user = userRepo.findById(userId).orElseThrow(() -> new UserNotFoundException("User with id: " + userId + "not found"));
-        Route route = new Route();
-        route.setRouteEvents(routeEvents);
-        Route savedRoute = routeRepo.save(route);
-        user.addRoute(route);
-        userRepo.save(user);
-        return savedRoute;
-    }
-
-    public List<Route> getRoutes(Long userId) {
-        User user = userRepo.findById(userId).orElseThrow(() -> new UserNotFoundException("User with id: " + userId + "not found"));
-        return user.getRoutes();
-    }
-
     public List<Event> getRouteInADayAndLocation(double lat, double lon, int radius, String day) {
         List<Event> events = getRouteByQuery(lat, lon, radius, day);
         List<Event> result = new ArrayList<>();
@@ -82,13 +67,6 @@ public class RouteService {
         return events;
     }
 
-    public void deleteRoute(Long routeId, Long userId) {
-        User user = userRepo.findById(userId).orElseThrow(() -> new UserNotFoundException("User with id: " + userId + "not found"));
-        Route route = routeRepo.findById(routeId).orElseThrow(() -> new UserNotFoundException("Route with id: " + routeId + "not found"));
-        user.deleteRoute(route);
-        routeRepo.delete(route);
-    }
-
     class SortByNumberOfMatches implements Comparator<Event> {
         private List<Tag> ambits;
         private List<Tag> categ;
@@ -100,20 +78,22 @@ public class RouteService {
             this.altresCateg = user.getTagsAltresCateg();
         }
 
-        private void sumPresence(int n1,int n2, List<Tag> tags1, List<Tag> tags2, List<Tag> tags) {
-            for(Tag tag : tags){
-                  if(tags1.contains(tag)) ++n1;
-                  if(tags2.contains(tag)) ++n2;
-            }
-        }
-
         public int compare(Event a, Event b) {
             int n1 = 0;
             int n2 = 0;
-            sumPresence(n1,n2,a.getTagsAmbits(),b.getTagsAmbits(),ambits);
-            sumPresence(n1,n2,a.getTagsCateg(),b.getTagsCateg(), categ);
-            sumPresence(n1,n2,a.getTagsAltresCateg(),b.getTagsAltresCateg(), altresCateg);
-            if(n1-n2 >= 0) return 1;
+            for(Tag tag : ambits){
+                if(a.getTagsAmbits().contains(tag)) ++n1;
+                if(b.getTagsAmbits().contains(tag)) ++n2;
+            }
+            for(Tag tag : categ){
+                if(a.getTagsCateg().contains(tag)) ++n1;
+                if(b.getTagsCateg().contains(tag)) ++n2;
+            }
+            for(Tag tag : altresCateg){
+                if(a.getTagsAltresCateg().contains(tag)) ++n1;
+                if(b.getTagsAltresCateg().contains(tag)) ++n2;
+            }
+            if(n1 > n2) return 1;
             else return -1;
         }
     }
