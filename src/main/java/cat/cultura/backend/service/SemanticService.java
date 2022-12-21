@@ -1,5 +1,6 @@
 package cat.cultura.backend.service;
 
+import cat.cultura.backend.utils.Score;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.catalina.mapper.Mapper;
 import org.springframework.beans.factory.annotation.Value;
@@ -23,7 +24,7 @@ public class SemanticService {
 
     @Value("${similarityservice.url}")
     private String serviceURL;
-    public List<Long> getEventListByQuery(String query) throws IOException {
+    public List<Score> getEventListByQuery(String query) throws IOException {
         URL url = new URL(serviceURL+"?q="+URLEncoder.encode(query, StandardCharsets.UTF_8));
         HttpURLConnection con = (HttpURLConnection) url.openConnection();
         con.setRequestMethod("GET");
@@ -39,14 +40,8 @@ public class SemanticService {
             }
             in.close();
             ObjectMapper objectMapper = new ObjectMapper();
-            List<Integer> temp = objectMapper.readValue(content.toString(), List.class);
 
-            return temp.stream().map(new Function() {
-                @Override
-                public Object apply(Object o) {
-                    return Long.valueOf((Integer) o);
-                }
-            }).toList();
+            return objectMapper.readValue(content.toString(), List.class);
         }
         else {
             return null;

@@ -6,6 +6,7 @@ import cat.cultura.backend.exceptions.EventAlreadyCreatedException;
 import cat.cultura.backend.exceptions.EventNotFoundException;
 import cat.cultura.backend.repository.EventJpaRepository;
 import cat.cultura.backend.repository.TagJpaRepository;
+import cat.cultura.backend.utils.Score;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
@@ -101,7 +102,7 @@ public class EventService {
     }
 
     public Page<Event> getBySemanticSimilarity(String query) {
-        List<Long> queryResult;
+        List<Score> queryResult;
         try {
              queryResult = semanticService.getEventListByQuery(query);
         } catch (IOException e) {
@@ -109,10 +110,8 @@ public class EventService {
         }
         if (queryResult!= null) {
             List<Event> results = new ArrayList<>();
-            for (Long id : queryResult) {
-                Event e = eventRepo.findById(id).orElse(null);
-                if (e != null)
-                    results.add(e);
+            for (Score id : queryResult) {
+                eventRepo.findById(id.getEventId()).ifPresent(results::add);
             }
             return new PageImpl<>(results);
         }
