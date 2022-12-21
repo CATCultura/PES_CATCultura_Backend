@@ -58,7 +58,10 @@ public class UserController {
     private ModelMapper modelMapper;
 
     @Autowired
-    private RouteService routeService;
+    private UserRouteService userRouteService;
+
+    @Autowired
+    private RouteDataService routeDataService;
 
     @Autowired
     private UserTagService userTagService;
@@ -79,9 +82,9 @@ public class UserController {
     @PostMapping("/users")
     public ResponseEntity<LoggedUserDto> addUser(@RequestBody UserDto user) {
         User userEntity = convertUserDtoToEntity(user);
-        User userCreated = userService.createUser(userEntity);
-        userTrophyService.firstRoute(userCreated.getId());
-        return ResponseEntity.status(HttpStatus.CREATED).body(convertUserToLoggedUserDto(userCreated));
+        User createdUser = userService.createUser(userEntity);
+        userTrophyService.createAccount(createdUser.getId());
+        return ResponseEntity.status(HttpStatus.CREATED).body(convertUserToLoggedUserDto(createdUser));
     }
 
     @GetMapping("/users")
@@ -91,7 +94,6 @@ public class UserController {
             @RequestParam(value = "name-and-surname", required = false) String nameAndSurname,
             Pageable pageable
     ) {
-//
         Page<User> users = userService.getUsersByQuery(id, username, nameAndSurname, pageable);
         return ResponseEntity.status(HttpStatus.OK).body(users.stream().map(this::convertUserToDto).toList());
     }
@@ -124,17 +126,18 @@ public class UserController {
     //Put, Get and Delete for attendance of a user
 
     @PutMapping("/users/{id}/attendance/{eventId}")
-    public ResponseEntity<String> addAttendance(@PathVariable Long id, @PathVariable Long eventId) {
+    public ResponseEntity<List<Long>> addAttendance(@PathVariable Long id, @PathVariable Long eventId) {
         if(!isCurrentUser(id)) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         } else {
+            List<Event> attendance;
             try {
-                attendanceService.addAttendance(id, eventId);
+                attendance = attendanceService.addAttendance(id, eventId);
             } catch (AssertionError as) {
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(as.getMessage());
+                return ResponseEntity.status(HttpStatus.CONFLICT).build();
             }
             userTrophyService.firstAttendance(id);
-            return ResponseEntity.status(HttpStatus.CREATED).body("Event attendance added");
+            return ResponseEntity.status(HttpStatus.CREATED).body(attendance.stream().map(Event::getId).toList());
         }
     }
 
@@ -145,30 +148,32 @@ public class UserController {
     }
 
     @DeleteMapping("/users/{id}/attendance/{eventId}")
-    public ResponseEntity<String> removeAttendance(@PathVariable Long id, @PathVariable Long eventId) {
+    public ResponseEntity<List<Long>> removeAttendance(@PathVariable Long id, @PathVariable Long eventId) {
         if(!isCurrentUser(id)) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         } else {
+            List<Event> attendance;
             try {
-                attendanceService.removeAttendance(id, eventId);
+                attendance = attendanceService.removeAttendance(id, eventId);
             } catch (AssertionError as) {
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(as.getMessage());
+                return ResponseEntity.status(HttpStatus.CONFLICT).build();
             }
-            return ResponseEntity.status(HttpStatus.OK).build();
+            return ResponseEntity.status(HttpStatus.OK).body(attendance.stream().map(Event::getId).toList());
         }
     }
 
     @PutMapping("/users/{id}/attended/{eventId}")
-    public ResponseEntity<String> confirmAttendance(@PathVariable Long id, @PathVariable Long eventId, @RequestParam String code) {
+    public ResponseEntity<List<Long>> confirmAttendance(@PathVariable Long id, @PathVariable Long eventId, @RequestParam String code) {
         if(!isCurrentUser(id)) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         } else {
+            List<Event> attended;
             try {
-                attendedService.confirmAttendance(id, eventId, code);
+                attended = attendedService.confirmAttendance(id, eventId, code);
             } catch (AssertionError as) {
-                return ResponseEntity.status(HttpStatus.CONFLICT).body(as.getMessage());
+                return ResponseEntity.status(HttpStatus.CONFLICT).build();
             }
-            return ResponseEntity.status(HttpStatus.OK).build();
+            return ResponseEntity.status(HttpStatus.OK).body(attended.stream().map(Event::getId).toList());
         }
     }
 
@@ -179,33 +184,35 @@ public class UserController {
     }
 
     @DeleteMapping("/users/{id}/attended/{eventId}")
-    public ResponseEntity<String> removeAttended(@PathVariable Long id, @PathVariable Long eventId) {
+    public ResponseEntity<List<Long>> removeAttended(@PathVariable Long id, @PathVariable Long eventId) {
         if(!isCurrentUser(id)) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         } else {
+            List<Event> attended;
             try {
-                attendedService.removeAttended(id, eventId);
+                attended = attendedService.removeAttended(id, eventId);
             } catch (AssertionError as) {
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(as.getMessage());
+                return ResponseEntity.status(HttpStatus.CONFLICT).build();
             }
-            return ResponseEntity.status(HttpStatus.OK).build();
+            return ResponseEntity.status(HttpStatus.OK).body(attended.stream().map(Event::getId).toList());
         }
     }
 
     //Put, Get and Delete for favourites of a user
 
     @PutMapping("/users/{id}/favourites/{eventId}")
-    public ResponseEntity<String> addFavourites(@PathVariable Long id, @PathVariable Long eventId) {
+    public ResponseEntity<List<Long>> addFavourites(@PathVariable Long id, @PathVariable Long eventId) {
         if(!isCurrentUser(id)) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         } else {
+            List<Event> favourites;
             try {
-                favouriteService.addFavourite(id, eventId);
+                favourites = favouriteService.addFavourite(id, eventId);
             } catch (AssertionError as) {
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(as.getMessage());
+                return ResponseEntity.status(HttpStatus.CONFLICT).build();
             }
             userTrophyService.firstFavourite(id);
-            return ResponseEntity.status(HttpStatus.CREATED).body("Favourite added");
+            return ResponseEntity.status(HttpStatus.CREATED).body(favourites.stream().map(Event::getId).toList());
         }
     }
 
@@ -216,33 +223,34 @@ public class UserController {
     }
 
     @DeleteMapping("/users/{id}/favourites/{eventId}")
-    public ResponseEntity<String> removeFavourites(@PathVariable Long id, @PathVariable Long eventId) {
+    public ResponseEntity<List<Long>> removeFavourites(@PathVariable Long id, @PathVariable Long eventId) {
         if(!isCurrentUser(id)) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         } else {
+            List<Event> favourites;
             try {
-                favouriteService.removeFavourite(id, eventId);
+                favourites = favouriteService.removeFavourite(id, eventId);
             } catch (AssertionError as) {
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(as.getMessage());
+                return ResponseEntity.status(HttpStatus.CONFLICT).build();
             }
-            return ResponseEntity.status(HttpStatus.OK).build();
+            return ResponseEntity.status(HttpStatus.OK).body(favourites.stream().map(Event::getId).toList());
         }
     }
 
     //Put, Get and Delete for trophies of a user
 
     @PutMapping("/users/{id}/trophies")
-    public ResponseEntity<UserDto> addTrophies(@PathVariable Long id, @RequestBody List<Long> trophiesIds) {
-        User user;
+    public ResponseEntity<List<Long>> addTrophies(@PathVariable Long id, @RequestBody List<Long> trophiesIds) {
+        List<Trophy> trophies;
         if(!isCurrentUser(id)) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         } else {
             try {
-                user = userTrophyService.addTrophy(id, trophiesIds);
+                trophies = userTrophyService.addTrophy(id, trophiesIds);
             } catch (AssertionError as) {
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
+                return ResponseEntity.status(HttpStatus.CONFLICT).build();
             }
-            return ResponseEntity.status(HttpStatus.CREATED).body(convertUserToDto(user));
+            return ResponseEntity.status(HttpStatus.CREATED).body(trophies.stream().map(Trophy::getId).toList());
         }
     }
 
@@ -253,38 +261,39 @@ public class UserController {
     }
 
     @DeleteMapping("/users/{id}/trophies")
-    public ResponseEntity<UserDto> removeTrophies(@PathVariable Long id, @RequestBody List<Long> trophiesIds) {
-        User user;
+    public ResponseEntity<List<Long>> removeTrophies(@PathVariable Long id, @RequestBody List<Long> trophiesIds) {
+        List<Trophy> trophies;
         if(!isCurrentUser(id)) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         } else {
             try {
-                user = userTrophyService.removeTrophy(id, trophiesIds);
+                trophies = userTrophyService.removeTrophy(id, trophiesIds);
             } catch (AssertionError as) {
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
+                return ResponseEntity.status(HttpStatus.CONFLICT).build();
             }
-            return ResponseEntity.status(HttpStatus.OK).body(convertUserToDto(user));
+            return ResponseEntity.status(HttpStatus.OK).body(trophies.stream().map(Trophy::getId).toList());
         }
     }
 
     //Put, Get and Delete for the friend requests to other users of a user
 
     @PutMapping("/users/{id}/friends/{friendId}")
-    public ResponseEntity<String> addRequestsTo(@PathVariable Long id, @PathVariable Long friendId) {
+    public ResponseEntity<List<Long>> addFriend(@PathVariable Long id, @PathVariable Long friendId) {
         if(!isCurrentUser(id)) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         } else {
+            List<User> friend;
             try {
-                requestService.addFriend(id, friendId);
+                friend = requestService.addFriend(id, friendId);
             } catch (AssertionError as) {
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(as.getMessage());
+                return ResponseEntity.status(HttpStatus.CONFLICT).build();
             }
-            return ResponseEntity.status(HttpStatus.CREATED).body("Request added");
+            return ResponseEntity.status(HttpStatus.CREATED).body(friend.stream().map(User::getId).toList());
         }
     }
 
     @GetMapping("users/{id}/friends")
-    public ResponseEntity<List<UserDto>> getRequestsTo(@PathVariable Long id, @RequestParam(required = true) String status) {
+    public ResponseEntity<List<UserDto>> getFriend(@PathVariable Long id, @RequestParam String status) {
         List<User> users = new ArrayList<>();
         if(Objects.equals(status, "requested")) users = requestService.getRequestsTo(id);
         else if(Objects.equals(status, "received")) users = requestService.getRequestFrom(id);
@@ -293,33 +302,34 @@ public class UserController {
     }
 
     @DeleteMapping("/users/{id}/friends/{friendId}")
-    public ResponseEntity removeRequestsTo(@PathVariable Long id, @PathVariable Long friendId) {
+    public ResponseEntity<List<Long>> removeFriend(@PathVariable Long id, @PathVariable Long friendId) {
         if(!isCurrentUser(id)) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         } else {
+            List<User> friend;
             try {
-                requestService.removeFriend(id, friendId);
+                friend = requestService.removeFriend(id, friendId);
             } catch (AssertionError as) {
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(as.getMessage());
+                return ResponseEntity.status(HttpStatus.CONFLICT).build();
             }
-            return ResponseEntity.status(HttpStatus.OK).build();
+            return ResponseEntity.status(HttpStatus.OK).body(friend.stream().map(User::getId).toList());
         }
     }
 
     @GetMapping("/users/generate_route")
-    public ResponseEntity<List<EventDto>> getRoutes(
-            @RequestParam(required = true) double lat,
-            @RequestParam(required = true) double lon,
-            @RequestParam(required = true) int radius,
-            @RequestParam(required = true) String day,
+    public ResponseEntity<List<EventDto>> generateRoute(
+            @RequestParam double lat,
+            @RequestParam double lon,
+            @RequestParam int radius,
+            @RequestParam String day,
             @RequestParam(required = false) Long userId
     ) {
         List<Event> events;
         if(userId != null) {
-            events = routeService.getUserAdjustedRouteInADayAndLocation(lat, lon, radius, day, userId);
+            events = routeDataService.getUserAdjustedRouteInADayAndLocation(lat, lon, radius, day, userId);
             userTrophyService.firstRoute(userId);
         } else {
-            events = routeService.getRouteInADayAndLocation(lat, lon, radius, day);
+            events = routeDataService.getRouteInADayAndLocation(lat, lon, radius, day);
         }
         return ResponseEntity.status(HttpStatus.OK).body(events.stream().map(eventMapper::convertEventToDto).toList());
     }
@@ -327,35 +337,36 @@ public class UserController {
     @GetMapping("/users/{id}/routes")
     public ResponseEntity<List<RouteDto>> getRoutes(@PathVariable Long id) {
         if(!isCurrentUser(id)) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         } else {
-            List<Route> routes = routeService.getRoutes(id);
+            List<Route> routes = userRouteService.getRoutes(id);
             return ResponseEntity.status(HttpStatus.OK).body(routes.stream().map(routeMapper::convertRouteToDto).toList());
         }
     }
 
     @PutMapping("/users/{id}/routes")
-    public ResponseEntity<RouteDto> saveRoute(@PathVariable Long id, @RequestBody List<EventDto> events) {
+    public ResponseEntity<List<Long>> saveRoute(@PathVariable Long id, @RequestBody List<EventDto> events) {
         if(!isCurrentUser(id)) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         } else {
             List<Event> ev = events.stream().map(eventMapper::convertEventDtoToEntity).toList();
-            Route result = routeService.saveRoute(ev,id);
-            return ResponseEntity.status(HttpStatus.CREATED).body(routeMapper.convertRouteToDto(result));
+            List<Route> result = userRouteService.saveRoute(ev,id);
+            return ResponseEntity.status(HttpStatus.CREATED).body(result.stream().map(Route::getRouteId).toList());
         }
     }
 
     @DeleteMapping("/users/{userId}/routes/{routeId}")
-    public ResponseEntity getEventsRoute(@PathVariable Long userId, @PathVariable Long routeId) {
+    public ResponseEntity<List<Long>> removeRoute(@PathVariable Long userId, @PathVariable Long routeId) {
         if(!isCurrentUser(userId)) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         } else {
+            List<Route> result;
             try {
-                routeService.deleteRoute(routeId,userId);
+                result = userRouteService.deleteRoute(routeId,userId);
             } catch (AssertionError as) {
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(as.getMessage());
+                return ResponseEntity.status(HttpStatus.CONFLICT).build();
             }
-            return ResponseEntity.status(HttpStatus.OK).build();
+            return ResponseEntity.status(HttpStatus.OK).body(result.stream().map(Route::getRouteId).toList());
         }
     }
 
@@ -366,37 +377,37 @@ public class UserController {
     }
 
     @PostMapping("/users/{userId}/reviews")
-    public ResponseEntity<ReviewDto> addEvent(
+    public ResponseEntity<List<Long>> addReview(
             @PathVariable Long userId,
-            @RequestParam(required = true) Long eventId,
+            @RequestParam Long eventId,
             @RequestBody ReviewDto ev) {
-        ReviewDto reviewDto;
         if(!isCurrentUser(userId)) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         } else {
+            List<Review> reviews;
             try {
                 Review aux = reviewMapper.convertReviewDtoToEntity(ev);
-                aux = reviewService.addReview(eventId, aux, userId);
-                reviewDto = reviewMapper.convertReviewToDto(aux);
+                reviews = reviewService.addReview(eventId, aux, userId);
             } catch (AssertionError as) {
-                return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
+                return ResponseEntity.status(HttpStatus.CONFLICT).build();
             }
             userTrophyService.firstReview(userId);
-            return ResponseEntity.status(HttpStatus.CREATED).body(reviewDto);
+            return ResponseEntity.status(HttpStatus.CREATED).body(reviews.stream().map(Review::getId).toList());
         }
     }
 
     @DeleteMapping("/users/{userId}/reviews/{reviewId}")
-    public ResponseEntity<String> getEventById(@PathVariable Long userId, @PathVariable Long reviewId) {
+    public ResponseEntity<List<Long>> removeReview(@PathVariable Long userId, @PathVariable Long reviewId) {
         if(!isCurrentUser(userId)) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         } else {
+            List<Review> reviews;
             try {
-                reviewService.deleteReview(reviewId);
+                reviews = reviewService.deleteReview(reviewId);
             } catch (AssertionError as) {
-                return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
+                return ResponseEntity.status(HttpStatus.CONFLICT).build();
             }
-            return ResponseEntity.status(HttpStatus.OK).body(null);
+            return ResponseEntity.status(HttpStatus.OK).body(reviews.stream().map(Review::getId).toList());
         }
     }
 
@@ -417,63 +428,63 @@ public class UserController {
     @PostMapping("/users/{userId}/tags")
     public ResponseEntity<String> addTags(@PathVariable Long userId, @RequestBody List<String> tags) {
         userTagService.addTags(userId,tags);
-        return ResponseEntity.status(HttpStatus.CREATED).body(null);
+        return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
     @DeleteMapping("/users/{userId}/tags")
     public ResponseEntity<String> removeTags(@PathVariable Long userId, @RequestBody List<String> tags) {
         userTagService.removeTags(userId,tags);
-        return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 
     @GetMapping("/users/{userId}/upvotes")
-    public ResponseEntity<List<ReviewDto>> getEventById(@PathVariable Long userId) {
+    public ResponseEntity<List<ReviewDto>> getUpvotes(@PathVariable Long userId) {
         List<Review> reviews;
         if(!isCurrentUser(userId)) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         } else {
             try {
                 reviews = reviewService.getUpvotes(userId);
             } catch (AssertionError as) {
-                return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
+                return ResponseEntity.status(HttpStatus.CONFLICT).build();
             }
             return ResponseEntity.status(HttpStatus.OK).body(reviews.stream().map(reviewMapper::convertReviewToDto).toList());
         }
     }
 
     @PostMapping("/users/{userId}/upvotes/{reviewId}")
-    public ResponseEntity<String> upvoteReview(@PathVariable Long userId, @PathVariable Long reviewId) {
+    public ResponseEntity<List<Long>> upvote(@PathVariable Long userId, @PathVariable Long reviewId) {
         if(!isCurrentUser(userId)) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         } else {
+            List<Review> reviews;
             try {
-                reviewService.upvote(userId,reviewId);
+                reviews = reviewService.upvote(userId,reviewId);
             } catch (AssertionError as) {
-                return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
+                return ResponseEntity.status(HttpStatus.CONFLICT).build();
             }
-            return ResponseEntity.status(HttpStatus.OK).body(null);
+            return ResponseEntity.status(HttpStatus.OK).body(reviews.stream().map(Review::getId).toList());
         }
     }
 
     @DeleteMapping("/users/{userId}/upvotes/{reviewId}")
-    public ResponseEntity<String> unvoteReview(@PathVariable Long userId, @PathVariable Long reviewId) {
-        List<Review> reviews;
+    public ResponseEntity<List<Long>> deleteUpvotes(@PathVariable Long userId, @PathVariable Long reviewId) {
         if(!isCurrentUser(userId)) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         } else {
+            List<Review> reviews;
             try {
-                reviewService.unvote(userId,reviewId);
+                reviews = reviewService.unvote(userId,reviewId);
             } catch (AssertionError as) {
-                return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
+                return ResponseEntity.status(HttpStatus.CONFLICT).build();
             }
-            return ResponseEntity.status(HttpStatus.OK).body(null);
+            return ResponseEntity.status(HttpStatus.OK).body(reviews.stream().map(Review::getId).toList());
         }
     }
 
 
 
     //Dto conversion functions
-
     private UserDto convertUserToDto(User user) {
         UserDto userDto = modelMapper.map(user, UserDto.class);
         userDto.setPassword(null);
@@ -510,12 +521,12 @@ public class UserController {
         }
         else return modelMapper.map(userDto, User.class);
     }
-
+    
     //Utils
     private boolean isCurrentUser(Long userId) {
         CurrentUser currentUser = (CurrentUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         User u = userService.getUserByUsername(currentUser.getUsername());
-        return u.getId()==userId;
+        return Objects.equals(u.getId(), userId);
     }
 
 }

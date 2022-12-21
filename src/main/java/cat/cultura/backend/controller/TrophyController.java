@@ -31,7 +31,7 @@ public class TrophyController {
     @GetMapping("/trophies")
     public ResponseEntity<List<TrophyDto>> getTrophies() {
         List<Trophy> trophies = trophyService.getTrophies();
-        return ResponseEntity.status(HttpStatus.OK).body(trophies.stream().map(trophyMapper::convertTrophyToDto).collect(Collectors.toList()));
+        return ResponseEntity.status(HttpStatus.OK).body(trophies.stream().map(trophyMapper::convertTrophyToDto).toList());
     }
 
     @DeleteMapping("/trophies/{id}")
