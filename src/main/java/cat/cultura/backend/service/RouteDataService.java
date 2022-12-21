@@ -1,12 +1,10 @@
 package cat.cultura.backend.service;
 
 import cat.cultura.backend.entity.Event;
-import cat.cultura.backend.entity.Route;
 import cat.cultura.backend.entity.User;
 import cat.cultura.backend.entity.tag.Tag;
 import cat.cultura.backend.exceptions.UserNotFoundException;
 import cat.cultura.backend.repository.EventJpaRepository;
-import cat.cultura.backend.repository.RouteJpaRepository;
 import cat.cultura.backend.repository.UserJpaRepository;
 import cat.cultura.backend.utils.Coordinate;
 import org.springframework.stereotype.Service;
@@ -14,17 +12,14 @@ import org.springframework.stereotype.Service;
 import java.util.*;
 
 @Service
-public class RouteService {
+public class RouteDataService {
     private final EventJpaRepository eventRepo;
 
     private final UserJpaRepository userRepo;
 
-    private final RouteJpaRepository routeRepo;
-
-    public RouteService(EventJpaRepository eventRepo, UserJpaRepository userRepo, RouteJpaRepository routeRepo) {
+    public RouteDataService(EventJpaRepository eventRepo, UserJpaRepository userRepo) {
         this.eventRepo = eventRepo;
         this.userRepo = userRepo;
-        this.routeRepo = routeRepo;
     }
 
     public List<Event> getRouteInADayAndLocation(double lat, double lon, int radius, String day) {
@@ -63,14 +58,13 @@ public class RouteService {
         Coordinate down = Coordinate.calcEndPoint(x,radius,270);
         Coordinate left = Coordinate.calcEndPoint(x,radius,180);
         Coordinate right = Coordinate.calcEndPoint(x,radius,0);
-        List<Event> events = eventRepo.getEventsByDayAndLocation(day, up.getLon(), down.getLon(), left.getLat(), right.getLat());
-        return events;
+        return eventRepo.getEventsByDayAndLocation(day, up.getLon(), down.getLon(), left.getLat(), right.getLat());
     }
 
     class SortByNumberOfMatches implements Comparator<Event> {
-        private List<Tag> ambits;
-        private List<Tag> categ;
-        private List<Tag> altresCateg;
+        private final List<Tag> ambits;
+        private final List<Tag> categ;
+        private final List<Tag> altresCateg;
 
         public SortByNumberOfMatches(User user) {
             this.ambits = user.getTagsAmbits();
@@ -93,17 +87,13 @@ public class RouteService {
                 if(a.getTagsAltresCateg().contains(tag)) ++n1;
                 if(b.getTagsAltresCateg().contains(tag)) ++n2;
             }
-            if(n1 > n2) return 1;
-            else return -1;
+            return Integer.compare(n1, n2);
         }
     }
 
     class SortByLongitude implements Comparator<Event> {
         public int compare(Event a, Event b) {
-            double x = a.getLongitud() - b.getLongitud();
-            if(x > 0) return 1;
-            else if(x < 0) return -1;
-            else return 0;
+            return Double.compare(a.getLongitud(), b.getLongitud());
         }
     }
 

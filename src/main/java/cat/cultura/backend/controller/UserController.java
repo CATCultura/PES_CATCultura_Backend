@@ -61,7 +61,7 @@ public class UserController {
     private UserRouteService userRouteService;
 
     @Autowired
-    private RouteService routeService;
+    private RouteDataService routeDataService;
 
     @Autowired
     private UserTagService userTagService;
@@ -82,9 +82,9 @@ public class UserController {
     @PostMapping("/users")
     public ResponseEntity<LoggedUserDto> addUser(@RequestBody UserDto user) {
         User userEntity = convertUserDtoToEntity(user);
-        User userCreated = userService.createUser(userEntity);
-        userTrophyService.createAccount(userCreated.getId());
-        return ResponseEntity.status(HttpStatus.CREATED).body(convertUserToLoggedUserDto(userCreated));
+        User createdUser = userService.createUser(userEntity);
+        userTrophyService.createAccount(createdUser.getId());
+        return ResponseEntity.status(HttpStatus.CREATED).body(convertUserToLoggedUserDto(createdUser));
     }
 
     @GetMapping("/users")
@@ -293,7 +293,7 @@ public class UserController {
     }
 
     @GetMapping("users/{id}/friends")
-    public ResponseEntity<List<UserDto>> getFriend(@PathVariable Long id, @RequestParam(required = true) String status) {
+    public ResponseEntity<List<UserDto>> getFriend(@PathVariable Long id, @RequestParam String status) {
         List<User> users = new ArrayList<>();
         if(Objects.equals(status, "requested")) users = requestService.getRequestsTo(id);
         else if(Objects.equals(status, "received")) users = requestService.getRequestFrom(id);
@@ -326,10 +326,10 @@ public class UserController {
     ) {
         List<Event> events;
         if(userId != null) {
-            events = routeService.getUserAdjustedRouteInADayAndLocation(lat, lon, radius, day, userId);
+            events = routeDataService.getUserAdjustedRouteInADayAndLocation(lat, lon, radius, day, userId);
             userTrophyService.firstRoute(userId);
         } else {
-            events = routeService.getRouteInADayAndLocation(lat, lon, radius, day);
+            events = routeDataService.getRouteInADayAndLocation(lat, lon, radius, day);
         }
         return ResponseEntity.status(HttpStatus.OK).body(events.stream().map(eventMapper::convertEventToDto).toList());
     }
@@ -381,7 +381,6 @@ public class UserController {
             @PathVariable Long userId,
             @RequestParam Long eventId,
             @RequestBody ReviewDto ev) {
-        ReviewDto reviewDto;
         if(!isCurrentUser(userId)) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         } else {
@@ -522,7 +521,7 @@ public class UserController {
         }
         else return modelMapper.map(userDto, User.class);
     }
-
+    
     //Utils
     private boolean isCurrentUser(Long userId) {
         CurrentUser currentUser = (CurrentUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();

@@ -31,7 +31,7 @@ public class EventController {
     private EventService eventService;
 
     @Autowired
-    private RouteService routeService;
+    private RouteDataService routeDataService;
 
     @Autowired
     private UserService userService;
