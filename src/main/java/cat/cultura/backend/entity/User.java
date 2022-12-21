@@ -128,6 +128,7 @@ public class User {
     }
 
     public List<Review> getUpvotedReviews() {
+
         return upvotedReviews;
     }
 
