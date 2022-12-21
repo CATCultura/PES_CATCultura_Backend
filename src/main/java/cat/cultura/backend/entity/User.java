@@ -116,12 +116,12 @@ public class User {
     @OneToMany
     @CollectionTable(name="Routes", joinColumns=@JoinColumn(name="id"))
     @Column(name="Routes")
-    private List<Route> routes;
+    private List<Route> routes = new ArrayList<>();
 
     @OneToMany
     @CollectionTable(name="upvotedReviews", joinColumns=@JoinColumn(name="id"))
     @Column(name="Review")
-    private List<Review> upvotedReviews;
+    private List<Review> upvotedReviews = new ArrayList<>();
 
     public void setAttended(List<Event> attended) {
         this.attended = attended;
