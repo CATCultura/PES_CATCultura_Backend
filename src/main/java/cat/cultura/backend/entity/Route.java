@@ -15,6 +15,12 @@ public class Route {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long routeId;
 
+    private String name;
+
+    private String description;
+
+    private String createdAt;
+
     @ElementCollection
     @CollectionTable(name="RouteEvents", joinColumns=@JoinColumn(name="id"))
     @Column(name="route_events")
@@ -35,4 +41,30 @@ public class Route {
     public void setRouteEvents(List<Event> events) {
         this.routeEvents = events;
     }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public String getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(String createdAt) {
+        this.createdAt = createdAt;
+    }
+
+
 }

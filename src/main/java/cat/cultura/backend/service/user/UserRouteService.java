@@ -1,6 +1,5 @@
 package cat.cultura.backend.service.user;
 
-import cat.cultura.backend.entity.Event;
 import cat.cultura.backend.entity.Route;
 import cat.cultura.backend.entity.User;
 import cat.cultura.backend.exceptions.UserNotFoundException;
@@ -8,6 +7,8 @@ import cat.cultura.backend.repository.RouteJpaRepository;
 import cat.cultura.backend.repository.UserJpaRepository;
 import org.springframework.stereotype.Service;
 
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.List;
 
 @Service
@@ -22,10 +23,9 @@ public class UserRouteService {
         this.routeRepo = routeRepo;
     }
 
-    public List<Route> saveRoute(List<Event> routeEvents, Long userId) {
+    public List<Route> saveRoute(Route route, Long userId) {
         User user = userRepo.findById(userId).orElseThrow(() -> new UserNotFoundException("User with id: " + userId + "not found"));
-        Route route = new Route();
-        route.setRouteEvents(routeEvents);
+        route.setCreatedAt(new SimpleDateFormat("dd/MM/yyyy HH:mm:ss").format(Calendar.getInstance().getTime()));
         routeRepo.save(route);
         user.addRoute(route);
         userRepo.save(user);
