@@ -8,6 +8,8 @@ import cat.cultura.backend.repository.EventJpaRepository;
 import cat.cultura.backend.repository.UserJpaRepository;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 public class AttendanceService {
 
@@ -20,19 +22,22 @@ public class AttendanceService {
         this.userRepo = userRepo;
     }
 
-    public void addAttendance(Long userId, Long eventId) {
+    public List<Event> addAttendance(Long userId, Long eventId) {
         User user = userRepo.findById(userId).orElseThrow(() -> new UserNotFoundException("User with id: " + userId + " not found"));
         Event event = eventRepo.findById(eventId).orElseThrow(() -> new EventNotFoundException("Event with id: " + eventId + "not found"));
         user.addAttendance(event);
         userRepo.save(user);
+        return user.getAttendance();
     }
 
-    public void removeAttendance(Long userId, Long eventId) {
+    public List<Event> removeAttendance(Long userId, Long eventId) {
         User user = userRepo.findById(userId).orElseThrow(() -> new UserNotFoundException("User with id: " + userId + " not found"));
         Event event = eventRepo.findById(eventId).orElseThrow(() -> new EventNotFoundException("Event with id: " + eventId + "not found"));
         user.removeAttendance(event);
         userRepo.save(user);
+        return user.getAttendance();
     }
+
 
 }
 

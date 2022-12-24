@@ -27,11 +27,6 @@ public class UserDto {
 
     private int points;
 
-    //    private List<Event> favourites = new ArrayList<>();
-//    private List<Trophy> trophies = new ArrayList<>();
-//    private List<Event> attendance = new ArrayList<>();
-//    private List<User> friends = new ArrayList<>();
-
     public Long getId() {
         return id;
     }
@@ -87,37 +82,5 @@ public class UserDto {
     public void setRole(Role role) {
         this.role = role;
     }
-
-//    public List<Event> getFavourites() {
-//        return favourites;
-//    }
-//
-//    public void setFavourites(List<Event> favourites) {
-//        this.favourites = favourites;
-//    }
-//
-//    public List<Trophy> getTrophies() {
-//        return trophies;
-//    }
-//
-//    public void setTrophies(List<Trophy> trophies) {
-//        this.trophies = trophies;
-//    }
-//
-//    public List<Event> getAttendance() {
-//        return attendance;
-//    }
-//
-//    public void setAttendance(List<Event> attendance) {
-//        this.attendance = attendance;
-//    }
-//
-//    public List<User> getFriends() {
-//        return friends;
-//    }
-//
-//    public void setFriends(List<User> friends) {
-//        this.friends = friends;
-//    }
 
 }

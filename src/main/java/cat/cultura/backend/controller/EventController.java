@@ -10,6 +10,7 @@ import cat.cultura.backend.exceptions.MissingRequiredParametersException;
 import cat.cultura.backend.mappers.EventMapper;
 import cat.cultura.backend.mappers.ReviewMapper;
 import cat.cultura.backend.service.*;
+import cat.cultura.backend.service.user.ReviewService;
 import cat.cultura.backend.service.user.UserService;
 import cat.cultura.backend.service.user.UserTrophyService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,7 +31,7 @@ public class EventController {
     private EventService eventService;
 
     @Autowired
-    private RouteService routeService;
+    private RouteDataService routeDataService;
 
     @Autowired
     private UserService userService;
@@ -134,6 +135,16 @@ public class EventController {
             return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
         }
         return ResponseEntity.status(HttpStatus.OK).body(reviews.stream().map(reviewMapper::convertReviewToDto).toList());
+    }
+
+    @GetMapping("/events/{id}/attendanceCode")
+    public ResponseEntity<String> getAttendanceCode(@PathVariable Long id) {
+        return ResponseEntity.status(HttpStatus.OK).body(eventService.getAttendanceCode(id));
+    }
+
+    @PostMapping("/events/{id}/attendanceCode")
+    public ResponseEntity<String> generateAttendanceCode(@PathVariable Long id) {
+        return ResponseEntity.status(HttpStatus.OK).body(eventService.generateAttendanceCode(id));
     }
 
 }
