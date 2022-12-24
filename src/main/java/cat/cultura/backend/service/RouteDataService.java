@@ -26,14 +26,10 @@ public class RouteDataService {
         List<Event> events = getRouteByQuery(lat, lon, radius, day);
         List<Event> result = new ArrayList<>();
         int n = events.size();
-        if(n > 2) {
-            result = events.subList(0,3);
-            result.sort(new SortByLongitude());
-        }
+        if(n > 2) result = events.subList(0,3);
         else if(n > 1) result = events.subList(0,2);
         else if(n == 1) result = events.subList(0,1);
-
-        return result;
+        return orderEvents(lat,lon,result);
     }
 
     public List<Event> getUserAdjustedRouteInADayAndLocation(double lat, double lon, int radius, String day, Long userId) {
@@ -44,12 +40,10 @@ public class RouteDataService {
         if(n > 2) {
             events.sort(new SortByNumberOfMatches(user));
             result = events.subList(0,3);
-            result.sort(new SortByLongitude());
         }
         else if(n > 1) result = events.subList(0,2);
         else if(n == 1) result = events.subList(0,1);
-
-        return result;
+        return orderEvents(lat,lon,result);
     }
 
     private List<Event> getRouteByQuery(double lat, double lon, int radius, String day) {
@@ -91,9 +85,62 @@ public class RouteDataService {
         }
     }
 
-    class SortByLongitude implements Comparator<Event> {
-        public int compare(Event a, Event b) {
-            return Double.compare(a.getLongitud(), b.getLongitud());
+    private Event getNearestToMe(double lat, double lon, List<Event> events){
+        Event nearestEvent = null;
+        double minDist = 100000000;
+        for(Event event : events) {
+            double dist = distance(lat,lon,event.getLatitud(),event.getLongitud(),"K");
+            if(minDist > dist) {
+                minDist = dist;
+                nearestEvent = event;
+            }
+        }
+        return nearestEvent;
+    }
+
+    private List<Event> orderEvents(double lat, double lon, List<Event> events) {
+        if(events.size() < 1) return events;
+        else {
+            List<Event> result = new ArrayList<>();
+            Event ne = getNearestToMe(lat, lon, events);
+            result.add(ne);
+            events.remove(ne);
+            Event e1 = events.get(0);
+            if (events.size() > 1) {
+                Event e2 = events.get(1);
+                double d1 = distance(ne.getLongitud(), ne.getLongitud(), e1.getLatitud(), e1.getLongitud(), "K");
+                double d2 = distance(ne.getLongitud(), ne.getLongitud(), e2.getLatitud(), e2.getLongitud(), "K");
+                if (d1 < d2) {
+                    result.add(e1);
+                    result.add(e2);
+                } else {
+                    result.add(e2);
+                    result.add(e1);
+                }
+            } else {
+                result.add(e1);
+            }
+            return result;
+        }
+    }
+
+    private static double distance(double lat1, double lon1, double lat2, double lon2, String unit) {
+        if ((lat1 == lat2) && (lon1 == lon2)) {
+            return 0;
+        }
+        else {
+            double theta = lon1 - lon2;
+            double dist = Math.sin(Math.toRadians(lat1)) * Math.sin(Math.toRadians(lat2)) +
+                    Math.cos(Math.toRadians(lat1)) * Math.cos(Math.toRadians(lat2)) * Math.cos(Math.toRadians(theta));
+            dist = Math.acos(dist);
+            dist = Math.toDegrees(dist);
+            dist = dist * 60 * 1.1515;
+            if (unit.equals("K")) {
+                dist = dist * 1.609344;
+            } else if (unit.equals("N")) {
+                dist = dist * 0.8684;
+            }
+            return (dist);
         }
     }
 

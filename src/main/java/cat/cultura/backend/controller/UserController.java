@@ -345,12 +345,12 @@ public class UserController {
     }
 
     @PutMapping("/users/{id}/routes")
-    public ResponseEntity<List<Long>> saveRoute(@PathVariable Long id, @RequestBody List<EventDto> events) {
+    public ResponseEntity<List<Long>> saveRoute(@PathVariable Long id, @RequestBody RouteDto routeDto) {
         if(!isCurrentUser(id)) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         } else {
-            List<Event> ev = events.stream().map(eventMapper::convertEventDtoToEntity).toList();
-            List<Route> result = userRouteService.saveRoute(ev,id);
+            Route r = routeMapper.convertRouteDtoToEntity(routeDto);
+            List<Route> result = userRouteService.saveRoute(r,id);
             return ResponseEntity.status(HttpStatus.CREATED).body(result.stream().map(Route::getRouteId).toList());
         }
     }
@@ -380,14 +380,13 @@ public class UserController {
     public ResponseEntity<List<Long>> addReview(
             @PathVariable Long userId,
             @RequestParam Long eventId,
-            @RequestBody ReviewDto ev) {
+            @RequestBody ReviewDto r) {
         if(!isCurrentUser(userId)) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         } else {
             List<Review> reviews;
             try {
-                Review aux = reviewMapper.convertReviewDtoToEntity(ev);
-                reviews = reviewService.addReview(eventId, aux, userId);
+                reviews = reviewService.addReview(eventId, reviewMapper.convertReviewDtoToEntity(r), userId);
             } catch (AssertionError as) {
                 return ResponseEntity.status(HttpStatus.CONFLICT).build();
             }
