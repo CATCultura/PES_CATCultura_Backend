@@ -44,9 +44,9 @@ public class SimilarityServiceImpl implements SimilarityServiceAdapter {
     public List<Score> getMostSimilar(String query) throws IOException {
         String responseBody = performRequest(query);
         ObjectMapper mapper = new ObjectMapper();
-        Map<String,Double> parsedResponse = mapper.readValue(responseBody, Map.class);
+        Map<String,String> parsedResponse = mapper.readValue(responseBody, Map.class);
         List<Score> eventList = new ArrayList<>();
-        for(Map.Entry<String,Double> item : parsedResponse.entrySet()) {
+        for(Map.Entry<String,String> item : parsedResponse.entrySet()) {
             eventList.add(Score.parseScore(item));
         }
         return eventList;

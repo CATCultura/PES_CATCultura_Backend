@@ -12,7 +12,9 @@ import org.junit.jupiter.api.Test;
 import org.springframework.test.context.ActiveProfiles;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @ActiveProfiles("test")
 class UserTest {
@@ -389,6 +391,25 @@ class UserTest {
         Assertions.assertTrue(tagList.contains(t));
         u.removeTag(t);
         Assertions.assertFalse(tagList.contains(t));
+    }
+
+    @Test
+    void getAllTags() {
+        User u = new User("JoanJosep");
+        Tag ta = new TagAmbits("arts-visuals");
+        Tag tc = new TagCategories("exposicions");
+        Tag tac = new TagAltresCategories("nadal");
+        u.addTag(ta);
+        u.addTag(tc);
+        u.addTag(tac);
+
+        Set<Tag> expected = new HashSet<>();
+        expected.add(ta);
+        expected.add(tc);
+        expected.add(tac);
+
+        Assertions.assertEquals(expected,u.getTags());
+
     }
 
 

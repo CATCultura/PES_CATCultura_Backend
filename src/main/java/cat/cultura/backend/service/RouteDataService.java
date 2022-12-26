@@ -105,8 +105,8 @@ public class RouteDataService {
             List<Event> result = new ArrayList<>(events);
             if (ne != null) {
                 result.sort((o1, o2) -> {
-                    double d1 = distance(ne.getLongitud(), ne.getLongitud(), o1.getLatitud(), o1.getLongitud(), "K");
-                    double d2 = distance(ne.getLongitud(), ne.getLongitud(), o2.getLatitud(), o2.getLongitud(), "K");
+                    double d1 = distance(ne.getLatitud(), ne.getLongitud(), o1.getLatitud(), o1.getLongitud(), "K");
+                    double d2 = distance(ne.getLatitud(), ne.getLongitud(), o2.getLatitud(), o2.getLongitud(), "K");
                     return Double.compare(d1, d2);
                 });
             }
