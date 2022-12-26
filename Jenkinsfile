@@ -3,6 +3,15 @@ pipeline {
 
     stages {
 
+        stage('Code Coverage') {
+            steps {
+                withMaven {
+                    sh 'mvn test'
+                    sh 'mvn jacoco:report'
+                }
+            }
+        }
+
         stage('SonarQube Analysis') {
             steps {
                 withMaven() {
@@ -21,13 +30,13 @@ pipeline {
             }
         }
 
-        stage('Test') {
-            steps {
-                withMaven {
-                    sh "mvn test"
-                    }
-            }
-        }
+//         stage('Test') {
+//             steps {
+//                 withMaven {
+//                     sh "mvn test"
+//                     }
+//             }
+//         }
 
         stage('Deploy') {
             when { branch 'dev-main' }
