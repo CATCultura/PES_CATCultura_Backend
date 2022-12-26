@@ -63,15 +63,14 @@ public class EntryPointController {
                     logger.info(String.format("Created new organizer for event %s",e.getDenominacio()));
                 }
             }
-
             try {
                 eventService.saveEvent(e);
-                logger.info(String.format("Saved event %s",e.getDenominacio()));
+                logger.info("Saved event {}",e.getDenominacio());
             }
             catch (EventAlreadyCreatedException ignored) {
                 logger.info(String.format("Event %s already created",e.getDenominacio()));
-
             }
+
         }
         logger.info("Insertion OK");
         return new ResponseEntity<>("All ok", HttpStatus.OK);

@@ -2,7 +2,6 @@ package cat.cultura.backend.interceptors;
 
 import cat.cultura.backend.entity.Role;
 import cat.cultura.backend.repository.UserJpaRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -19,12 +18,16 @@ public class SecurityConfig {
 
     public static final String EVENTENDPOINT = "/events*";
     public static final String CONCRETEEVENT = "/events/*";
-    @Autowired
-    private UserJpaRepository userJpaRepository;
 
-    private String organizer = Role.ORGANIZER.toString();
+    private final UserJpaRepository userJpaRepository;
 
-    private String service = Role.SERVICE.toString();
+    public SecurityConfig(UserJpaRepository userJpaRepository) {
+        this.userJpaRepository = userJpaRepository;
+    }
+
+    private final String organizer = Role.ORGANIZER.toString();
+
+    private final String service = Role.SERVICE.toString();
 
 
     @Bean
