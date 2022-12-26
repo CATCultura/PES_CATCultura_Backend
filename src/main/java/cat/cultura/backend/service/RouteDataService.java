@@ -90,7 +90,7 @@ public class RouteDataService {
         double minDist = 100000000;
         for(Event event : events) {
             double dist = distance(lat,lon,event.getLatitud(),event.getLongitud(),"K");
-            if(minDist > dist) {
+            if (minDist > dist) {
                 minDist = dist;
                 nearestEvent = event;
             }
@@ -99,26 +99,16 @@ public class RouteDataService {
     }
 
     private List<Event> orderEvents(double lat, double lon, List<Event> events) {
-        if(events.size() < 1) return events;
+        if (events.isEmpty()) return events;
         else {
-            List<Event> result = new ArrayList<>();
             Event ne = getNearestToMe(lat, lon, events);
-            result.add(ne);
-            events.remove(ne);
-            Event e1 = events.get(0);
-            if (events.size() > 1) {
-                Event e2 = events.get(1);
-                double d1 = distance(ne.getLongitud(), ne.getLongitud(), e1.getLatitud(), e1.getLongitud(), "K");
-                double d2 = distance(ne.getLongitud(), ne.getLongitud(), e2.getLatitud(), e2.getLongitud(), "K");
-                if (d1 < d2) {
-                    result.add(e1);
-                    result.add(e2);
-                } else {
-                    result.add(e2);
-                    result.add(e1);
-                }
-            } else {
-                result.add(e1);
+            List<Event> result = new ArrayList<>(events);
+            if (ne != null) {
+                result.sort((o1, o2) -> {
+                    double d1 = distance(ne.getLongitud(), ne.getLongitud(), o1.getLatitud(), o1.getLongitud(), "K");
+                    double d2 = distance(ne.getLongitud(), ne.getLongitud(), o2.getLatitud(), o2.getLongitud(), "K");
+                    return Double.compare(d1, d2);
+                });
             }
             return result;
         }
