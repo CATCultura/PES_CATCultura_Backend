@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import javax.persistence.*;
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -21,10 +22,9 @@ public class Route {
 
     private String createdAt;
 
-    @ElementCollection
-    @CollectionTable(name="RouteEvents", joinColumns=@JoinColumn(name="id"))
-    @Column(name="route_events")
-    private List<Event> routeEvents;
+    @ManyToMany
+    @JoinColumn(name = "events")
+    private List<Event> routeEvents = new ArrayList<>();
 
     public Long getRouteId() {
         return routeId;
@@ -64,6 +64,10 @@ public class Route {
 
     public void setCreatedAt(String createdAt) {
         this.createdAt = createdAt;
+    }
+
+    public void addEvents(List<Event> ev) {
+        this.routeEvents.addAll(ev);
     }
 
 
