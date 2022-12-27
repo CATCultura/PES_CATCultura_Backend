@@ -2,6 +2,7 @@ package cat.cultura.backend.dtos;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 public class LoggedUserDto extends UserDto {
 
@@ -9,6 +10,20 @@ public class LoggedUserDto extends UserDto {
     private List<Long> favouriteEvents = new ArrayList<>();
     private List<Long> trophiesReceived = new ArrayList<>();
     private List<Long> eventsAttendance = new ArrayList<>();
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof LoggedUserDto that)) return false;
+        if (!super.equals(o)) return false;
+        return favouriteEvents.equals(that.favouriteEvents) && trophiesReceived.equals(that.trophiesReceived) && eventsAttendance.equals(that.eventsAttendance) && eventsAttended.equals(that.eventsAttended) && friendIds.equals(that.friendIds) && upvotedReviewIds.equals(that.upvotedReviewIds);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(super.hashCode(), favouriteEvents, trophiesReceived, eventsAttendance, eventsAttended, friendIds, upvotedReviewIds);
+    }
+
     private List<Long> eventsAttended = new ArrayList<>();
     private List<Long> friendIds = new ArrayList<>();
     private List<Long> upvotedReviewIds = new ArrayList<>();

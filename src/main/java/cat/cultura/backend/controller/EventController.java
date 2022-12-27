@@ -91,7 +91,8 @@ public class EventController {
         else {
             events = eventService.getByQuery(id, pageable);
         }
-
+        if (events == null)
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
         return ResponseEntity.status(HttpStatus.OK).body(events.stream().map(eventMapper::convertEventToDto).toList());
     }
 
