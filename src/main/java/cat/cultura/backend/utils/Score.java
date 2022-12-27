@@ -14,8 +14,8 @@ public class Score {
         this.similarityScore = similarityScore;
     }
 
-    public static Score parseScore(Map.Entry<String, String> item) {
-        double score = Double.parseDouble(item.getValue());
+    public static Score parseScore(Map.Entry<String, Double> item) {
+        double score = item.getValue();
         if (Double.isNaN(score))
             score = 0.0;
         return new Score(Long.valueOf(item.getKey()), score);

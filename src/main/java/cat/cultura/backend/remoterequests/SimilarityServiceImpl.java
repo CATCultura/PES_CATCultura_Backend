@@ -1,6 +1,7 @@
 package cat.cultura.backend.remoterequests;
 
 import cat.cultura.backend.utils.Score;
+import com.fasterxml.jackson.core.json.JsonReadFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -22,9 +23,10 @@ public class SimilarityServiceImpl implements SimilarityServiceAdapter {
     public List<Score> getMostSimilar(String query) throws IOException {
         String responseBody = requestStrategy.performRequest(serviceURL, query);
         ObjectMapper mapper = new ObjectMapper();
-        Map<String,String> parsedResponse = mapper.readValue(responseBody, Map.class);
+        mapper.enable(JsonReadFeature.ALLOW_NON_NUMERIC_NUMBERS.mappedFeature());
+        Map<String,Double> parsedResponse = mapper.readValue(responseBody, Map.class);
         List<Score> eventList = new ArrayList<>();
-        for(Map.Entry<String,String> item : parsedResponse.entrySet()) {
+        for(Map.Entry<String,Double> item : parsedResponse.entrySet()) {
             eventList.add(Score.parseScore(item));
         }
         return eventList;
