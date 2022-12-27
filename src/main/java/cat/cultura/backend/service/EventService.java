@@ -4,8 +4,11 @@ import cat.cultura.backend.entity.Event;
 import cat.cultura.backend.entity.tag.Tag;
 import cat.cultura.backend.exceptions.EventAlreadyCreatedException;
 import cat.cultura.backend.exceptions.EventNotFoundException;
+import cat.cultura.backend.remoterequests.SimilarityServiceAdapter;
+import cat.cultura.backend.remoterequests.SimilarityServiceImpl;
 import cat.cultura.backend.repository.EventJpaRepository;
 import cat.cultura.backend.repository.TagJpaRepository;
+import cat.cultura.backend.utils.Score;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
@@ -22,7 +25,7 @@ public class EventService {
 
     private final TagJpaRepository tagRepo;
 
-    private final SemanticService semanticService;
+    private SimilarityServiceAdapter similarityService;
 
     private boolean isUniqueInDB(Event ev) {
         List<Event> sameDenominacioEvents = eventRepo.findByDenominacioLikeIgnoreCaseAllIgnoreCase(ev.getDenominacio());
@@ -46,10 +49,10 @@ public class EventService {
         return res;
     }
 
-    public EventService(EventJpaRepository eventRepo, TagJpaRepository tagRepo, SemanticService semanticService) {
+    public EventService(EventJpaRepository eventRepo, TagJpaRepository tagRepo, SimilarityServiceImpl semanticService) {
         this.eventRepo = eventRepo;
         this.tagRepo = tagRepo;
-        this.semanticService = semanticService;
+        this.similarityService = semanticService;
     }
 
     public Event saveEvent(Event ev) {
@@ -101,18 +104,17 @@ public class EventService {
     }
 
     public Page<Event> getBySemanticSimilarity(String query) {
-        List<Long> queryResult;
+        List<Score> queryResult;
         try {
-             queryResult = semanticService.getEventListByQuery(query);
+             queryResult = similarityService.getMostSimilar(query);
         } catch (IOException e) {
             return null;
         }
         if (queryResult!= null) {
             List<Event> results = new ArrayList<>();
-            for (Long id : queryResult) {
-                Event e = eventRepo.findById(id).orElse(null);
-                if (e != null)
-                    results.add(e);
+            for (Score id : queryResult) {
+                if (id.getSimilarityScore() > 0.5)
+                    eventRepo.findById(id.getEventId()).ifPresent(results::add);
             }
             return new PageImpl<>(results);
         }
