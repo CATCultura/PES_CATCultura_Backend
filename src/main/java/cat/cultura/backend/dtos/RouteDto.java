@@ -1,4 +1,5 @@
 package cat.cultura.backend.dtos;
+import java.util.ArrayList;
 import java.util.List;
 
 public class RouteDto {
@@ -10,7 +11,9 @@ public class RouteDto {
 
     private String createdAt;
 
-    private List<EventDto> routeEvents;
+    private List<Long> eventIds = new ArrayList<>();
+
+    private List<EventDto> routeEvents = new ArrayList<>();
 
     public Long getRouteId() {
         return routeId;
@@ -50,5 +53,13 @@ public class RouteDto {
 
     public void setCreatedAt(String createdAt) {
         this.createdAt = createdAt;
+    }
+
+    public List<Long> getEventIds() {
+        return eventIds;
+    }
+
+    public void setEventIds(List<Long> eventIds) {
+        this.eventIds = eventIds;
     }
 }

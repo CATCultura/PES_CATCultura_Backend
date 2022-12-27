@@ -349,8 +349,9 @@ public class UserController {
         if(!isCurrentUser(id)) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         } else {
+            List<Long> eventIds = routeDto.getEventIds();
             Route r = routeMapper.convertRouteDtoToEntity(routeDto);
-            List<Route> result = userRouteService.saveRoute(r,id);
+            List<Route> result = userRouteService.saveRoute(r,id, eventIds);
             return ResponseEntity.status(HttpStatus.CREATED).body(result.stream().map(Route::getRouteId).toList());
         }
     }
