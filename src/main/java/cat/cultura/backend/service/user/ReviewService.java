@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.Comparator;
 import java.util.List;
 @Service
 public class ReviewService {
@@ -33,6 +34,7 @@ public class ReviewService {
         review.setDate(new SimpleDateFormat("dd/MM/yyyy HH:mm:ss").format(Calendar.getInstance().getTime()));
         review.setAuthor(user);
         review.setEvent(event);
+        reviewRepo.save(review);
         return reviewRepo.findByUser(user);
     }
 
@@ -78,5 +80,49 @@ public class ReviewService {
         return user.getUpvotedReviews();
     }
 
+    public List<Review> report(Long userId, Long reviewId) {
+        User user = userRepo.findById(userId).orElseThrow(UserNotFoundException::new);
+        Review review = reviewRepo.findById(reviewId).orElseThrow(ReviewNotFoundException::new);
+        user.addReport(review);
+        review.report();
+        reviewRepo.save(review);
+        userRepo.save(user);
+        return user.getReportedReviews();
+    }
 
+    public List<Review> quitReport(Long userId, Long reviewId) {
+        User user = userRepo.findById(userId).orElseThrow(UserNotFoundException::new);
+        Review review = reviewRepo.findById(reviewId).orElseThrow(ReviewNotFoundException::new);
+        user.removeReport(review);
+        review.removeReport();
+        reviewRepo.save(review);
+        userRepo.save(user);
+        return user.getReportedReviews();
+    }
+
+    public Review blockReview(Long reviewId) {
+        Review review = reviewRepo.findById(reviewId).orElseThrow(ReviewNotFoundException::new);
+        review.setBlocked(true);
+        reviewRepo.save(review);
+        return review;
+    }
+
+
+    public Review unblockReview(Long reviewId) {
+        Review review = reviewRepo.findById(reviewId).orElseThrow(ReviewNotFoundException::new);
+        review.setBlocked(false);
+        reviewRepo.save(review);
+        return review;
+    }
+
+    public List<Review> getMostReportedReviews() {
+        List<Review> reviews = reviewRepo.findReportedReviews();
+        reviews.sort(Comparator.comparingInt(Review::getReports));
+        return reviews;
+    }
+
+    public List<Review> getBlockedReviews() {
+        List<Review> reviews = reviewRepo.findBlockedReviews();
+        return reviews;
+    }
 }

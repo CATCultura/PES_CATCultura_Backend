@@ -51,8 +51,11 @@ public class User {
     @Column(name="creationDate")
     private String creationDate;
 
-    @Column(name="points")
+    @Column(name="points", nullable = false)
     private int points = 0;
+
+    @Column(name="reports", nullable = false)
+    private int reports = 0;
 
     @ManyToMany
     @JoinTable(name="favourites",
@@ -120,6 +123,16 @@ public class User {
     @Column(name="Review")
     private List<Review> upvotedReviews = new ArrayList<>();
 
+    @OneToMany
+    @CollectionTable(name="reportedReviews", joinColumns=@JoinColumn(name="id"))
+    @Column(name="reportedReviews")
+    private List<Review> reportedReviews = new ArrayList<>();
+
+    @ManyToMany
+    @CollectionTable(name="reportedUsers", joinColumns=@JoinColumn(name="id"))
+    @Column(name="ReportedUsers")
+    private List<User> reportedUsers = new ArrayList<>();
+
     public void setAttended(List<Event> attended) {
         this.attended = attended;
     }
@@ -141,6 +154,24 @@ public class User {
     public void addUpvote(Review review) {
         if(upvotedReviews.contains(review)) throw new AssertionError("Review with id " + review.getId() + " is already in upvoted reviews");
         else upvotedReviews.add(review);
+    }
+
+    public List<Review> getReportedReviews() {
+        return reportedReviews;
+    }
+
+    public void setReportedReviews(List<Review> reportedReviews) {
+        this.reportedReviews = reportedReviews;
+    }
+
+    public void removeReport(Review review) {
+        if(!reportedReviews.contains(review)) throw new AssertionError("Review with id " + review.getId() + " is not in reported reviews");
+        else reportedReviews.remove(review);
+    }
+
+    public void addReport(Review review) {
+        if(reportedReviews.contains(review)) throw new AssertionError("Review with id " + review.getId() + " is already in reported reviews");
+        else reportedReviews.add(review);
     }
 
     @Override
@@ -555,6 +586,40 @@ public class User {
 
     public void setUrl(String url) {
         this.url = url;
+    }
+
+    public int getReports() {
+        return reports;
+    }
+
+    public void setReports(int reports) {
+        this.reports = reports;
+    }
+
+    public void report(){
+        ++this.reports;
+    }
+
+    public void removeReport() {
+        --this.reports;
+    }
+
+    public List<User> getReportedUsers() {
+        return reportedUsers;
+    }
+
+    public void setReportedUsers(List<User> reportedUsers) {
+        this.reportedUsers = reportedUsers;
+    }
+
+    public void removeReportToUser(User user) {
+        if(!reportedUsers.contains(user)) throw new AssertionError("User with id " + user.getId() + " is not in reported users");
+        else reportedUsers.remove(user);
+    }
+
+    public void addReportToUser(User user) {
+        if(reportedUsers.contains(user)) throw new AssertionError("User with id " + user.getId() + " is already in reported users");
+        else reportedUsers.add(user);
     }
 
 
