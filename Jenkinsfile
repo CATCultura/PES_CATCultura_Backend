@@ -50,6 +50,18 @@ pipeline {
                 sh 'sudo docker build -t backend .'
                 sh 'sudo docker run -d -p 8081:8081 backend'
             }
+
+            when { branch 'master' }
+                        steps {
+
+                            withMaven {
+                                sh 'mvn clean package'
+                            }
+                            sh 'sudo docker build -t backend .'
+                            sh 'sudo docker tag backend catculturacontainerhub.azurecr.io/backend'
+                            sh 'sudo docker push catculturacontainerhub.azurecr.io/backend'
+
+                        }
         }
 
         stage('Notify') {
