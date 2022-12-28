@@ -324,14 +324,15 @@ public class UserController {
             @RequestParam double lon,
             @RequestParam int radius,
             @RequestParam String day,
-            @RequestParam(required = false) Long userId
+            @RequestParam(required = false) Long userId,
+            @RequestBody List<Long> discardedEvents
     ) {
         List<Event> events;
         if(userId != null) {
-            events = routeDataService.getUserAdjustedRouteInADayAndLocation(lat, lon, radius, day, userId);
+            events = routeDataService.getUserAdjustedRouteInADayAndLocation(lat, lon, radius, day, userId, discardedEvents);
             userTrophyService.firstRoute(userId);
         } else {
-            events = routeDataService.getRouteInADayAndLocation(lat, lon, radius, day);
+            events = routeDataService.getRouteInADayAndLocation(lat, lon, radius, day, discardedEvents);
         }
         return ResponseEntity.status(HttpStatus.OK).body(events.stream().map(eventMapper::convertEventToDto).toList());
     }
