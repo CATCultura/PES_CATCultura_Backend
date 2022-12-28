@@ -303,6 +303,15 @@ public class UserController {
         return ResponseEntity.status(HttpStatus.OK).body(users.stream().map(userMapper::convertUserToDto).toList());
     }
 
+    @GetMapping("users/{id}/friends/session")
+    public ResponseEntity<HashMap<String, List<Long>>> getFriendsIds(@PathVariable Long id) {
+        HashMap<String, List<Long>> users = new HashMap<>();
+        users.put("requested", requestService.getRequestsTo(id).stream().map(User::getId).toList());
+        users.put("received",requestService.getRequestFrom(id).stream().map(User::getId).toList());
+        users.put("accepted",requestService.getFriends(id).stream().map(User::getId).toList());
+        return ResponseEntity.status(HttpStatus.OK).body(users);
+    }
+
     @DeleteMapping("/users/{id}/friends/{friendId}")
     public ResponseEntity<List<Long>> removeFriend(@PathVariable Long id, @PathVariable Long friendId) {
         if(!isCurrentUser(id)) {
@@ -325,9 +334,10 @@ public class UserController {
             @RequestParam int radius,
             @RequestParam String day,
             @RequestParam(required = false) Long userId,
-            @RequestBody List<Long> discardedEvents
+            @RequestParam(required = false) List<Long> discardedEvents
     ) {
         List<Event> events;
+        if(discardedEvents == null) discardedEvents = new ArrayList<>();
         if(userId != null) {
             events = routeDataService.getUserAdjustedRouteInADayAndLocation(lat, lon, radius, day, userId, discardedEvents);
             userTrophyService.firstRoute(userId);
@@ -482,6 +492,65 @@ public class UserController {
                 return ResponseEntity.status(HttpStatus.CONFLICT).build();
             }
             return ResponseEntity.status(HttpStatus.OK).body(reviews.stream().map(Review::getId).toList());
+        }
+    }
+    @PostMapping("/users/{userId}/reviewReports/{reviewId}")
+    public ResponseEntity<List<Long>> report(@PathVariable Long userId, @PathVariable Long reviewId) {
+        if(!isCurrentUser(userId)) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        } else {
+            List<Review> reviews;
+            try {
+                reviews = reviewService.report(userId,reviewId);
+            } catch (AssertionError as) {
+                return ResponseEntity.status(HttpStatus.CONFLICT).build();
+            }
+            return ResponseEntity.status(HttpStatus.OK).body(reviews.stream().map(Review::getId).toList());
+        }
+    }
+
+    @DeleteMapping("/users/{userId}/reviewReports/{reviewId}")
+    public ResponseEntity<List<Long>> quitReport(@PathVariable Long userId, @PathVariable Long reviewId) {
+        if(!isCurrentUser(userId)) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        } else {
+            List<Review> reviews;
+            try {
+                reviews = reviewService.quitReport(userId,reviewId);
+            } catch (AssertionError as) {
+                return ResponseEntity.status(HttpStatus.CONFLICT).build();
+            }
+            return ResponseEntity.status(HttpStatus.OK).body(reviews.stream().map(Review::getId).toList());
+        }
+    }
+
+    @PostMapping("/users/{userId}/userReports/{reportedUserId}")
+    public ResponseEntity<List<Long>> reportUser(@PathVariable Long userId, @PathVariable Long reportedUserId) {
+        if(!isCurrentUser(userId)) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        } else {
+            List<User> users;
+            try {
+                users = userService.report(userId,reportedUserId);
+            } catch (AssertionError as) {
+                return ResponseEntity.status(HttpStatus.CONFLICT).build();
+            }
+            return ResponseEntity.status(HttpStatus.OK).body(users.stream().map(User::getId).toList());
+        }
+    }
+
+    @DeleteMapping("/users/{userId}/userReports/{reportedUserId}")
+    public ResponseEntity<List<Long>> quitReportToUser(@PathVariable Long userId, @PathVariable Long reportedUserId) {
+        if(!isCurrentUser(userId)) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        } else {
+            List<User> users;
+            try {
+                users = userService.quitReport(userId,reportedUserId);
+            } catch (AssertionError as) {
+                return ResponseEntity.status(HttpStatus.CONFLICT).build();
+            }
+            return ResponseEntity.status(HttpStatus.OK).body(users.stream().map(User::getId).toList());
         }
     }
 

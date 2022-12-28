@@ -28,6 +28,8 @@ public class LoggedUserDto extends UserDto {
     private List<Long> friendIds = new ArrayList<>();
     private List<Long> upvotedReviewIds = new ArrayList<>();
 
+    private List<Long> reportedReviewIds = new ArrayList<>();
+
     public String getUserHash() {
         return userHash;
     }
@@ -57,6 +59,9 @@ public class LoggedUserDto extends UserDto {
     }
     public void addUpvotedReviews(Long reviewID) {
         upvotedReviewIds.add(reviewID);
+    }
+    public void addReportedReviews(Long reviewID) {
+        reportedReviewIds.add(reviewID);
     }
 
     public List<Long> getTrophiesReceived() {

@@ -10,10 +10,17 @@ import java.util.List;
 
 public interface ReviewJpaRepository extends JpaRepository<Review, Long> {
     @Query("select m from Review m where " +
-            "(m.author = ?1) ")
+            "(m.author = ?1) and (m.blocked = false) ")
     List<Review> findByUser(User user);
 
     @Query("select m from Review m where " +
-            "(m.event = ?1) ")
+            "(m.reports > 0) and (m.blocked = false) ")
+    List<Review> findReportedReviews();
+
+    @Query("select m from Review m where " +
+            "(m.event = ?1) and (m.blocked = false) ")
     List<Review> findByEvent(Event event);
+    @Query("select m from Review m where " +
+            "(m.blocked = true) ")
+    List<Review> findBlockedReviews();
 }
