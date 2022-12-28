@@ -1,6 +1,9 @@
 package cat.cultura.backend.utils;
 
 import java.util.Map;
+import java.util.Objects;
+
+import static java.lang.Double.NaN;
 
 public class Score {
 
@@ -12,7 +15,24 @@ public class Score {
     }
 
     public static Score parseScore(Map.Entry<String, Double> item) {
-        return new Score(Long.valueOf(item.getKey()), item.getValue());
+        double score = item.getValue();
+        if (Double.isNaN(score))
+            score = 0.0;
+        return new Score(Long.valueOf(item.getKey()), score);
+    }
+
+    public Score(){}
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Score score)) return false;
+        return eventId.equals(score.eventId) && similarityScore.equals(score.similarityScore);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(eventId, similarityScore);
     }
 
     public Long getEventId() {

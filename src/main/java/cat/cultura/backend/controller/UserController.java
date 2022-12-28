@@ -3,13 +3,10 @@ package cat.cultura.backend.controller;
 import cat.cultura.backend.dtos.*;
 import cat.cultura.backend.entity.*;
 import cat.cultura.backend.entity.tag.Tag;
-import cat.cultura.backend.mappers.ReviewMapper;
-import cat.cultura.backend.mappers.RouteMapper;
-import cat.cultura.backend.mappers.TrophyMapper;
+import cat.cultura.backend.mappers.*;
 import cat.cultura.backend.service.*;
 import cat.cultura.backend.service.user.*;
 import cat.cultura.backend.interceptors.CurrentUser;
-import cat.cultura.backend.mappers.EventMapper;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -69,11 +66,14 @@ public class UserController {
     @Autowired
     private AttendedService attendedService;
 
+    @Autowired
+    private UserMapper userMapper;
+
     @GetMapping("/login")
     public ResponseEntity<LoggedUserDto> authenticate() {
         CurrentUser currentUser = (CurrentUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         User u = userService.getUserByUsername(currentUser.getUsername());
-        LoggedUserDto loggedUserDto = convertUserToLoggedUserDto(u);
+        LoggedUserDto loggedUserDto = userMapper.convertUserToLoggedUserDto(u);
         return new ResponseEntity<>(loggedUserDto,HttpStatus.OK);
     }
 
@@ -81,10 +81,12 @@ public class UserController {
     //Post, Get, Put, and Delete for all UserDto properties (see class UserDto)
     @PostMapping("/users")
     public ResponseEntity<LoggedUserDto> addUser(@RequestBody UserDto user) {
-        User userEntity = convertUserDtoToEntity(user);
+        User userEntity = userMapper.convertUserDtoToEntity(user);
         User createdUser = userService.createUser(userEntity);
+        if (user.getTags() != null && !user.getTags().isEmpty())
+            userTagService.addTags(createdUser.getId(),user.getTags().stream().toList());
         userTrophyService.createAccount(createdUser.getId());
-        return ResponseEntity.status(HttpStatus.CREATED).body(convertUserToLoggedUserDto(createdUser));
+        return ResponseEntity.status(HttpStatus.CREATED).body(userMapper.convertUserToLoggedUserDto(createdUser));
     }
 
     @GetMapping("/users")
@@ -95,32 +97,32 @@ public class UserController {
             Pageable pageable
     ) {
         Page<User> users = userService.getUsersByQuery(id, username, nameAndSurname, pageable);
-        return ResponseEntity.status(HttpStatus.OK).body(users.stream().map(this::convertUserToDto).toList());
+        return ResponseEntity.status(HttpStatus.OK).body(users.stream().map(userMapper::convertUserToDto).toList());
     }
 
     @GetMapping("/users/{id}")
     public ResponseEntity<UserDto> getUserById(@PathVariable Long id) {
         User user = userService.getUserById(id);
-        return ResponseEntity.status(HttpStatus.OK).body(convertUserToDto(user));
+        return ResponseEntity.status(HttpStatus.OK).body(userMapper.convertUserToDto(user));
     }
 
     @GetMapping("/users/name={name}")
     public ResponseEntity<UserDto> getUserByName(@PathVariable String name) {
         User user = userService.getUserByUsername(name);
-        return ResponseEntity.status(HttpStatus.OK).body(convertUserToDto(user));
+        return ResponseEntity.status(HttpStatus.OK).body(userMapper.convertUserToDto(user));
     }
 
     @PutMapping("/users")
     public ResponseEntity<UserDto> updateUser(@RequestBody UserDto us) {
-        User userEntity = convertUserDtoToEntity(us);
+        User userEntity = userMapper.convertUserDtoToEntity(us);
         User user = userService.updateUser(userEntity);
-        return ResponseEntity.status(HttpStatus.CREATED).body(convertUserToDto(user));
+        return ResponseEntity.status(HttpStatus.CREATED).body(userMapper.convertUserToDto(user));
     }
 
     @DeleteMapping("/users/{id}")
     public ResponseEntity<String> deleteUser(@PathVariable Long id){
         userService.deleteUserById(id);
-        return ResponseEntity.status(HttpStatus.OK).build();
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 
     //Put, Get and Delete for attendance of a user
@@ -298,7 +300,7 @@ public class UserController {
         if(Objects.equals(status, "requested")) users = requestService.getRequestsTo(id);
         else if(Objects.equals(status, "received")) users = requestService.getRequestFrom(id);
         else if(Objects.equals(status, "accepted")) users = requestService.getFriends(id);
-        return ResponseEntity.status(HttpStatus.OK).body(users.stream().map(this::convertUserToDto).toList());
+        return ResponseEntity.status(HttpStatus.OK).body(users.stream().map(userMapper::convertUserToDto).toList());
     }
 
     @DeleteMapping("/users/{id}/friends/{friendId}")
@@ -482,45 +484,6 @@ public class UserController {
         }
     }
 
-
-
-    //Dto conversion functions
-    private UserDto convertUserToDto(User user) {
-        UserDto userDto = modelMapper.map(user, UserDto.class);
-        userDto.setPassword(null);
-        return userDto;
-    }
-
-    private LoggedUserDto convertUserToLoggedUserDto(User user) {
-        LoggedUserDto userDto = modelMapper.map(user, LoggedUserDto.class);
-        userDto.setPassword(null);
-        for (Event e : user.getFavourites()) {
-            userDto.addFavourite(e.getId());
-        }
-        for (Event e : user.getAttendance()) {
-            userDto.addAttendance(e.getId());
-        }
-        for (Event e : user.getAttended()) {
-            userDto.addAttended(e.getId());
-        }
-        for (User u : user.getFriends()) {
-            userDto.addFriend(u.getId());
-        }
-        for (Review r : user.getUpvotedReviews()) {
-            userDto.addUpvotedReviews(r.getId());
-        }
-        for (Trophy t : user.getTrophies()) {
-            userDto.addTrophy(t.getId());
-        }
-        return userDto;
-    }
-
-    private User convertUserDtoToEntity(UserDto userDto) {
-        if (userDto.getRole() == Role.ORGANIZER) {
-            return  modelMapper.map(userDto, Organizer.class);
-        }
-        else return modelMapper.map(userDto, User.class);
-    }
     
     //Utils
     private boolean isCurrentUser(Long userId) {

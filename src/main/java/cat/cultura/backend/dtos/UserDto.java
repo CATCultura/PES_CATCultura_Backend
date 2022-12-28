@@ -4,6 +4,10 @@ import cat.cultura.backend.entity.Role;
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
+import java.util.HashSet;
+import java.util.Objects;
+import java.util.Set;
+
 @JsonIgnoreProperties(ignoreUnknown=true)
 @JsonAutoDetect(fieldVisibility= JsonAutoDetect.Visibility.ANY)
 public class UserDto {
@@ -15,10 +19,24 @@ public class UserDto {
 
     private Role role = Role.USER;
 
+    private Set<String> tags = new HashSet<>();
+
     private String password;
 
     public String getPassword() {
         return password;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof UserDto userDto)) return false;
+        return points == userDto.points && id.equals(userDto.id) && username.equals(userDto.username) && nameAndSurname.equals(userDto.nameAndSurname) && Objects.equals(email, userDto.email) && creationDate.equals(userDto.creationDate) && role == userDto.role && Objects.equals(tags, userDto.tags) && Objects.equals(password, userDto.password);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, username, nameAndSurname, email, creationDate, role, tags, password, points);
     }
 
     public void setPassword(String password) {
@@ -82,5 +100,14 @@ public class UserDto {
     public void setRole(Role role) {
         this.role = role;
     }
+
+    public Set<String> getTags() {
+        return tags;
+    }
+
+    public void setTags(Set<String> tags) {
+        this.tags = tags;
+    }
+
 
 }

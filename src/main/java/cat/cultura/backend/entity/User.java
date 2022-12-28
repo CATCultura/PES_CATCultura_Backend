@@ -10,10 +10,7 @@ import javax.persistence.*;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 @Entity
 @Table(name = "User")
@@ -146,6 +143,18 @@ public class User {
         else upvotedReviews.add(review);
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof User user)) return false;
+        return Objects.equals(id, user.id) && username.equals(user.username) && nameAndSurname.equals(user.nameAndSurname);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, username, nameAndSurname);
+    }
+
     public void setUserHash(String userHash) {
         this.userHash = userHash;
     }
@@ -192,6 +201,14 @@ public class User {
                 tagsAltresCateg.add(tag);
             }
         }
+    }
+
+    public Set<Tag> getTags() {
+        Set<Tag> tags = new HashSet<>();
+        tags.addAll(tagsAmbits);
+        tags.addAll(tagsCateg);
+        tags.addAll(tagsAltresCateg);
+        return tags;
     }
 
     public void removeTag(Tag tag) {
