@@ -171,6 +171,7 @@ class EventServiceTest {
     @Test
     void testUpdateEventOk() {
         Event old_event = new Event();
+        old_event.setId(123L);
         old_event.setDenominacio("Concert de primavera");
         old_event.setDataInici("Dimarts");
         old_event.setUbicacio("Barcelona");
@@ -178,6 +179,7 @@ class EventServiceTest {
         old_event.setEspai("Sideral");
 
         Event ev2 = new Event();
+        ev2.setId(123L);
         ev2.setDenominacio("Concert de primavera");
         ev2.setDataInici("Dimarts");
         ev2.setUbicacio("Barcelona");
@@ -191,6 +193,8 @@ class EventServiceTest {
         given(eventJpaRepository.findByDenominacioLikeIgnoreCaseAllIgnoreCase(ev2.getDenominacio())).willReturn(eventList);
 
         given(eventJpaRepository.save(ev2)).willReturn(ev2);
+
+        given(eventJpaRepository.findById(123L)).willReturn(Optional.of(old_event));
 
         ev2.setDenominacio("Concert de tardor");
 
