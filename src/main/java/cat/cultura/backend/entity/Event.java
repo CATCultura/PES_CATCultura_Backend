@@ -12,6 +12,8 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import java.lang.reflect.*;
+
 @Entity
 @Table(name = "Event")
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
@@ -401,5 +403,19 @@ public class Event {
 
     public void setOrganizer(Organizer organizer) {
         this.organizer = organizer;
+    }
+
+    public void update(Event ev) {
+        Class cls = this.getClass();
+        Field[] fieldList = cls.getDeclaredFields();
+        for (Field f : fieldList) {
+            try {
+                if (f.get(ev) != null && f.get(this) != f.get(ev)) {
+                    f.set(this,f.get(ev));
+                }
+            } catch (IllegalAccessException e) {
+                throw new RuntimeException(e);
+            }
+        }
     }
 }
