@@ -22,21 +22,27 @@ public class RouteDataService {
         this.userRepo = userRepo;
     }
 
-    public List<Event> getRouteInADayAndLocation(double lat, double lon, int radius, String day) {
+    private List<Event> getFilteredEvents(double lat, double lon, int radius, String day, List<Long> discardedEvents) {
         List<Event> events = getRouteByQuery(lat, lon, radius, day);
-        List<Event> result = new ArrayList<>();
+        if(!discardedEvents.isEmpty()) events = events.stream().filter(event -> !discardedEvents.contains(event.getId())).toList();
+        return new ArrayList<>(events);
+    }
+
+    public List<Event> getRouteInADayAndLocation(double lat, double lon, int radius, String day, List<Long> discardedEvents) {
+        List<Event> events = getFilteredEvents(lat,lon,radius,day,discardedEvents);
         int n = events.size();
+        List<Event> result = new ArrayList<>();
         if(n > 2) result = events.subList(0,3);
         else if(n > 1) result = events.subList(0,2);
         else if(n == 1) result = events.subList(0,1);
         return orderEvents(lat,lon,result);
     }
 
-    public List<Event> getUserAdjustedRouteInADayAndLocation(double lat, double lon, int radius, String day, Long userId) {
+    public List<Event> getUserAdjustedRouteInADayAndLocation(double lat, double lon, int radius, String day, Long userId, List<Long> discardedEvents) {
         User user = userRepo.findById(userId).orElseThrow(() -> new UserNotFoundException("User with id: " + userId + "not found"));
-        List<Event> events = getRouteByQuery(lat, lon, radius, day);
-        List<Event> result = new ArrayList<>();
+        List<Event> events = getFilteredEvents(lat,lon,radius,day,discardedEvents);
         int n = events.size();
+        List<Event> result = new ArrayList<>();
         if(n > 2) {
             events.sort(new SortByNumberOfMatches(user));
             result = events.subList(0,3);
