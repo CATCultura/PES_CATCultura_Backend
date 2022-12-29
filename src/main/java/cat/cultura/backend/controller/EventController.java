@@ -27,7 +27,6 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 
 @RestController
@@ -115,6 +114,7 @@ public class EventController {
         if (ev.getId() == null)
             return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
         Event eventEntity = eventMapper.convertEventDtoToEntity(ev);
+        if (eventEntity.getOrganizer() == null) return ResponseEntity.status(HttpStatus.FORBIDDEN).body(null);
         if (! Objects.equals(currentUserAccessor.getCurrentUsername(), eventEntity.getOrganizer().getUsername())) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body(null);
         }
@@ -123,7 +123,7 @@ public class EventController {
     }
 
     @PutMapping("/events/{eventId}/cancelled")
-    public ResponseEntity<EventDto> cancelEvent(@RequestParam Long eventId) {
+    public ResponseEntity<EventDto> cancelEvent(@PathVariable Long eventId) {
         eventService.cancelEvent(eventId);
         return ResponseEntity.status(HttpStatus.ACCEPTED).body(null);
     }

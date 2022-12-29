@@ -3,6 +3,7 @@ package cat.cultura.backend.service;
 import cat.cultura.backend.entity.Request;
 import cat.cultura.backend.entity.User;
 import cat.cultura.backend.exceptions.RequestAlreadyAddedException;
+import cat.cultura.backend.interceptors.CurrentUserAccessor;
 import cat.cultura.backend.repository.RequestJpaRepository;
 import cat.cultura.backend.repository.UserJpaRepository;
 import cat.cultura.backend.service.user.RequestService;
@@ -28,6 +29,9 @@ class RequestServiceTest {
 
     @MockBean
     private UserJpaRepository userRepo;
+
+    @MockBean
+    private CurrentUserAccessor currentUserAccessor;
 
     @Test
     void addingFriendOneTimeWorks() {
@@ -116,6 +120,7 @@ class RequestServiceTest {
 
         given(userRepo.findById(1L)).willReturn(req);
         given(userRepo.findById(2L)).willReturn(fri);
+        given(currentUserAccessor.getCurrentUsername()).willReturn("Joan");
 
         requestService.removeFriend(1L,2L);
 
