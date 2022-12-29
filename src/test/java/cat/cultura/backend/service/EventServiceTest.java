@@ -77,6 +77,7 @@ class EventServiceTest {
     @Test
     void saveEventTestSameDenominacioDifferentAdreca() {
         Event ev1 = new Event();
+
         ev1.setDenominacio("Concert de primavera");
         ev1.setDataInici("Dimarts");
         ev1.setUbicacio("Barcelona");

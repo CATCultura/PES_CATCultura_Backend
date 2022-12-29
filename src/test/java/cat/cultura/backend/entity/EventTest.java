@@ -185,5 +185,41 @@ class EventTest {
         Assertions.assertEquals(expected,ev1);
     }
 
+    @Test
+    void updateEventOkCancelado() {
+        Event ev1 = new Event();
+        ev1.setId(123L);
+        ev1.setDenominacio("Concert de primavera");
+        ev1.setDescripcio("Una bona desc");
+        ev1.setDataInici("Dimarts");
+        ev1.setUbicacio("Barcelona");
+        ev1.setAdreca("C/ Quinta Forca");
+        ev1.setEspai("Sideral");
+        ev1.setCancelado(false);
+
+        Map<String,Object> ev2 = new HashMap<>();
+
+        ev2.put("ubicacio","Tarragona");
+        ev2.put("adreca","C/ Quarta Forca");
+        ev2.put("cancelado",true);
+
+
+        Event expected = new Event();
+        expected.setId(123L);
+        expected.setDenominacio("Concert de primavera");
+        expected.setDescripcio("Una bona desc");
+        expected.setDataInici("Dimarts");
+        expected.setUbicacio("Tarragona");
+        expected.setAdreca("C/ Quarta Forca");
+        expected.setEspai("Sideral");
+        expected.setCancelado(true);
+
+
+        ev1.update(ev2);
+
+        Assertions.assertEquals(expected,ev1);
+        Assertions.assertEquals(expected.getCancelado(),ev1.getCancelado());
+    }
+
 
 }
