@@ -108,7 +108,7 @@ public class EventMapper {
         String urlOrganitzador = eventDto.getUrlOrganitzador();
         String telefonOrganitzador = eventDto.getTelefonOrganitzador();
         String emailOrganitzador = eventDto.getEmailOrganitzador();
-        if (nomOrganitzador != null && (urlOrganitzador != null || telefonOrganitzador != null || emailOrganitzador != null)) {
+        if (nomOrganitzador != null) {
             Organizer org;
             org = new Organizer(nomOrganitzador);
             org.setUrl(urlOrganitzador);

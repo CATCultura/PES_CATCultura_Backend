@@ -1,4 +1,4 @@
-package cat.cultura.backend.controllers;
+package cat.cultura.backend.controller;
 
 import cat.cultura.backend.dtos.TrophyDto;
 import cat.cultura.backend.entity.Trophy;
