@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 @Service
 public class EventService {
@@ -79,8 +80,8 @@ public class EventService {
         eventRepo.delete(event);
     }
 
-    public Event updateEvent(Event ev) {
-        Event e = eventRepo.findById(ev.getId()).orElseThrow(EventNotFoundException::new);
+    public Event updateEvent(Map<String,Object> ev) {
+        Event e = eventRepo.findById((Long) ev.get("id")).orElseThrow(EventNotFoundException::new);
         e.update(ev);
         return eventRepo.save(e);
     }

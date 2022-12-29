@@ -16,9 +16,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 import static org.mockito.BDDMockito.given;
 
@@ -79,6 +77,7 @@ class EventServiceTest {
     @Test
     void saveEventTestSameDenominacioDifferentAdreca() {
         Event ev1 = new Event();
+
         ev1.setDenominacio("Concert de primavera");
         ev1.setDataInici("Dimarts");
         ev1.setUbicacio("Barcelona");
@@ -178,29 +177,31 @@ class EventServiceTest {
         old_event.setAdreca("C/ Quinta Forca");
         old_event.setEspai("Sideral");
 
-        Event ev2 = new Event();
-        ev2.setId(123L);
-        ev2.setDenominacio("Concert de primavera");
-        ev2.setDataInici("Dimarts");
-        ev2.setUbicacio("Barcelona");
-        ev2.setAdreca("C/ Quarta Forca");
-        ev2.setEspai("Sideral");
+        Map<String,Object> ev2 = new HashMap<>();
+        ev2.put("id",123L);
+        ev2.put("denominacio", "Concert de primavera");
+        ev2.put("dataInici", "Dimarts");
+        ev2.put("ubicacio", "Tarragona");
+        ev2.put("adreca", "C/ Quinta Forca");
+        ev2.put("espai","Sideral");
 
-        List<Event> eventList = new ArrayList<>();
 
-        eventList.add(old_event);
+        Event expected = new Event();
+        expected.setId(123L);
+        expected.setDenominacio("Concert de primavera");
+        expected.setDataInici("Dimarts");
+        expected.setUbicacio("Tarragona");
+        expected.setAdreca("C/ Quinta Forca");
+        expected.setEspai("Sideral");
 
-        given(eventJpaRepository.findByDenominacioLikeIgnoreCaseAllIgnoreCase(ev2.getDenominacio())).willReturn(eventList);
 
-        given(eventJpaRepository.save(ev2)).willReturn(ev2);
+        given(eventJpaRepository.save(old_event)).willReturn(old_event);
 
         given(eventJpaRepository.findById(123L)).willReturn(Optional.of(old_event));
 
-        ev2.setDenominacio("Concert de tardor");
-
         Event updated = eventService.updateEvent(ev2);
 
-        Assertions.assertEquals(ev2,updated);
+        Assertions.assertEquals(expected,updated);
     }
 
     @Test
@@ -213,10 +214,10 @@ class EventServiceTest {
         oldEvent.setAdreca("C/ Quinta Forca");
         oldEvent.setEspai("Sideral");
 
-        Event ev2 = new Event();
-        ev2.setId(123L);
-        ev2.setUbicacio("Tarragona");
-        ev2.setAdreca("C/ Quarta Forca");
+        Map<String,Object> ev2 = new HashMap<>();
+        ev2.put("id",123L);
+        ev2.put("ubicacio", "Tarragona");
+        ev2.put("adreca", "C/ Quarta Forca");
 
         Event result = new Event();
         result.setId(123L);
@@ -226,8 +227,6 @@ class EventServiceTest {
         result.setAdreca("C/ Quarta Forca");
         result.setEspai("Sideral");
 
-
-//        given(eventJpaRepository.findByDenominacioLikeIgnoreCaseAllIgnoreCase(ev2.getDenominacio())).willReturn(eventList);
 
         given(eventJpaRepository.save(oldEvent)).willReturn(result);
 
