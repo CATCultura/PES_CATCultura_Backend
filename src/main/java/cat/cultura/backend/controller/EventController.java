@@ -3,8 +3,11 @@ package cat.cultura.backend.controller;
 import cat.cultura.backend.dtos.EventDto;
 import cat.cultura.backend.dtos.ReviewDto;
 import cat.cultura.backend.entity.Event;
+import cat.cultura.backend.entity.Organizer;
 import cat.cultura.backend.entity.Review;
+import cat.cultura.backend.entity.User;
 import cat.cultura.backend.exceptions.EventAlreadyCreatedException;
+import cat.cultura.backend.interceptors.CurrentUserAccessor;
 import cat.cultura.backend.mappers.EventMapper;
 import cat.cultura.backend.mappers.ReviewMapper;
 import cat.cultura.backend.service.EventService;
@@ -19,6 +22,7 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
@@ -32,6 +36,9 @@ public class EventController {
 
     @Autowired
     private RouteDataService routeDataService;
+
+    @Autowired
+    private CurrentUserAccessor currentUserAccessor;
 
     @Autowired
     private UserService userService;
@@ -52,11 +59,14 @@ public class EventController {
     private TagService tagService;
 
     @PostMapping("/events")
-    public ResponseEntity<List<EventDto>> addEvent(@RequestBody List<EventDto> ev) {
+    public ResponseEntity<List<EventDto>> addEvent(@RequestBody List<EventDto> ev, Authentication authentication) {
         List<Event> eventsEntities = new ArrayList<>();
         for (EventDto eventDto : ev) {
+
+            User u = userService.getUserByUsername(currentUserAccessor.getCurrentUsername());
             if (eventDto.getId() != null) return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
             Event event = eventMapper.convertEventDtoToEntity(eventDto);
+            event.setOrganizer((Organizer) u);
             eventsEntities.add(event);
         }
         List<Event> events;
@@ -73,6 +83,7 @@ public class EventController {
             @RequestParam(value = "id", required = false) Long id,
             @RequestParam(value = "tag", required = false) String tag,
             @RequestParam(value = "q", required = false) String query,
+            @RequestParam(value = "organizer", required = false) Long orgId,
             Pageable pageable
     ) {
         Page<Event> events;

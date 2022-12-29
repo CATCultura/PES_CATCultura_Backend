@@ -123,6 +123,7 @@ public class EventMapper {
         if (source.getOrganizer() != null) {
             target.setIdOrganitzador(source.getOrganizer().getId());
             target.setNomOrganitzador(source.getOrganizer().getUsername());
+            target.setTelefonOrganitzador(source.getOrganizer().getTelefon());
             target.setEmailOrganitzador(source.getOrganizer().getEmail());
             target.setUrlOrganitzador(source.getOrganizer().getUrl());
         }

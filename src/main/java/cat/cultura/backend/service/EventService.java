@@ -34,7 +34,9 @@ public class EventService {
         return true;
     }
 
-    public EventService(EventJpaRepository eventRepo, TagService tagService, SimilarityServiceImpl semanticService) {
+    public EventService(EventJpaRepository eventRepo,
+                        TagService tagService,
+                        SimilarityServiceImpl semanticService) {
         this.eventRepo = eventRepo;
         this.tagService = tagService;
         this.similarityService = semanticService;
@@ -133,4 +135,5 @@ public class EventService {
         eventRepo.save(event);
         return code;
     }
+
 }
