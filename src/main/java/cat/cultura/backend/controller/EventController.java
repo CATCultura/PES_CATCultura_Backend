@@ -133,7 +133,7 @@ public class EventController {
     @DeleteMapping("/events/{id}")
     public ResponseEntity<String> deleteEvent(@PathVariable Long id){
         eventService.deleteEvent(id);
-        return ResponseEntity.status(HttpStatus.OK).build();
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 
     @PutMapping("/events/outdated")

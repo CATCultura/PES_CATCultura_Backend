@@ -5,4 +5,8 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 
 @ResponseStatus(value = HttpStatus.FORBIDDEN)
 public class ForbiddenActionException extends RuntimeException {
+
+    public ForbiddenActionException() {
+        super("Not allowed");
+    }
 }

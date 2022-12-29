@@ -29,7 +29,10 @@ public class BackendApplication  implements WebMvcConfigurer {
 				skip(destination.getTagsCateg());
 			}
 		};
+
+
 		modelMapper.addMappings(propertyMap);
+
 		return modelMapper;
 	}
 

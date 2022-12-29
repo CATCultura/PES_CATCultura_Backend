@@ -84,6 +84,10 @@ public class EventService {
 
     public void deleteEvent(Long id) {
         Event event = eventRepo.findById(id).orElseThrow(()-> new EventNotFoundException("Event with id: " + id + " not found"));
+        if (event.getOrganizer() == null) throw new ForbiddenActionException();
+        if (!Objects.equals(currentUserAccesor.getCurrentUsername(),event.getOrganizer().getUsername())) {
+            throw new ForbiddenActionException();
+        }
         eventRepo.delete(event);
     }
 
