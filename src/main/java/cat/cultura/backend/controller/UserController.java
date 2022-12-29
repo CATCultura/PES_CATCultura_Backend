@@ -112,6 +112,12 @@ public class UserController {
         return ResponseEntity.status(HttpStatus.OK).body(userMapper.convertUserToDto(user));
     }
 
+    @GetMapping("/users/{id}/events")
+    public ResponseEntity<List<EventDto>> getEventsByOrganizer(@PathVariable Long id) {
+        List<Event> organizedEvents = userService.getOrganizedEvents(id);
+        return ResponseEntity.status(HttpStatus.OK).body(organizedEvents.stream().map(eventMapper::convertEventToDto).toList());
+    }
+
     @PutMapping("/users")
     public ResponseEntity<UserDto> updateUser(@RequestBody UserDto us) {
         User userEntity = userMapper.convertUserDtoToEntity(us);

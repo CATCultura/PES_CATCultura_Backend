@@ -5,6 +5,7 @@ import cat.cultura.backend.exceptions.TagAlreadyAddedException;
 import cat.cultura.backend.exceptions.TagNotPresentException;
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import org.hibernate.annotations.DiscriminatorFormula;
 
 import javax.persistence.*;
 import java.nio.charset.StandardCharsets;
@@ -14,10 +15,11 @@ import java.util.*;
 
 @Entity
 @Table(name = "User")
-@Inheritance(strategy = InheritanceType.TABLE_PER_CLASS)
+@Inheritance(strategy = InheritanceType.SINGLE_TABLE)
 @JsonIgnoreProperties(ignoreUnknown=true)
-@DiscriminatorColumn(name="role")
 @JsonAutoDetect(fieldVisibility= JsonAutoDetect.Visibility.ANY)
+@DiscriminatorFormula("CASE when role=0 then 'User' when role=1 then 'Administrator' when role=2 then 'Organizer' when role=3 then 'User' end")
+@DiscriminatorValue("User")
 public class User {
 
     public static final String EVENT_WITH_ID = "Event with id: ";
@@ -260,10 +262,16 @@ public class User {
     }
 
 
-    public User(){}
+    public User(){
+    }
 
     public User(String username) {
         this.username = username;
+    }
+
+    public User(String username, Role role) {
+        this.username = username;
+        this.role = role;
     }
 
     public Long getId() {
@@ -620,6 +628,14 @@ public class User {
     public void addReportToUser(User user) {
         if(reportedUsers.contains(user)) throw new AssertionError("User with id " + user.getId() + " is already in reported users");
         else reportedUsers.add(user);
+    }
+
+    public List<Event> getOrganizedEvents() {
+        return new ArrayList<>();
+    }
+
+    public void setOrganizedEvents(List<Event> organizedEvents) {
+        // to avoid issues
     }
 
 

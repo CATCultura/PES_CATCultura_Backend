@@ -2,10 +2,15 @@ package cat.cultura.backend.controllers;
 
 import cat.cultura.backend.dtos.EventDto;
 import cat.cultura.backend.entity.Event;
+import cat.cultura.backend.entity.Organizer;
+import cat.cultura.backend.entity.User;
 import cat.cultura.backend.exceptions.EventNotFoundException;
 import cat.cultura.backend.exceptions.MissingRequiredParametersException;
+import cat.cultura.backend.interceptors.CurrentUser;
+import cat.cultura.backend.interceptors.CurrentUserAccessor;
 import cat.cultura.backend.mappers.EventMapper;
 import cat.cultura.backend.service.EventService;
+import cat.cultura.backend.service.user.UserService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.json.AutoConfigureJsonTesters;
@@ -18,7 +23,11 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockHttpServletResponse;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.security.test.context.support.WithUserDetails;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.ArrayList;
@@ -40,8 +49,11 @@ class EventControllerTest {
     @MockBean
     private EventService eventService;
 
-//    @MockBean
-//    private EventMapper eventMapper;
+    @MockBean
+    private UserService userService;
+
+    @MockBean
+    private CurrentUserAccessor currentUserAccessor;
 
     @Autowired
     private JacksonTester<EventDto> jsonEventDto;
@@ -134,7 +146,7 @@ class EventControllerTest {
     }
 
     @Test
-    @WithMockUser(username = "admin", authorities = { "ORGANIZER"})
+    @WithMockUser(username = "admin", authorities = {"ORGANIZER"})
     void canCreateNewEvents() throws Exception {
         EventDto event = new EventDto();
         event.setDenominacio("titol");
@@ -144,6 +156,11 @@ class EventControllerTest {
         event.setAdreca("C/Pixa");
         List<EventDto> array = new ArrayList<>();
         array.add(event);
+
+        Organizer joan = new Organizer("Joan");
+
+        given(currentUserAccessor.getCurrentUsername()).willReturn("Joan");
+        given(userService.getUserByUsername("Joan")).willReturn(joan);
 
         // when
         MockHttpServletResponse response = mvc.perform(
@@ -166,6 +183,11 @@ class EventControllerTest {
 
         List<EventDto> array = new ArrayList<>();
         array.add(event);
+
+        Organizer joan = new Organizer("Joan");
+
+        given(currentUserAccessor.getCurrentUsername()).willReturn("Joan");
+        given(userService.getUserByUsername("Joan")).willReturn(joan);
 
 
         // when
@@ -192,6 +214,10 @@ class EventControllerTest {
         List<EventDto> array = new ArrayList<>();
         array.add(event);
 
+        Organizer joan = new Organizer("Joan");
+
+        given(currentUserAccessor.getCurrentUsername()).willReturn("Joan");
+        given(userService.getUserByUsername("Joan")).willReturn(joan);
         // when
         MockHttpServletResponse response = mvc.perform(
                 post("/events").contentType(MediaType.APPLICATION_JSON).content(

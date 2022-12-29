@@ -1,6 +1,5 @@
 package cat.cultura.backend.service.user;
 
-import cat.cultura.backend.dtos.UserDto;
 import cat.cultura.backend.entity.*;
 import cat.cultura.backend.exceptions.UserNotFoundException;
 import cat.cultura.backend.repository.UserJpaRepository;
@@ -125,5 +124,10 @@ public class UserService {
         List<User> users = userRepo.findReportedUsers();
         users.sort(Comparator.comparingInt(User::getReports));
         return users;
+    }
+
+    public List<Event> getOrganizedEvents(Long id) {
+        User u = userRepo.findById(id).orElseThrow(UserNotFoundException::new);
+        return u.getOrganizedEvents();
     }
 }
