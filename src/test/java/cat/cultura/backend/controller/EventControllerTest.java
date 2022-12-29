@@ -266,7 +266,7 @@ class EventControllerTest {
                 delete("/events/2").accept(MediaType.APPLICATION_JSON).header(HttpHeaders.AUTHORIZATION,"somthg")).andReturn().getResponse();
 
         // then
-        Assertions.assertEquals(response.getStatus(), HttpStatus.OK.value());
+        Assertions.assertEquals(response.getStatus(), HttpStatus.NO_CONTENT.value());
     }
 
     @Test
