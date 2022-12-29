@@ -204,31 +204,38 @@ class EventServiceTest {
     }
 
     @Test
-    void testUpdateEventRepeated() {
-        Event old_event = new Event();
-        old_event.setDenominacio("Concert de primavera");
-        old_event.setDataInici("Dimarts");
-        old_event.setUbicacio("Barcelona");
-        old_event.setAdreca("C/ Quinta Forca");
-        old_event.setEspai("Sideral");
+    void testUpdateEventFewParams() {
+        Event oldEvent = new Event();
+        oldEvent.setId(123L);
+        oldEvent.setDenominacio("Concert de primavera");
+        oldEvent.setDataInici("Dimarts");
+        oldEvent.setUbicacio("Barcelona");
+        oldEvent.setAdreca("C/ Quinta Forca");
+        oldEvent.setEspai("Sideral");
 
         Event ev2 = new Event();
-        ev2.setDenominacio("Concert de primavera");
-        ev2.setDataInici("Dimarts");
-        ev2.setUbicacio("Barcelona");
+        ev2.setId(123L);
+        ev2.setUbicacio("Tarragona");
         ev2.setAdreca("C/ Quarta Forca");
-        ev2.setEspai("Sideral");
 
-        List<Event> eventList = new ArrayList<>();
+        Event result = new Event();
+        result.setId(123L);
+        result.setDenominacio("Concert de primavera");
+        result.setDataInici("Dimarts");
+        result.setUbicacio("Tarragona");
+        result.setAdreca("C/ Quarta Forca");
+        result.setEspai("Sideral");
 
-        eventList.add(old_event);
 
-        given(eventJpaRepository.findByDenominacioLikeIgnoreCaseAllIgnoreCase(ev2.getDenominacio())).willReturn(eventList);
+//        given(eventJpaRepository.findByDenominacioLikeIgnoreCaseAllIgnoreCase(ev2.getDenominacio())).willReturn(eventList);
 
-        ev2.setAdreca("C/ Quinta Forca");
+        given(eventJpaRepository.save(oldEvent)).willReturn(result);
 
+        given(eventJpaRepository.findById(123L)).willReturn(Optional.of(oldEvent));
 
-        Assertions.assertThrows(EventAlreadyCreatedException.class, () -> eventService.updateEvent(ev2));
+        Event updated = eventService.updateEvent(ev2);
+
+        Assertions.assertEquals(result,updated);
     }
 
 

@@ -78,7 +78,6 @@ public class EventService {
     }
 
     public Event updateEvent(Event ev) {
-        if (!isUniqueInDB(ev)) throw new EventAlreadyCreatedException();
         Event e = eventRepo.findById(ev.getId()).orElseThrow(EventNotFoundException::new);
         e.update(ev);
         return eventRepo.save(e);

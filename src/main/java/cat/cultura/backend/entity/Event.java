@@ -411,7 +411,8 @@ public class Event {
         for (Field f : fieldList) {
             try {
                 if (f.get(ev) != null && f.get(this) != f.get(ev)) {
-                    f.set(this,f.get(ev));
+                    if (f.getGenericType().equals(String.class) && !f.get(ev).equals(""))
+                        f.set(this,f.get(ev));
                 }
             } catch (IllegalAccessException e) {
                 throw new RuntimeException(e);
