@@ -20,9 +20,14 @@ public class EventMapper {
     }
 
     public Event convertEventDtoToEntity(EventDto eventDto) {
-        if (eventDto.getDenominacio() == null) throw new MissingRequiredParametersException();
-        if (eventDto.getDataInici() == null) throw new MissingRequiredParametersException();
-        if (eventDto.getUbicacio() == null) throw new MissingRequiredParametersException();
+        //either an id or primary key
+        if (eventDto.getId() == null) {
+            if (eventDto.getDenominacio() == null) throw new MissingRequiredParametersException();
+            if (eventDto.getDataInici() == null) throw new MissingRequiredParametersException();
+            if (eventDto.getUbicacio() == null) throw new MissingRequiredParametersException();
+            if (eventDto.getAdreca() == null) throw new MissingRequiredParametersException();
+            if (eventDto.getEspai() == null) throw new MissingRequiredParametersException();
+        }
 
         Event result = modelMapper.map(eventDto, Event.class);
         Organizer org = extractOrganizerInfo(eventDto);

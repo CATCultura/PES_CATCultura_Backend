@@ -3,6 +3,8 @@ package cat.cultura.backend.controllers;
 import cat.cultura.backend.dtos.EventDto;
 import cat.cultura.backend.entity.Event;
 import cat.cultura.backend.exceptions.EventNotFoundException;
+import cat.cultura.backend.exceptions.MissingRequiredParametersException;
+import cat.cultura.backend.mappers.EventMapper;
 import cat.cultura.backend.service.EventService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,6 +40,9 @@ class EventControllerTest {
     @MockBean
     private EventService eventService;
 
+//    @MockBean
+//    private EventMapper eventMapper;
+
     @Autowired
     private JacksonTester<EventDto> jsonEventDto;
 
@@ -52,6 +57,7 @@ class EventControllerTest {
         event.setId(2L);
         given(eventService.getEventById(2L)).willReturn(event);
 
+
         // when
         MockHttpServletResponse response = mvc.perform(
                 get("/events/2").accept(MediaType.APPLICATION_JSON))
@@ -61,7 +67,8 @@ class EventControllerTest {
         Assertions.assertEquals(response.getStatus(), HttpStatus.OK.value());
         EventDto eventDto = new EventDto();
         eventDto.setId(2L);
-        Assertions.assertEquals(response.getContentAsString(), jsonEventDto.write(eventDto).getJson());
+//        given(eventMapper.convertEventToDto(event)).willReturn(eventDto);
+        Assertions.assertEquals(jsonEventDto.write(eventDto).getJson(), response.getContentAsString());
     }
 
     @Test
@@ -130,7 +137,6 @@ class EventControllerTest {
     @WithMockUser(username = "admin", authorities = { "ORGANIZER"})
     void canCreateNewEvents() throws Exception {
         EventDto event = new EventDto();
-        event.setId(8L);
         event.setDenominacio("titol");
         event.setDataInici("ahir");
         event.setUbicacio("BCN");
@@ -154,7 +160,30 @@ class EventControllerTest {
     @WithMockUser(username = "admin", authorities = { "ORGANIZER"})
     void canNotCreateNewEventsWihtMissinParams() throws Exception {
         EventDto event = new EventDto();
-        event.setId(8L);
+        event.setDenominacio("titol");
+//        event.setDataInici("ahir");
+        event.setAdreca("C/Pixa");
+
+        List<EventDto> array = new ArrayList<>();
+        array.add(event);
+
+
+        // when
+        MockHttpServletResponse response = mvc.perform(
+                post("/events").contentType(MediaType.APPLICATION_JSON).content(
+                        jsonListEventDto.write(array).getJson()
+                )).andReturn().getResponse();
+
+
+        // then
+        Assertions.assertEquals(HttpStatus.CONFLICT.value(), response.getStatus());
+    }
+
+    @Test
+    @WithMockUser(username = "admin", authorities = { "ORGANIZER"})
+    void canNotCreateEventWithSpecifiedId() throws Exception {
+        EventDto event = new EventDto();
+        event.setId(123L);
         event.setDenominacio("titol");
         event.setDataInici("ahir");
 
@@ -232,6 +261,75 @@ class EventControllerTest {
 
         // then
         Assertions.assertEquals(response.getStatus(), HttpStatus.NOT_FOUND.value());
+    }
+
+    @Test
+    @WithMockUser(username = "admin", authorities = { "ORGANIZER"})
+    void canModifyEvent() throws Exception {
+        EventDto eventDto = new EventDto();
+        eventDto.setId(123L);
+        eventDto.setDenominacio("titol");
+        eventDto.setDataInici("ahir");
+        eventDto.setAdreca("C/Pixa");
+        eventDto.setUbicacio("BCN");
+
+        Event event = new Event();
+        event.setId(123L);
+        event.setDenominacio("titol");
+        event.setDataInici("ahir");
+        event.setAdreca("C/Pixa");
+        event.setUbicacio("BCN");
+//        given(eventMapper.convertEventDtoToEntity(eventDto)).willReturn(event);
+        given(eventService.updateEvent(event)).willReturn(event);
+
+        // when
+        MockHttpServletResponse response = mvc.perform(
+                put("/events").contentType(MediaType.APPLICATION_JSON).content(
+                        jsonEventDto.write(eventDto).getJson()
+                )).andReturn().getResponse();
+
+
+        // then
+        Assertions.assertEquals(HttpStatus.ACCEPTED.value(), response.getStatus());
+    }
+
+    @Test
+    @WithMockUser(username = "admin", authorities = { "USER"})
+    void canNotModifyEventLackOfAuth() throws Exception {
+        EventDto event = new EventDto();
+        event.setId(123L);
+        event.setDenominacio("titol");
+        event.setDataInici("ahir");
+        event.setAdreca("C/Pixa");
+
+        // when
+        MockHttpServletResponse response = mvc.perform(
+                put("/events").contentType(MediaType.APPLICATION_JSON).content(
+                        jsonEventDto.write(event).getJson()
+                )).andReturn().getResponse();
+
+
+        // then
+        Assertions.assertEquals(HttpStatus.FORBIDDEN.value(), response.getStatus());
+    }
+
+    @Test
+    @WithMockUser(username = "admin", authorities = { "ORGANIZER"})
+    void canNotModifyEventWithoutId() throws Exception {
+        EventDto event = new EventDto();
+        event.setDenominacio("titol");
+        event.setDataInici("ahir");
+        event.setAdreca("C/Pixa");
+
+        // when
+        MockHttpServletResponse response = mvc.perform(
+                put("/events").contentType(MediaType.APPLICATION_JSON).content(
+                        jsonEventDto.write(event).getJson()
+                )).andReturn().getResponse();
+
+
+        // then
+        Assertions.assertEquals(HttpStatus.CONFLICT.value(), response.getStatus());
     }
 
 }

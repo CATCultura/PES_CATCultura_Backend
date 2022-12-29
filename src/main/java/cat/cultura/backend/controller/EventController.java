@@ -3,13 +3,13 @@ package cat.cultura.backend.controller;
 import cat.cultura.backend.dtos.EventDto;
 import cat.cultura.backend.dtos.ReviewDto;
 import cat.cultura.backend.entity.Event;
-
 import cat.cultura.backend.entity.Review;
 import cat.cultura.backend.exceptions.EventAlreadyCreatedException;
-import cat.cultura.backend.exceptions.MissingRequiredParametersException;
 import cat.cultura.backend.mappers.EventMapper;
 import cat.cultura.backend.mappers.ReviewMapper;
-import cat.cultura.backend.service.*;
+import cat.cultura.backend.service.EventService;
+import cat.cultura.backend.service.RouteDataService;
+import cat.cultura.backend.service.TagService;
 import cat.cultura.backend.service.user.ReviewService;
 import cat.cultura.backend.service.user.UserService;
 import cat.cultura.backend.service.user.UserTrophyService;
@@ -55,13 +55,8 @@ public class EventController {
     public ResponseEntity<List<EventDto>> addEvent(@RequestBody List<EventDto> ev) {
         List<Event> eventsEntities = new ArrayList<>();
         for (EventDto eventDto : ev) {
-            Event event;
-            try {
-                event = eventMapper.convertEventDtoToEntity(eventDto);
-            }
-            catch (MissingRequiredParametersException mpe) {
-                return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
-            }
+            if (eventDto.getId() != null) return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
+            Event event = eventMapper.convertEventDtoToEntity(eventDto);
             eventsEntities.add(event);
         }
         List<Event> events;
@@ -104,9 +99,10 @@ public class EventController {
 
     @PutMapping("/events")
     public ResponseEntity<EventDto> updateEvent(@RequestBody EventDto ev) {
+        if (ev.getId() == null) return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
         Event eventEntity = eventMapper.convertEventDtoToEntity(ev);
         Event event = eventService.updateEvent(eventEntity);
-        return ResponseEntity.status(HttpStatus.CREATED).body(eventMapper.convertEventToDto(event));
+        return ResponseEntity.status(HttpStatus.ACCEPTED).body(eventMapper.convertEventToDto(event));
     }
 
     @DeleteMapping("/events/{id}")
@@ -147,5 +143,6 @@ public class EventController {
     public ResponseEntity<String> generateAttendanceCode(@PathVariable Long id) {
         return ResponseEntity.status(HttpStatus.OK).body(eventService.generateAttendanceCode(id));
     }
+
 
 }

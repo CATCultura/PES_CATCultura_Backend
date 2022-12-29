@@ -145,8 +145,9 @@ class EventTest {
     }
 
     @Test
-    void updateEventOkMssingPars() {
+    void updateEventOkMissingPars() {
         Event ev1 = new Event();
+        ev1.setId(123L);
         ev1.setDenominacio("Concert de primavera");
         ev1.setDescripcio("Una bona desc");
         ev1.setDataInici("Dimarts");
@@ -155,13 +156,13 @@ class EventTest {
         ev1.setEspai("Sideral");
 
         Event ev2 = new Event();
-        ev2.setDenominacio("Concert de primavera");
-        ev2.setDataInici("Dimarts");
+
         ev2.setUbicacio("Tarragona");
         ev2.setAdreca("C/ Quarta Forca");
-        ev2.setEspai("Sideral");
+
 
         Event res = new Event();
+        res.setId(123L);
         res.setDenominacio("Concert de primavera");
         res.setDescripcio("Una bona desc");
         res.setDataInici("Dimarts");
