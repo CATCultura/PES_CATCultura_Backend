@@ -329,7 +329,7 @@ public class Event {
     }
 
 
-    public boolean isCancelado() {
+    public boolean getCancelado() {
         return cancelado;
     }
 
@@ -413,6 +413,10 @@ public class Event {
                 if (f.get(ev) != null && f.get(this) != f.get(ev)) {
                     if (f.getGenericType().equals(String.class) && !f.get(ev).equals(""))
                         f.set(this,f.get(ev));
+                    else {
+                        if ()
+                            f.set(this,f.get(ev));
+                    }
                 }
             } catch (IllegalAccessException e) {
                 throw new RuntimeException(e);

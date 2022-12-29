@@ -27,6 +27,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 public class EventController {
@@ -109,10 +110,11 @@ public class EventController {
     }
 
     @PutMapping("/events")
-    public ResponseEntity<EventDto> updateEvent(@RequestBody EventDto ev) {
-        if (ev.getId() == null) return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
-        Event eventEntity = eventMapper.convertEventDtoToEntity(ev);
-        Event event = eventService.updateEvent(eventEntity);
+    public ResponseEntity<EventDto> updateEvent(@RequestBody Map<String,Object> ev) {
+        if (!ev.containsKey("id"))
+            return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
+
+        Event event = eventService.updateEvent(ev);
         return ResponseEntity.status(HttpStatus.ACCEPTED).body(eventMapper.convertEventToDto(event));
     }
 
