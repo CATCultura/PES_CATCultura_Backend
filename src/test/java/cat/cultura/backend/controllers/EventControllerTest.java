@@ -31,10 +31,13 @@ import org.springframework.security.test.context.support.WithUserDetails;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.junit.jupiter.api.Assertions;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.doThrow;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -58,6 +61,8 @@ class EventControllerTest {
     @Autowired
     private JacksonTester<EventDto> jsonEventDto;
 
+    @Autowired
+    private JacksonTester<Map<String,Object>> jacksonMapTester;
     @Autowired
     private JacksonTester<List<EventDto>> jsonListEventDto;
 
@@ -292,26 +297,26 @@ class EventControllerTest {
     @Test
     @WithMockUser(username = "admin", authorities = { "ORGANIZER"})
     void canModifyEvent() throws Exception {
-        EventDto eventDto = new EventDto();
-        eventDto.setId(123L);
-        eventDto.setDenominacio("titol");
-        eventDto.setDataInici("ahir");
-        eventDto.setAdreca("C/Pixa");
-        eventDto.setUbicacio("BCN");
+        Map<String, Object> eventDto = new HashMap<>();
+        eventDto.put("id",123L);
+        eventDto.put("denominacio","titol");
+        eventDto.put("dataInici","ahir");
+        eventDto.put("adreca","C/Pixa");
+        eventDto.put("ubicacio","BCN");
 
-        Event event = new Event();
-        event.setId(123L);
-        event.setDenominacio("titol");
-        event.setDataInici("ahir");
-        event.setAdreca("C/Pixa");
-        event.setUbicacio("BCN");
+        Event expected = new Event();
+        expected.setId(123L);
+        expected.setDenominacio("titol");
+        expected.setDataInici("ahir");
+        expected.setAdreca("C/Pixa");
+        expected.setUbicacio("BCN");
 //        given(eventMapper.convertEventDtoToEntity(eventDto)).willReturn(event);
-        given(eventService.updateEvent(event)).willReturn(event);
+        given(eventService.updateEvent(any(Map.class))).willReturn(expected);
 
         // when
         MockHttpServletResponse response = mvc.perform(
                 put("/events").contentType(MediaType.APPLICATION_JSON).content(
-                        jsonEventDto.write(eventDto).getJson()
+                        jacksonMapTester.write(eventDto).getJson()
                 )).andReturn().getResponse();
 
 
@@ -342,15 +347,15 @@ class EventControllerTest {
     @Test
     @WithMockUser(username = "admin", authorities = { "ORGANIZER"})
     void canNotModifyEventWithoutId() throws Exception {
-        EventDto event = new EventDto();
-        event.setDenominacio("titol");
-        event.setDataInici("ahir");
-        event.setAdreca("C/Pixa");
+        Map<String, Object> event = new HashMap<>();
+        event.put("denominacio", "titol");
+        event.put("dataInici", "ahir");
+        event.put("adreca", "C/Pixa");
 
         // when
         MockHttpServletResponse response = mvc.perform(
                 put("/events").contentType(MediaType.APPLICATION_JSON).content(
-                        jsonEventDto.write(event).getJson()
+                        jacksonMapTester.write(event).getJson()
                 )).andReturn().getResponse();
 
 
