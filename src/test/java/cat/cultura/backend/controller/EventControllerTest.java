@@ -1,4 +1,4 @@
-package cat.cultura.backend.controllers;
+package cat.cultura.backend.controller;
 
 import cat.cultura.backend.dtos.EventDto;
 import cat.cultura.backend.entity.Event;
@@ -297,12 +297,13 @@ class EventControllerTest {
     @Test
     @WithMockUser(username = "admin", authorities = { "ORGANIZER"})
     void canModifyEvent() throws Exception {
-        Map<String, Object> eventDto = new HashMap<>();
-        eventDto.put("id",123L);
-        eventDto.put("denominacio","titol");
-        eventDto.put("dataInici","ahir");
-        eventDto.put("adreca","C/Pixa");
-        eventDto.put("ubicacio","BCN");
+        EventDto eventDto = new EventDto();
+        eventDto.setId(123L);
+        eventDto.setDenominacio("titol");
+        eventDto.setDataInici("ahir");
+        eventDto.setAdreca("C/Pixa");
+        eventDto.setUbicacio("BCN");
+        eventDto.setNomOrganitzador("admin");
 
         Event expected = new Event();
         expected.setId(123L);
@@ -310,18 +311,55 @@ class EventControllerTest {
         expected.setDataInici("ahir");
         expected.setAdreca("C/Pixa");
         expected.setUbicacio("BCN");
+        expected.setOrganizer(new Organizer("admin"));
+
+        given(currentUserAccessor.getCurrentUsername()).willReturn("admin");
 //        given(eventMapper.convertEventDtoToEntity(eventDto)).willReturn(event);
-        given(eventService.updateEvent(any(Map.class))).willReturn(expected);
+        given(eventService.updateEvent(any(Event.class))).willReturn(expected);
 
         // when
         MockHttpServletResponse response = mvc.perform(
                 put("/events").contentType(MediaType.APPLICATION_JSON).content(
-                        jacksonMapTester.write(eventDto).getJson()
+                        jsonEventDto.write(eventDto).getJson()
                 )).andReturn().getResponse();
 
 
         // then
         Assertions.assertEquals(HttpStatus.ACCEPTED.value(), response.getStatus());
+    }
+
+    @Test
+    @WithMockUser(username = "admin", authorities = { "ORGANIZER"})
+    void canNotModifyOtherEvent() throws Exception {
+        EventDto eventDto = new EventDto();
+        eventDto.setId(123L);
+        eventDto.setDenominacio("titol");
+        eventDto.setDataInici("ahir");
+        eventDto.setAdreca("C/Pixa");
+        eventDto.setUbicacio("BCN");
+        eventDto.setNomOrganitzador("admin");
+
+        Event expected = new Event();
+        expected.setId(123L);
+        expected.setDenominacio("titol");
+        expected.setDataInici("ahir");
+        expected.setAdreca("C/Pixa");
+        expected.setUbicacio("BCN");
+        expected.setOrganizer(new Organizer("admin"));
+
+        given(currentUserAccessor.getCurrentUsername()).willReturn("josep");
+//        given(eventMapper.convertEventDtoToEntity(eventDto)).willReturn(event);
+        given(eventService.updateEvent(any(Event.class))).willReturn(expected);
+
+        // when
+        MockHttpServletResponse response = mvc.perform(
+                put("/events").contentType(MediaType.APPLICATION_JSON).content(
+                        jsonEventDto.write(eventDto).getJson()
+                )).andReturn().getResponse();
+
+
+        // then
+        Assertions.assertEquals(HttpStatus.FORBIDDEN.value(), response.getStatus());
     }
 
     @Test

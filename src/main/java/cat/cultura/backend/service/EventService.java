@@ -3,6 +3,8 @@ package cat.cultura.backend.service;
 import cat.cultura.backend.entity.Event;
 import cat.cultura.backend.exceptions.EventAlreadyCreatedException;
 import cat.cultura.backend.exceptions.EventNotFoundException;
+import cat.cultura.backend.exceptions.ForbiddenActionException;
+import cat.cultura.backend.interceptors.CurrentUserAccessor;
 import cat.cultura.backend.remoterequests.SimilarityServiceAdapter;
 import cat.cultura.backend.remoterequests.SimilarityServiceImpl;
 import cat.cultura.backend.repository.EventJpaRepository;
@@ -11,11 +13,12 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
+import java.util.Objects;
 
 @Service
 public class EventService {
@@ -25,6 +28,8 @@ public class EventService {
     private final SimilarityServiceAdapter similarityService;
 
     private final TagService tagService;
+
+    private final CurrentUserAccessor currentUserAccesor;
 
     private boolean isUniqueInDB(Event ev) {
         List<Event> sameDenominacioEvents = eventRepo.findByDenominacioLikeIgnoreCaseAllIgnoreCase(ev.getDenominacio());
@@ -37,10 +42,12 @@ public class EventService {
 
     public EventService(EventJpaRepository eventRepo,
                         TagService tagService,
-                        SimilarityServiceImpl semanticService) {
+                        SimilarityServiceImpl semanticService,
+                        CurrentUserAccessor currentUserAccessor) {
         this.eventRepo = eventRepo;
         this.tagService = tagService;
         this.similarityService = semanticService;
+        this.currentUserAccesor = currentUserAccessor;
     }
 
     public Event saveEvent(Event ev) {
@@ -80,10 +87,10 @@ public class EventService {
         eventRepo.delete(event);
     }
 
-    public Event updateEvent(Map<String,Object> ev) {
-        Event e = eventRepo.findById((Long) ev.get("id")).orElseThrow(EventNotFoundException::new);
-        e.update(ev);
-        return eventRepo.save(e);
+    public Event updateEvent(Event ev) {
+        Event e = eventRepo.findById(ev.getId()).orElseThrow(EventNotFoundException::new);
+
+        return eventRepo.save(ev);
     }
 
     public Page<Event> getByQuery(Long id, Pageable pageable) {
@@ -137,4 +144,13 @@ public class EventService {
         return code;
     }
 
+    @Transactional(rollbackFor = Exception.class)
+    public void cancelEvent(Long eventId) {
+        Event event = eventRepo.findById(eventId).orElseThrow(EventNotFoundException::new);
+        if (event.getOrganizer() == null) throw new ForbiddenActionException();
+        if (!Objects.equals(currentUserAccesor.getCurrentUsername(),event.getOrganizer().getUsername())) {
+            throw new ForbiddenActionException();
+        }
+        event.setCancelado(true);
+    }
 }

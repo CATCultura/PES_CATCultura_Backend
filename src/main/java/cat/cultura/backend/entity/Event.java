@@ -395,17 +395,5 @@ public class Event {
         this.organizer = organizer;
     }
 
-    public void update(Map<String, Object> ev) {
-        Class cls = this.getClass();
-        Field[] fieldList = cls.getDeclaredFields();
-        for (Field f : fieldList) {
-            if (ev.containsKey(f.getName())) {
-                try {
-                    f.set(this, ev.get(f.getName()));
-                } catch (IllegalAccessException e) {
-                    throw new RuntimeException(e);
-                }
-            }
-        }
-    }
+
 }

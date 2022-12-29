@@ -1,10 +1,11 @@
-package cat.cultura.backend.controllers;
+package cat.cultura.backend.controller;
 
 import cat.cultura.backend.dtos.UserDto;
 import cat.cultura.backend.entity.User;
 import cat.cultura.backend.service.user.FavouriteService;
 import cat.cultura.backend.service.user.RequestService;
 import cat.cultura.backend.service.user.UserService;
+import cat.cultura.backend.service.user.UserTagService;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,10 +28,14 @@ import org.springframework.test.web.servlet.MockMvc;
 
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 
 @AutoConfigureJsonTesters
 @SpringBootTest
@@ -49,6 +54,8 @@ class UserControllerTest {
     @MockBean
     private RequestService requestService;
 
+    @MockBean
+    private UserTagService userTagService;
     @Autowired
     private JacksonTester<UserDto> jsonUserDto;
 
@@ -129,4 +136,34 @@ class UserControllerTest {
         // then
         Assertions.assertEquals(HttpStatus.OK.value(),response.getStatus());
     }
+
+//    @Test
+//    //@WithMockUser(username = "admin", authorities = { "USER"})
+//    void canCreateUser() throws Exception {
+//        // given
+//        UserDto user = new UserDto();
+//        user.setUsername("JosepJoan");
+//        user.setNameAndSurname("Josep Sanchís");
+//        user.setPassword("1234");
+//        Set<String> tags = new HashSet<>();
+//        tags.add("nadal");
+//        tags.add("espectacles");
+//        user.setTags(tags);
+//
+//        User createdUser = new User("JosepJoan");
+//        createdUser.setId(123L);
+//        createdUser.setNameAndSurname("Josep Sanchís");
+//        createdUser.setPassword("1234");
+//
+//        given(userService.createUser(any(User.class))).willReturn(createdUser);
+//
+//        // when
+//        MockHttpServletResponse response = mvc.perform(
+//                post("/users").contentType(MediaType.APPLICATION_JSON).content(
+//                        jsonUserDto.write(user).getJson()
+//                )).andReturn().getResponse();
+//
+//        // then
+//        Assertions.assertEquals(HttpStatus.CREATED.value(),response.getStatus());
+//    }
 }

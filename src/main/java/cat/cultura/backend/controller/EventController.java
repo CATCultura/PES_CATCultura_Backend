@@ -28,6 +28,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 @RestController
 public class EventController {
@@ -110,13 +111,24 @@ public class EventController {
     }
 
     @PutMapping("/events")
-    public ResponseEntity<EventDto> updateEvent(@RequestBody Map<String,Object> ev) {
-        if (!ev.containsKey("id"))
+    public ResponseEntity<EventDto> updateEvent(@RequestBody EventDto ev) {
+        if (ev.getId() == null)
             return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
-
-        Event event = eventService.updateEvent(ev);
+        Event eventEntity = eventMapper.convertEventDtoToEntity(ev);
+        if (! Objects.equals(currentUserAccessor.getCurrentUsername(), eventEntity.getOrganizer().getUsername())) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(null);
+        }
+        Event event = eventService.updateEvent(eventEntity);
         return ResponseEntity.status(HttpStatus.ACCEPTED).body(eventMapper.convertEventToDto(event));
     }
+
+    @PutMapping("/events/{eventId}/cancelled")
+    public ResponseEntity<EventDto> cancelEvent(@RequestParam Long eventId) {
+        eventService.cancelEvent(eventId);
+        return ResponseEntity.status(HttpStatus.ACCEPTED).body(null);
+    }
+
+
 
     @DeleteMapping("/events/{id}")
     public ResponseEntity<String> deleteEvent(@PathVariable Long id){
