@@ -302,7 +302,7 @@ public class UserController {
 
     @GetMapping("users/{id}/friends")
     public ResponseEntity<List<UserDto>> getFriend(@PathVariable Long id,
-                                                   @RequestParam (name = "status", required = false) String status) {
+                                                   @RequestParam String status) {
         List<User> users = new ArrayList<>();
         if(Objects.equals(status, "requested")) users = requestService.getRequestsTo(id);
         else if(Objects.equals(status, "received")) users = requestService.getRequestFrom(id);
@@ -310,14 +310,6 @@ public class UserController {
         return ResponseEntity.status(HttpStatus.OK).body(users.stream().map(userMapper::convertUserToDto).toList());
     }
 
-//    @GetMapping("users/{id}/friends/session")
-//    public ResponseEntity<HashMap<String, List<Long>>> getFriendsIds(@PathVariable Long id) {
-//        HashMap<String, List<Long>> users = new HashMap<>();
-//        users.put("requested", requestService.getRequestsTo(id).stream().map(User::getId).toList());
-//        users.put("received",requestService.getRequestFrom(id).stream().map(User::getId).toList());
-//        users.put("accepted",requestService.getFriends(id).stream().map(User::getId).toList());
-//        return ResponseEntity.status(HttpStatus.OK).body(users);
-//    }
 
     @DeleteMapping("/users/{id}/friends/{friendId}")
     public ResponseEntity<List<Long>> removeFriend(@PathVariable Long id, @PathVariable Long friendId) {
