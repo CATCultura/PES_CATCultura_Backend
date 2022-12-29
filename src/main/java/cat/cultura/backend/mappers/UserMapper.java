@@ -63,10 +63,10 @@ public class UserMapper {
             userDto.addTrophy(t.getId());
         }
         for (Request r : user.getRequestsReceived()) {
-            userDto.getReceivedRequests().add(r.getRequester().getId());
+            userDto.getReceivedRequestsIds().add(r.getRequester().getId());
         }
         for (Request r : user.getRequestsSent()) {
-            userDto.getSentRequests().add(r.getFriend().getId());
+            userDto.getSentRequestsIds().add(r.getFriend().getId());
         }
 
         return userDto;
