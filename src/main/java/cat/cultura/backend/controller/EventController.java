@@ -123,7 +123,7 @@ public class EventController {
     }
 
     @PutMapping("/events/{eventId}/cancelled")
-    public ResponseEntity<EventDto> cancelEvent(@RequestParam Long eventId) {
+    public ResponseEntity<EventDto> cancelEvent(@PathVariable Long eventId) {
         eventService.cancelEvent(eventId);
         return ResponseEntity.status(HttpStatus.ACCEPTED).body(null);
     }

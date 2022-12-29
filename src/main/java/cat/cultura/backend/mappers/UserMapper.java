@@ -62,6 +62,13 @@ public class UserMapper {
         for (Trophy t : user.getTrophies()) {
             userDto.addTrophy(t.getId());
         }
+        for (Request r : user.getRequestsReceived()) {
+            userDto.getReceivedRequests().add(r.getRequester().getId());
+        }
+        for (Request r : user.getRequestsSent()) {
+            userDto.getSentRequests().add(r.getFriend().getId());
+        }
+
         return userDto;
     }
 

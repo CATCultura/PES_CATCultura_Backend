@@ -26,6 +26,10 @@ public class LoggedUserDto extends UserDto {
 
     private List<Long> eventsAttended = new ArrayList<>();
     private List<Long> friendIds = new ArrayList<>();
+
+    private List<Long> receivedRequests = new ArrayList<>();
+
+    private List<Long> sentRequests = new ArrayList<>();
     private List<Long> upvotedReviewIds = new ArrayList<>();
 
     private List<Long> reportedReviewIds = new ArrayList<>();
@@ -110,5 +114,21 @@ public class LoggedUserDto extends UserDto {
 
     public void setUpvotedReviewIds(List<Long> upvotedReviewIds) {
         this.upvotedReviewIds = upvotedReviewIds;
+    }
+
+    public List<Long> getReceivedRequests() {
+        return receivedRequests;
+    }
+
+    public void setReceivedRequests(List<Long> receivedRequests) {
+        this.receivedRequests = receivedRequests;
+    }
+
+    public List<Long> getSentRequests() {
+        return sentRequests;
+    }
+
+    public void setSentRequests(List<Long> sentRequests) {
+        this.sentRequests = sentRequests;
     }
 }
