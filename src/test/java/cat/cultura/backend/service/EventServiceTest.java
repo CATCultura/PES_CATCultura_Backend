@@ -203,7 +203,7 @@ class EventServiceTest {
 
         given(eventJpaRepository.save(any(Event.class))).willReturn(updatedEvent);
 
-        given(eventJpaRepository.findById(123L)).willReturn(Optional.of(old_event));
+        given(eventJpaRepository.existsById(123L)).willReturn(true);
 
         Event updated = eventService.updateEvent(updatedEvent);
 
@@ -229,13 +229,19 @@ class EventServiceTest {
         given(eventJpaRepository.findById(123L)).willReturn(Optional.of(ev1));
         given(eventJpaRepository.findById(456L)).willReturn(Optional.of(ev2));
 
-        List<Event> aux = new ArrayList<>();
-        aux.add(ev1);
+        List<List<Event>> aux = new LinkedList<>();
+        List<Event> closeMatch = new ArrayList<>();
+        closeMatch.add(ev1);
+        List<Event> fuzzyMatch = new ArrayList<>();
+        fuzzyMatch.add(ev2);
+
+        aux.add(closeMatch);
+        aux.add(fuzzyMatch);
 
 
-        Page<Event> result = eventService.getBySemanticSimilarity("whatever");
+        List<List<Event>> result = eventService.getBySemanticSimilarity("whatever");
 
-        Assertions.assertEquals(new PageImpl<>(aux), result);
+        Assertions.assertEquals(aux, result);
     }
 
     @Test
@@ -254,11 +260,19 @@ class EventServiceTest {
         given(eventJpaRepository.findById(123L)).willReturn(Optional.of(ev1));
         given(eventJpaRepository.findById(456L)).willReturn(Optional.of(ev2));
 
-        List<Event> aux = new ArrayList<>();
+        List<List<Event>> aux = new LinkedList<>();
+        List<Event> closeMatch = new ArrayList<>();
 
-        Page<Event> result = eventService.getBySemanticSimilarity("whatever");
+        List<Event> fuzzyMatch = new ArrayList<>();
+        fuzzyMatch.add(ev1);
+        fuzzyMatch.add(ev2);
 
-        Assertions.assertEquals(new PageImpl<>(aux), result);
+        aux.add(closeMatch);
+        aux.add(fuzzyMatch);
+
+        List<List<Event>> result = eventService.getBySemanticSimilarity("whatever");
+
+        Assertions.assertEquals(aux, result);
     }
 
     @Test

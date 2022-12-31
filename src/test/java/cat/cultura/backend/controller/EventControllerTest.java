@@ -3,12 +3,8 @@ package cat.cultura.backend.controller;
 import cat.cultura.backend.dtos.EventDto;
 import cat.cultura.backend.entity.Event;
 import cat.cultura.backend.entity.Organizer;
-import cat.cultura.backend.entity.User;
 import cat.cultura.backend.exceptions.EventNotFoundException;
-import cat.cultura.backend.exceptions.MissingRequiredParametersException;
-import cat.cultura.backend.interceptors.CurrentUser;
 import cat.cultura.backend.interceptors.CurrentUserAccessor;
-import cat.cultura.backend.mappers.EventMapper;
 import cat.cultura.backend.service.EventService;
 import cat.cultura.backend.service.user.UserService;
 import org.junit.jupiter.api.Test;
@@ -23,17 +19,10 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockHttpServletResponse;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContext;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.test.context.support.WithMockUser;
-import org.springframework.security.test.context.support.WithUserDetails;
 import org.springframework.test.web.servlet.MockMvc;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import org.junit.jupiter.api.Assertions;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -133,6 +122,58 @@ class EventControllerTest {
         // then
         Assertions.assertEquals(HttpStatus.OK.value(), response.getStatus());
     }
+
+    @Test
+    void goesToCorrectMethodWhenQuery() throws Exception {
+        // given
+        Event e1 = new Event();
+        Event e2 = new Event();
+
+        List<Event> l1 = new ArrayList<>();
+        l1.add(e1);
+        List<Event> l2 = new ArrayList<>();
+        l2.add(e2);
+
+        List<List<Event>> returnList = new LinkedList<>();
+        returnList.add(l1);
+        returnList.add(l2);
+
+        given(eventService.getBySemanticSimilarity("whatever")).willReturn(returnList);
+
+        // when
+        MockHttpServletResponse response = mvc.perform(
+                        get("/events?q=whatever").accept(MediaType.APPLICATION_JSON))
+                .andReturn().getResponse();
+
+        // then
+        Assertions.assertEquals(HttpStatus.OK.value(), response.getStatus());
+
+    }
+
+    @Test
+    void goesToCorrectMethodWithoutQuery() throws Exception {
+        // given
+        Event e1 = new Event();
+
+
+        List<Event> l1 = new ArrayList<>();
+        l1.add(e1);
+
+        Pageable pageable = PageRequest.of(0, 20);
+
+
+        given(eventService.getByQuery(null,pageable)).willReturn(new PageImpl<>(l1));
+
+        // when
+        MockHttpServletResponse response = mvc.perform(
+                        get("/events").accept(MediaType.APPLICATION_JSON))
+                .andReturn().getResponse();
+
+        // then
+        Assertions.assertEquals(HttpStatus.OK.value(), response.getStatus());
+
+    }
+
 
     @Test
     @WithMockUser(username = "admin", authorities = { "USER"})
