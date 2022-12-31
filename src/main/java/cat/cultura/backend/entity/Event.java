@@ -1,18 +1,19 @@
 package cat.cultura.backend.entity;
 
 import cat.cultura.backend.entity.tag.Tag;
+import cat.cultura.backend.utils.RandomString;
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import org.hibernate.annotations.ColumnDefault;
 
 import javax.persistence.*;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
+
+import java.lang.reflect.*;
 
 @Entity
-@Table(name = "Event", uniqueConstraints = {})
+@Table(name = "Event")
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
 @JsonIgnoreProperties(ignoreUnknown=true)
 @JsonAutoDetect(fieldVisibility= JsonAutoDetect.Visibility.ANY)
@@ -115,6 +116,9 @@ public class Event {
     @Column(name="outdated")
     @ColumnDefault("false")
     private boolean outdated;
+
+    @Column(name="attendanceCode")
+    private String attendanceCode;
 
     public Long getId() {
         return id;
@@ -323,7 +327,7 @@ public class Event {
     }
 
 
-    public boolean isCancelado() {
+    public boolean getCancelado() {
         return cancelado;
     }
 
@@ -352,6 +356,19 @@ public class Event {
         this.outdated = outdated;
     }
 
+    public String getAttendanceCode() {
+        return attendanceCode;
+    }
+
+    public void setAttendanceCode(String attendanceCode) {
+        this.attendanceCode = attendanceCode;
+    }
+
+    public String generateAttendanceCode() {
+        attendanceCode = RandomString.generate();
+        return attendanceCode;
+    }
+
     public boolean isPastEvent() {
         SimpleDateFormat formatter= new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'.000'");
         Date date = new Date(System.currentTimeMillis());
@@ -359,23 +376,15 @@ public class Event {
     }
 
     @Override
-    public boolean equals(Object obj) {
-        if (obj == null) return false;
-        if (this.getClass() != obj.getClass()) return false;
-        Event that = (Event) obj;
-        if (!this.denominacio.equalsIgnoreCase(that.denominacio)) return false;
-        if (!this.dataInici.equalsIgnoreCase(that.dataInici)) return false;
-        if (!this.ubicacio.equalsIgnoreCase(that.ubicacio)) return false;
-        if (!this.adreca.equalsIgnoreCase(that.adreca)) return false;
-        return this.espai.equalsIgnoreCase(that.espai);
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Event event)) return false;
+        return codiPostal == event.codiPostal && Double.compare(event.latitud, latitud) == 0 && Double.compare(event.longitud, longitud) == 0 && cancelado == event.cancelado && outdated == event.outdated && Objects.equals(id, event.id) && Objects.equals(codi, event.codi) && Objects.equals(dataFi, event.dataFi) && dataInici.equals(event.dataInici) && Objects.equals(dataFiAprox, event.dataFiAprox) && denominacio.equals(event.denominacio) && Objects.equals(descripcio, event.descripcio) && Objects.equals(entrades, event.entrades) && Objects.equals(horari, event.horari) && Objects.equals(subtitol, event.subtitol) && Objects.equals(tagsAmbits, event.tagsAmbits) && Objects.equals(tagsCateg, event.tagsCateg) && Objects.equals(tagsAltresCateg, event.tagsAltresCateg) && Objects.equals(links, event.links) && Objects.equals(documents, event.documents) && Objects.equals(imatges, event.imatges) && Objects.equals(videos, event.videos) && adreca.equals(event.adreca) && ubicacio.equals(event.ubicacio) && Objects.equals(email, event.email) && espai.equals(event.espai) && Objects.equals(telf, event.telf) && Objects.equals(URL, event.URL) && Objects.equals(imgApp, event.imgApp) && Objects.equals(organizer, event.organizer) && Objects.equals(attendanceCode, event.attendanceCode);
     }
 
     @Override
     public int hashCode() {
-        int hash = ((this.id == null) ? 1 : this.id.hashCode());
-        hash += this.denominacio.hashCode() + this.dataInici.hashCode() + ubicacio.hashCode();
-        hash += adreca.hashCode() + espai.hashCode();
-        return hash;
+        return Objects.hash(id, codi, dataFi, dataInici, dataFiAprox, denominacio, descripcio, entrades, horari, subtitol, tagsAmbits, tagsCateg, tagsAltresCateg, links, documents, imatges, videos, adreca, codiPostal, ubicacio, email, espai, latitud, longitud, telf, URL, imgApp, cancelado, organizer, outdated, attendanceCode);
     }
 
     public Organizer getOrganizer() {
@@ -385,4 +394,6 @@ public class Event {
     public void setOrganizer(Organizer organizer) {
         this.organizer = organizer;
     }
+
+
 }

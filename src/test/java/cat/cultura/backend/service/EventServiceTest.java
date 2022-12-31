@@ -2,18 +2,26 @@ package cat.cultura.backend.service;
 
 
 import cat.cultura.backend.entity.Event;
+import cat.cultura.backend.entity.Organizer;
 import cat.cultura.backend.exceptions.EventAlreadyCreatedException;
+import cat.cultura.backend.exceptions.ForbiddenActionException;
+import cat.cultura.backend.interceptors.CurrentUserAccessor;
+import cat.cultura.backend.remoterequests.SimilarityServiceImpl;
 import cat.cultura.backend.repository.EventJpaRepository;
 import cat.cultura.backend.service.EventService;
+import cat.cultura.backend.utils.Score;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.io.IOException;
+import java.util.*;
 
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 
 @SpringBootTest
@@ -24,6 +32,13 @@ class EventServiceTest {
 
     @MockBean
     EventJpaRepository eventJpaRepository;
+
+    @MockBean
+    SimilarityServiceImpl similarityService;
+
+    @MockBean
+    CurrentUserAccessor currentUserAccessor;
+
 
     @Test
     void saveEventTestAllOk() {
@@ -69,6 +84,7 @@ class EventServiceTest {
     @Test
     void saveEventTestSameDenominacioDifferentAdreca() {
         Event ev1 = new Event();
+
         ev1.setDenominacio("Concert de primavera");
         ev1.setDataInici("Dimarts");
         ev1.setUbicacio("Barcelona");
@@ -161,60 +177,128 @@ class EventServiceTest {
     @Test
     void testUpdateEventOk() {
         Event old_event = new Event();
+        old_event.setId(123L);
         old_event.setDenominacio("Concert de primavera");
         old_event.setDataInici("Dimarts");
         old_event.setUbicacio("Barcelona");
         old_event.setAdreca("C/ Quinta Forca");
         old_event.setEspai("Sideral");
 
+        Event updatedEvent = new Event();
+        updatedEvent.setId(123L);
+        updatedEvent.setDenominacio("Concert de primavera");
+        updatedEvent.setDataInici("Dimarts");
+        updatedEvent.setUbicacio("Tarragona");
+        updatedEvent.setAdreca("C/ Quinta Forca");
+        updatedEvent.setEspai("Sideral");
+
+        Event expected = new Event();
+        expected.setId(123L);
+        expected.setDenominacio("Concert de primavera");
+        expected.setDataInici("Dimarts");
+        expected.setUbicacio("Tarragona");
+        expected.setAdreca("C/ Quinta Forca");
+        expected.setEspai("Sideral");
+
+
+        given(eventJpaRepository.save(any(Event.class))).willReturn(updatedEvent);
+
+        given(eventJpaRepository.findById(123L)).willReturn(Optional.of(old_event));
+
+        Event updated = eventService.updateEvent(updatedEvent);
+
+        Assertions.assertEquals(expected,updated);
+    }
+
+
+
+
+    @Test
+    void processSimilarityResultOk() throws IOException {
+        List<Score> remoteRequestResult = new ArrayList<>();
+        remoteRequestResult.add(new Score(123L,0.8));
+        remoteRequestResult.add(new Score(456L,0.2));
+
+        Event ev1 = new Event();
+        ev1.setId(123L);
+
         Event ev2 = new Event();
-        ev2.setDenominacio("Concert de primavera");
-        ev2.setDataInici("Dimarts");
-        ev2.setUbicacio("Barcelona");
-        ev2.setAdreca("C/ Quarta Forca");
-        ev2.setEspai("Sideral");
+        ev2.setId(456L);
 
-        List<Event> eventList = new ArrayList<>();
+        given(similarityService.getMostSimilar("whatever")).willReturn(remoteRequestResult);
+        given(eventJpaRepository.findById(123L)).willReturn(Optional.of(ev1));
+        given(eventJpaRepository.findById(456L)).willReturn(Optional.of(ev2));
 
-        eventList.add(old_event);
+        List<Event> aux = new ArrayList<>();
+        aux.add(ev1);
 
-        given(eventJpaRepository.findByDenominacioLikeIgnoreCaseAllIgnoreCase(ev2.getDenominacio())).willReturn(eventList);
 
-        given(eventJpaRepository.save(ev2)).willReturn(ev2);
+        Page<Event> result = eventService.getBySemanticSimilarity("whatever");
 
-        ev2.setDenominacio("Concert de tardor");
-
-        Event updated = eventService.updateEvent(ev2);
-
-        Assertions.assertEquals(ev2,updated);
+        Assertions.assertEquals(new PageImpl<>(aux), result);
     }
 
     @Test
-    void testUpdateEventRepeated() {
-        Event old_event = new Event();
-        old_event.setDenominacio("Concert de primavera");
-        old_event.setDataInici("Dimarts");
-        old_event.setUbicacio("Barcelona");
-        old_event.setAdreca("C/ Quinta Forca");
-        old_event.setEspai("Sideral");
+    void processSimilarityResultVoid() throws IOException {
+        List<Score> remoteRequestResult = new ArrayList<>();
+        remoteRequestResult.add(new Score(123L,0.3));
+        remoteRequestResult.add(new Score(456L,0.2));
+
+        Event ev1 = new Event();
+        ev1.setId(123L);
 
         Event ev2 = new Event();
-        ev2.setDenominacio("Concert de primavera");
-        ev2.setDataInici("Dimarts");
-        ev2.setUbicacio("Barcelona");
-        ev2.setAdreca("C/ Quarta Forca");
-        ev2.setEspai("Sideral");
+        ev2.setId(456L);
 
-        List<Event> eventList = new ArrayList<>();
+        given(similarityService.getMostSimilar("whatever")).willReturn(remoteRequestResult);
+        given(eventJpaRepository.findById(123L)).willReturn(Optional.of(ev1));
+        given(eventJpaRepository.findById(456L)).willReturn(Optional.of(ev2));
 
-        eventList.add(old_event);
+        List<Event> aux = new ArrayList<>();
 
-        given(eventJpaRepository.findByDenominacioLikeIgnoreCaseAllIgnoreCase(ev2.getDenominacio())).willReturn(eventList);
+        Page<Event> result = eventService.getBySemanticSimilarity("whatever");
 
-        ev2.setAdreca("C/ Quinta Forca");
+        Assertions.assertEquals(new PageImpl<>(aux), result);
+    }
+
+    @Test
+    void cancelEventOk(){
+        Event event = new Event();
+        event.setId(123L);
+        event.setOrganizer(new Organizer("joan"));
+
+        given(currentUserAccessor.getCurrentUsername()).willReturn("joan");
+        given(eventJpaRepository.findById(123L)).willReturn(Optional.of(event));
+
+        eventService.cancelEvent(123L);
+        Assertions.assertTrue(event.getCancelado());
+
+    }
+
+    @Test
+    void cancelEventNotCorrectOrg(){
+        Event event = new Event();
+        event.setId(123L);
+        event.setOrganizer(new Organizer("joaquim"));
+
+        given(currentUserAccessor.getCurrentUsername()).willReturn("joan");
+        given(eventJpaRepository.findById(123L)).willReturn(Optional.of(event));
+
+        Assertions.assertThrows(ForbiddenActionException.class, () -> eventService.cancelEvent(123L));
+
+    }
+
+    @Test
+    void cancelEventNoOrg(){
+        Event event = new Event();
+        event.setId(123L);
 
 
-        Assertions.assertThrows(EventAlreadyCreatedException.class, () -> eventService.updateEvent(ev2));
+        given(currentUserAccessor.getCurrentUsername()).willReturn("joan");
+        given(eventJpaRepository.findById(123L)).willReturn(Optional.of(event));
+
+        Assertions.assertThrows(ForbiddenActionException.class, () -> eventService.cancelEvent(123L));
+
     }
 
 }

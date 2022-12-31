@@ -20,9 +20,14 @@ public class EventMapper {
     }
 
     public Event convertEventDtoToEntity(EventDto eventDto) {
-        if (eventDto.getDenominacio() == null) throw new MissingRequiredParametersException();
-        if (eventDto.getDataInici() == null) throw new MissingRequiredParametersException();
-        if (eventDto.getUbicacio() == null) throw new MissingRequiredParametersException();
+        //either an id or primary key
+        if (eventDto.getId() == null) {
+            if (eventDto.getDenominacio() == null) throw new MissingRequiredParametersException();
+            if (eventDto.getDataInici() == null) throw new MissingRequiredParametersException();
+            if (eventDto.getUbicacio() == null) throw new MissingRequiredParametersException();
+            if (eventDto.getAdreca() == null) throw new MissingRequiredParametersException();
+            if (eventDto.getEspai() == null) throw new MissingRequiredParametersException();
+        }
 
         Event result = modelMapper.map(eventDto, Event.class);
         Organizer org = extractOrganizerInfo(eventDto);
@@ -103,7 +108,7 @@ public class EventMapper {
         String urlOrganitzador = eventDto.getUrlOrganitzador();
         String telefonOrganitzador = eventDto.getTelefonOrganitzador();
         String emailOrganitzador = eventDto.getEmailOrganitzador();
-        if (nomOrganitzador != null && (urlOrganitzador != null || telefonOrganitzador != null || emailOrganitzador != null)) {
+        if (nomOrganitzador != null) {
             Organizer org;
             org = new Organizer(nomOrganitzador);
             org.setUrl(urlOrganitzador);
@@ -118,6 +123,7 @@ public class EventMapper {
         if (source.getOrganizer() != null) {
             target.setIdOrganitzador(source.getOrganizer().getId());
             target.setNomOrganitzador(source.getOrganizer().getUsername());
+            target.setTelefonOrganitzador(source.getOrganizer().getTelefon());
             target.setEmailOrganitzador(source.getOrganizer().getEmail());
             target.setUrlOrganitzador(source.getOrganizer().getUrl());
         }

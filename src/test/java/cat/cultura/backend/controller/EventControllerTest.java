@@ -1,9 +1,16 @@
-package cat.cultura.backend.controllers;
+package cat.cultura.backend.controller;
 
 import cat.cultura.backend.dtos.EventDto;
 import cat.cultura.backend.entity.Event;
+import cat.cultura.backend.entity.Organizer;
+import cat.cultura.backend.entity.User;
 import cat.cultura.backend.exceptions.EventNotFoundException;
+import cat.cultura.backend.exceptions.MissingRequiredParametersException;
+import cat.cultura.backend.interceptors.CurrentUser;
+import cat.cultura.backend.interceptors.CurrentUserAccessor;
+import cat.cultura.backend.mappers.EventMapper;
 import cat.cultura.backend.service.EventService;
+import cat.cultura.backend.service.user.UserService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.json.AutoConfigureJsonTesters;
@@ -16,14 +23,21 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockHttpServletResponse;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.security.test.context.support.WithUserDetails;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.junit.jupiter.api.Assertions;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.doThrow;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -38,9 +52,17 @@ class EventControllerTest {
     @MockBean
     private EventService eventService;
 
+    @MockBean
+    private UserService userService;
+
+    @MockBean
+    private CurrentUserAccessor currentUserAccessor;
+
     @Autowired
     private JacksonTester<EventDto> jsonEventDto;
 
+    @Autowired
+    private JacksonTester<Map<String,Object>> jacksonMapTester;
     @Autowired
     private JacksonTester<List<EventDto>> jsonListEventDto;
 
@@ -52,6 +74,7 @@ class EventControllerTest {
         event.setId(2L);
         given(eventService.getEventById(2L)).willReturn(event);
 
+
         // when
         MockHttpServletResponse response = mvc.perform(
                 get("/events/2").accept(MediaType.APPLICATION_JSON))
@@ -61,7 +84,8 @@ class EventControllerTest {
         Assertions.assertEquals(response.getStatus(), HttpStatus.OK.value());
         EventDto eventDto = new EventDto();
         eventDto.setId(2L);
-        Assertions.assertEquals(response.getContentAsString(), jsonEventDto.write(eventDto).getJson());
+//        given(eventMapper.convertEventToDto(event)).willReturn(eventDto);
+        Assertions.assertEquals(jsonEventDto.write(eventDto).getJson(), response.getContentAsString());
     }
 
     @Test
@@ -127,10 +151,9 @@ class EventControllerTest {
     }
 
     @Test
-    @WithMockUser(username = "admin", authorities = { "ORGANIZER"})
+    @WithMockUser(username = "admin", authorities = {"ORGANIZER"})
     void canCreateNewEvents() throws Exception {
         EventDto event = new EventDto();
-        event.setId(8L);
         event.setDenominacio("titol");
         event.setDataInici("ahir");
         event.setUbicacio("BCN");
@@ -138,6 +161,11 @@ class EventControllerTest {
         event.setAdreca("C/Pixa");
         List<EventDto> array = new ArrayList<>();
         array.add(event);
+
+        Organizer joan = new Organizer("Joan");
+
+        given(currentUserAccessor.getCurrentUsername()).willReturn("Joan");
+        given(userService.getUserByUsername("Joan")).willReturn(joan);
 
         // when
         MockHttpServletResponse response = mvc.perform(
@@ -154,7 +182,35 @@ class EventControllerTest {
     @WithMockUser(username = "admin", authorities = { "ORGANIZER"})
     void canNotCreateNewEventsWihtMissinParams() throws Exception {
         EventDto event = new EventDto();
-        event.setId(8L);
+        event.setDenominacio("titol");
+//        event.setDataInici("ahir");
+        event.setAdreca("C/Pixa");
+
+        List<EventDto> array = new ArrayList<>();
+        array.add(event);
+
+        Organizer joan = new Organizer("Joan");
+
+        given(currentUserAccessor.getCurrentUsername()).willReturn("Joan");
+        given(userService.getUserByUsername("Joan")).willReturn(joan);
+
+
+        // when
+        MockHttpServletResponse response = mvc.perform(
+                post("/events").contentType(MediaType.APPLICATION_JSON).content(
+                        jsonListEventDto.write(array).getJson()
+                )).andReturn().getResponse();
+
+
+        // then
+        Assertions.assertEquals(HttpStatus.CONFLICT.value(), response.getStatus());
+    }
+
+    @Test
+    @WithMockUser(username = "admin", authorities = { "ORGANIZER"})
+    void canNotCreateEventWithSpecifiedId() throws Exception {
+        EventDto event = new EventDto();
+        event.setId(123L);
         event.setDenominacio("titol");
         event.setDataInici("ahir");
 
@@ -163,6 +219,10 @@ class EventControllerTest {
         List<EventDto> array = new ArrayList<>();
         array.add(event);
 
+        Organizer joan = new Organizer("Joan");
+
+        given(currentUserAccessor.getCurrentUsername()).willReturn("Joan");
+        given(userService.getUserByUsername("Joan")).willReturn(joan);
         // when
         MockHttpServletResponse response = mvc.perform(
                 post("/events").contentType(MediaType.APPLICATION_JSON).content(
@@ -206,7 +266,7 @@ class EventControllerTest {
                 delete("/events/2").accept(MediaType.APPLICATION_JSON).header(HttpHeaders.AUTHORIZATION,"somthg")).andReturn().getResponse();
 
         // then
-        Assertions.assertEquals(response.getStatus(), HttpStatus.OK.value());
+        Assertions.assertEquals(response.getStatus(), HttpStatus.NO_CONTENT.value());
     }
 
     @Test
@@ -232,6 +292,113 @@ class EventControllerTest {
 
         // then
         Assertions.assertEquals(response.getStatus(), HttpStatus.NOT_FOUND.value());
+    }
+
+    @Test
+    @WithMockUser(username = "admin", authorities = { "ORGANIZER"})
+    void canModifyEvent() throws Exception {
+        EventDto eventDto = new EventDto();
+        eventDto.setId(123L);
+        eventDto.setDenominacio("titol");
+        eventDto.setDataInici("ahir");
+        eventDto.setAdreca("C/Pixa");
+        eventDto.setUbicacio("BCN");
+        eventDto.setNomOrganitzador("admin");
+
+        Event expected = new Event();
+        expected.setId(123L);
+        expected.setDenominacio("titol");
+        expected.setDataInici("ahir");
+        expected.setAdreca("C/Pixa");
+        expected.setUbicacio("BCN");
+        expected.setOrganizer(new Organizer("admin"));
+
+        given(currentUserAccessor.getCurrentUsername()).willReturn("admin");
+//        given(eventMapper.convertEventDtoToEntity(eventDto)).willReturn(event);
+        given(eventService.updateEvent(any(Event.class))).willReturn(expected);
+
+        // when
+        MockHttpServletResponse response = mvc.perform(
+                put("/events").contentType(MediaType.APPLICATION_JSON).content(
+                        jsonEventDto.write(eventDto).getJson()
+                )).andReturn().getResponse();
+
+
+        // then
+        Assertions.assertEquals(HttpStatus.ACCEPTED.value(), response.getStatus());
+    }
+
+    @Test
+    @WithMockUser(username = "admin", authorities = { "ORGANIZER"})
+    void canNotModifyOtherEvent() throws Exception {
+        EventDto eventDto = new EventDto();
+        eventDto.setId(123L);
+        eventDto.setDenominacio("titol");
+        eventDto.setDataInici("ahir");
+        eventDto.setAdreca("C/Pixa");
+        eventDto.setUbicacio("BCN");
+        eventDto.setNomOrganitzador("admin");
+
+        Event expected = new Event();
+        expected.setId(123L);
+        expected.setDenominacio("titol");
+        expected.setDataInici("ahir");
+        expected.setAdreca("C/Pixa");
+        expected.setUbicacio("BCN");
+        expected.setOrganizer(new Organizer("admin"));
+
+        given(currentUserAccessor.getCurrentUsername()).willReturn("josep");
+//        given(eventMapper.convertEventDtoToEntity(eventDto)).willReturn(event);
+        given(eventService.updateEvent(any(Event.class))).willReturn(expected);
+
+        // when
+        MockHttpServletResponse response = mvc.perform(
+                put("/events").contentType(MediaType.APPLICATION_JSON).content(
+                        jsonEventDto.write(eventDto).getJson()
+                )).andReturn().getResponse();
+
+
+        // then
+        Assertions.assertEquals(HttpStatus.FORBIDDEN.value(), response.getStatus());
+    }
+
+    @Test
+    @WithMockUser(username = "admin", authorities = { "USER"})
+    void canNotModifyEventLackOfAuth() throws Exception {
+        EventDto event = new EventDto();
+        event.setId(123L);
+        event.setDenominacio("titol");
+        event.setDataInici("ahir");
+        event.setAdreca("C/Pixa");
+
+        // when
+        MockHttpServletResponse response = mvc.perform(
+                put("/events").contentType(MediaType.APPLICATION_JSON).content(
+                        jsonEventDto.write(event).getJson()
+                )).andReturn().getResponse();
+
+
+        // then
+        Assertions.assertEquals(HttpStatus.FORBIDDEN.value(), response.getStatus());
+    }
+
+    @Test
+    @WithMockUser(username = "admin", authorities = { "ORGANIZER"})
+    void canNotModifyEventWithoutId() throws Exception {
+        Map<String, Object> event = new HashMap<>();
+        event.put("denominacio", "titol");
+        event.put("dataInici", "ahir");
+        event.put("adreca", "C/Pixa");
+
+        // when
+        MockHttpServletResponse response = mvc.perform(
+                put("/events").contentType(MediaType.APPLICATION_JSON).content(
+                        jacksonMapTester.write(event).getJson()
+                )).andReturn().getResponse();
+
+
+        // then
+        Assertions.assertEquals(HttpStatus.CONFLICT.value(), response.getStatus());
     }
 
 }

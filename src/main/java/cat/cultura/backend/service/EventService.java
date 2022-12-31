@@ -1,28 +1,35 @@
 package cat.cultura.backend.service;
 
 import cat.cultura.backend.entity.Event;
-import cat.cultura.backend.entity.tag.Tag;
 import cat.cultura.backend.exceptions.EventAlreadyCreatedException;
 import cat.cultura.backend.exceptions.EventNotFoundException;
+import cat.cultura.backend.exceptions.ForbiddenActionException;
+import cat.cultura.backend.interceptors.CurrentUserAccessor;
+import cat.cultura.backend.remoterequests.SimilarityServiceAdapter;
+import cat.cultura.backend.remoterequests.SimilarityServiceImpl;
 import cat.cultura.backend.repository.EventJpaRepository;
-import cat.cultura.backend.repository.TagJpaRepository;
+import cat.cultura.backend.utils.Score;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 @Service
 public class EventService {
 
     private final EventJpaRepository eventRepo;
 
-    private final TagJpaRepository tagRepo;
+    private final SimilarityServiceAdapter similarityService;
 
-    private final SemanticService semanticService;
+    private final TagService tagService;
+
+    private final CurrentUserAccessor currentUserAccesor;
 
     private boolean isUniqueInDB(Event ev) {
         List<Event> sameDenominacioEvents = eventRepo.findByDenominacioLikeIgnoreCaseAllIgnoreCase(ev.getDenominacio());
@@ -33,30 +40,21 @@ public class EventService {
         return true;
     }
 
-    private List<Tag> persistTags(List<Tag> tags) {
-        List<Tag> res = new ArrayList<>();
-        for (Tag t : tags) {
-            if (!tagRepo.existsByValue(t.getValue())) {
-                res.add(tagRepo.save(t));
-            }
-            else {
-                res.add(tagRepo.findByValue(t.getValue()).orElse(null));
-            }
-        }
-        return res;
-    }
-
-    public EventService(EventJpaRepository eventRepo, TagJpaRepository tagRepo, SemanticService semanticService) {
+    public EventService(EventJpaRepository eventRepo,
+                        TagService tagService,
+                        SimilarityServiceImpl semanticService,
+                        CurrentUserAccessor currentUserAccessor) {
         this.eventRepo = eventRepo;
-        this.tagRepo = tagRepo;
-        this.semanticService = semanticService;
+        this.tagService = tagService;
+        this.similarityService = semanticService;
+        this.currentUserAccesor = currentUserAccessor;
     }
 
     public Event saveEvent(Event ev) {
         if (isUniqueInDB(ev)) {
-            ev.setTagsAmbits(persistTags(ev.getTagsAmbits()));
-            ev.setTagsCateg(persistTags(ev.getTagsCateg()));
-            ev.setTagsAltresCateg(persistTags(ev.getTagsAltresCateg()));
+            ev.setTagsAmbits(tagService.persistTags(ev.getTagsAmbits()));
+            ev.setTagsCateg(tagService.persistTags(ev.getTagsCateg()));
+            ev.setTagsAltresCateg(tagService.persistTags(ev.getTagsAltresCateg()));
             return eventRepo.save(ev);
         }
         throw new EventAlreadyCreatedException();
@@ -86,11 +84,16 @@ public class EventService {
 
     public void deleteEvent(Long id) {
         Event event = eventRepo.findById(id).orElseThrow(()-> new EventNotFoundException("Event with id: " + id + " not found"));
+        if (event.getOrganizer() == null) throw new ForbiddenActionException();
+        if (!Objects.equals(currentUserAccesor.getCurrentUsername(),event.getOrganizer().getUsername())) {
+            throw new ForbiddenActionException();
+        }
         eventRepo.delete(event);
     }
 
     public Event updateEvent(Event ev) {
-        if (!isUniqueInDB(ev)) throw new EventAlreadyCreatedException();
+        Event e = eventRepo.findById(ev.getId()).orElseThrow(EventNotFoundException::new);
+
         return eventRepo.save(ev);
     }
 
@@ -101,18 +104,17 @@ public class EventService {
     }
 
     public Page<Event> getBySemanticSimilarity(String query) {
-        List<Long> queryResult;
+        List<Score> queryResult;
         try {
-             queryResult = semanticService.getEventListByQuery(query);
+             queryResult = similarityService.getMostSimilar(query);
         } catch (IOException e) {
             return null;
         }
         if (queryResult!= null) {
             List<Event> results = new ArrayList<>();
-            for (Long id : queryResult) {
-                Event e = eventRepo.findById(id).orElse(null);
-                if (e != null)
-                    results.add(e);
+            for (Score id : queryResult) {
+                if (id.getSimilarityScore() > 0.5)
+                    eventRepo.findById(id.getEventId()).ifPresent(results::add);
             }
             return new PageImpl<>(results);
         }
@@ -134,4 +136,25 @@ public class EventService {
         return eventRepo.getPastEvents();
     }
 
+    public String getAttendanceCode(Long eventId) {
+        Event event = eventRepo.findById(eventId).orElseThrow(()-> new EventNotFoundException("Event with id: " + eventId + " not found"));
+        return event.getAttendanceCode();
+    }
+
+    public String generateAttendanceCode(Long eventId) {
+        Event event = eventRepo.findById(eventId).orElseThrow(()-> new EventNotFoundException("Event with id: " + eventId + " not found"));
+        String code = event.generateAttendanceCode();
+        eventRepo.save(event);
+        return code;
+    }
+
+    @Transactional(rollbackFor = Exception.class)
+    public void cancelEvent(Long eventId) {
+        Event event = eventRepo.findById(eventId).orElseThrow(EventNotFoundException::new);
+        if (event.getOrganizer() == null) throw new ForbiddenActionException();
+        if (!Objects.equals(currentUserAccesor.getCurrentUsername(),event.getOrganizer().getUsername())) {
+            throw new ForbiddenActionException();
+        }
+        event.setCancelado(true);
+    }
 }

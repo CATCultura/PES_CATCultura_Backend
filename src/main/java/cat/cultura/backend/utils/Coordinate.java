@@ -1,8 +1,8 @@
 package cat.cultura.backend.utils;
 
 public class Coordinate {
-    private double lon;
-    private double lat;
+    private final double lon;
+    private final double lat;
 
     public Coordinate(double lon, double lat) {
         this.lon = lon;
@@ -19,8 +19,6 @@ public class Coordinate {
     //takes Coordinates, a distance in meters and a bearing in degrees and returns the new coordinate.
     public static Coordinate calcEndPoint(Coordinate center , int distance, double  bearing)
     {
-        Coordinate gp=null;
-
         double R = 6371000; // meters , earth Radius approx
         double PI = 3.1415926535;
         double RADIANS = PI/180;
@@ -42,8 +40,6 @@ public class Coordinate {
 
         //System.out.println("lat2="+lat2*DEGREES + ",lon2="+lon2*DEGREES);
 
-        gp = new Coordinate( lon2*DEGREES, lat2*DEGREES);
-
-        return(gp);
+        return new Coordinate( lon2*DEGREES, lat2*DEGREES);
     }
 }

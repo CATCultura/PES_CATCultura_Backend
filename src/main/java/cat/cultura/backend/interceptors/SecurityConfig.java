@@ -2,7 +2,6 @@ package cat.cultura.backend.interceptors;
 
 import cat.cultura.backend.entity.Role;
 import cat.cultura.backend.repository.UserJpaRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -19,12 +18,16 @@ public class SecurityConfig {
 
     public static final String EVENTENDPOINT = "/events*";
     public static final String CONCRETEEVENT = "/events/*";
-    @Autowired
-    private UserJpaRepository userJpaRepository;
 
-    private String organizer = Role.ORGANIZER.toString();
+    private final UserJpaRepository userJpaRepository;
 
-    private String service = Role.SERVICE.toString();
+    public SecurityConfig(UserJpaRepository userJpaRepository) {
+        this.userJpaRepository = userJpaRepository;
+    }
+
+    private final String organizer = Role.ORGANIZER.toString();
+
+    private final String service = Role.SERVICE.toString();
 
 
     @Bean
@@ -33,10 +36,11 @@ public class SecurityConfig {
                 .authorizeHttpRequests()
                         .antMatchers(HttpMethod.GET, EVENTENDPOINT).permitAll().and().authorizeHttpRequests()
                         .antMatchers(HttpMethod.GET, CONCRETEEVENT).permitAll().and().authorizeHttpRequests()
+                        .antMatchers(HttpMethod.GET, "/chat").permitAll().and().authorizeHttpRequests()
                         .antMatchers(HttpMethod.GET, "/tags").permitAll().and().authorizeHttpRequests()
                         .antMatchers(HttpMethod.POST,"/users").permitAll().and().authorizeHttpRequests()
                         .antMatchers(HttpMethod.POST, EVENTENDPOINT).hasAuthority(organizer).and().authorizeHttpRequests()
-                        .antMatchers(HttpMethod.PUT, CONCRETEEVENT).hasAuthority(organizer).and().authorizeHttpRequests()
+                        .antMatchers(HttpMethod.PUT, EVENTENDPOINT).hasAuthority(organizer).and().authorizeHttpRequests()
                         .antMatchers(HttpMethod.DELETE, CONCRETEEVENT).hasAuthority(organizer).and().authorizeHttpRequests()
 //                .antMatchers(HttpMethod.DELETE, "/events/2").hasAuthority(organizer).and().authorizeHttpRequests()
                         .antMatchers(HttpMethod.GET, "/allevents").hasAuthority(service).and().authorizeHttpRequests()

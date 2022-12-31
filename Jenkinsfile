@@ -3,6 +3,15 @@ pipeline {
 
     stages {
 
+        stage('Code Coverage') {
+            steps {
+                withMaven {
+                    sh 'mvn test'
+                    sh 'mvn jacoco:report'
+                }
+            }
+        }
+
         stage('SonarQube Analysis') {
             steps {
                 withMaven() {
@@ -21,26 +30,40 @@ pipeline {
             }
         }
 
-        stage('Test') {
-            steps {
-                withMaven {
-                    sh "mvn test"
-                    }
-            }
-        }
+//         stage('Test') {
+//             steps {
+//                 withMaven {
+//                     sh "mvn test"
+//                     }
+//             }
+//         }
 
-        stage('Deploy') {
+        stage('Deploy locally') {
             when { branch 'dev-main' }
             steps {
 
                 withMaven {
                     sh 'mvn clean package'
                 }
-                sh 'sudo docker kill $(sudo docker ps -q -f ancestor=backend)'
-                sh 'sudo docker rmi backend -f'
-                sh 'sudo docker build -t backend .'
-                sh 'sudo docker run -d -p 8081:8081 backend'
+                sh 'sudo docker kill $(sudo docker ps -q -f ancestor=backend-staging)'
+                sh 'sudo docker rmi backend-staging -f'
+                sh 'sudo docker build -t backend-staging .'
+                sh 'sudo docker run -d -p 8081:8081 backend-staging'
             }
+
+        }
+        stage('Deploy remotely') {
+            when { branch 'master' }
+                steps {
+
+                    withMaven {
+                        sh 'mvn clean package'
+                    }
+                    sh 'sudo docker build -t backend .'
+                    sh 'sudo docker tag backend catculturacontainerhub.azurecr.io/backend'
+                    sh 'sudo docker push catculturacontainerhub.azurecr.io/backend'
+
+                }
         }
 
         stage('Notify') {

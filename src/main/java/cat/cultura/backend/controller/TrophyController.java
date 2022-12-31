@@ -10,7 +10,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @RestController
 public class TrophyController {
@@ -31,7 +30,7 @@ public class TrophyController {
     @GetMapping("/trophies")
     public ResponseEntity<List<TrophyDto>> getTrophies() {
         List<Trophy> trophies = trophyService.getTrophies();
-        return ResponseEntity.status(HttpStatus.OK).body(trophies.stream().map(trophyMapper::convertTrophyToDto).collect(Collectors.toList()));
+        return ResponseEntity.status(HttpStatus.OK).body(trophies.stream().map(trophyMapper::convertTrophyToDto).toList());
     }
 
     @DeleteMapping("/trophies/{id}")

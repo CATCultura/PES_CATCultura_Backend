@@ -3,13 +3,17 @@ package cat.cultura.backend.controller;
 import cat.cultura.backend.dtos.EventDto;
 import cat.cultura.backend.dtos.ReviewDto;
 import cat.cultura.backend.entity.Event;
-
+import cat.cultura.backend.entity.Organizer;
 import cat.cultura.backend.entity.Review;
+import cat.cultura.backend.entity.User;
 import cat.cultura.backend.exceptions.EventAlreadyCreatedException;
-import cat.cultura.backend.exceptions.MissingRequiredParametersException;
+import cat.cultura.backend.interceptors.CurrentUserAccessor;
 import cat.cultura.backend.mappers.EventMapper;
 import cat.cultura.backend.mappers.ReviewMapper;
-import cat.cultura.backend.service.*;
+import cat.cultura.backend.service.EventService;
+import cat.cultura.backend.service.RouteDataService;
+import cat.cultura.backend.service.TagService;
+import cat.cultura.backend.service.user.ReviewService;
 import cat.cultura.backend.service.user.UserService;
 import cat.cultura.backend.service.user.UserTrophyService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,10 +22,12 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 @RestController
 public class EventController {
@@ -30,7 +36,10 @@ public class EventController {
     private EventService eventService;
 
     @Autowired
-    private RouteService routeService;
+    private RouteDataService routeDataService;
+
+    @Autowired
+    private CurrentUserAccessor currentUserAccessor;
 
     @Autowired
     private UserService userService;
@@ -51,16 +60,14 @@ public class EventController {
     private TagService tagService;
 
     @PostMapping("/events")
-    public ResponseEntity<List<EventDto>> addEvent(@RequestBody List<EventDto> ev) {
+    public ResponseEntity<List<EventDto>> addEvent(@RequestBody List<EventDto> ev, Authentication authentication) {
         List<Event> eventsEntities = new ArrayList<>();
         for (EventDto eventDto : ev) {
-            Event event;
-            try {
-                event = eventMapper.convertEventDtoToEntity(eventDto);
-            }
-            catch (MissingRequiredParametersException mpe) {
-                return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
-            }
+
+            User u = userService.getUserByUsername(currentUserAccessor.getCurrentUsername());
+            if (eventDto.getId() != null) return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
+            Event event = eventMapper.convertEventDtoToEntity(eventDto);
+            event.setOrganizer((Organizer) u);
             eventsEntities.add(event);
         }
         List<Event> events;
@@ -77,6 +84,7 @@ public class EventController {
             @RequestParam(value = "id", required = false) Long id,
             @RequestParam(value = "tag", required = false) String tag,
             @RequestParam(value = "q", required = false) String query,
+            @RequestParam(value = "organizer", required = false) Long orgId,
             Pageable pageable
     ) {
         Page<Event> events;
@@ -90,7 +98,8 @@ public class EventController {
         else {
             events = eventService.getByQuery(id, pageable);
         }
-
+        if (events == null)
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
         return ResponseEntity.status(HttpStatus.OK).body(events.stream().map(eventMapper::convertEventToDto).toList());
     }
 
@@ -102,15 +111,29 @@ public class EventController {
 
     @PutMapping("/events")
     public ResponseEntity<EventDto> updateEvent(@RequestBody EventDto ev) {
+        if (ev.getId() == null)
+            return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
         Event eventEntity = eventMapper.convertEventDtoToEntity(ev);
+        if (eventEntity.getOrganizer() == null) return ResponseEntity.status(HttpStatus.FORBIDDEN).body(null);
+        if (! Objects.equals(currentUserAccessor.getCurrentUsername(), eventEntity.getOrganizer().getUsername())) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(null);
+        }
         Event event = eventService.updateEvent(eventEntity);
-        return ResponseEntity.status(HttpStatus.CREATED).body(eventMapper.convertEventToDto(event));
+        return ResponseEntity.status(HttpStatus.ACCEPTED).body(eventMapper.convertEventToDto(event));
     }
+
+    @PutMapping("/events/{eventId}/cancelled")
+    public ResponseEntity<EventDto> cancelEvent(@PathVariable Long eventId) {
+        eventService.cancelEvent(eventId);
+        return ResponseEntity.status(HttpStatus.ACCEPTED).body(null);
+    }
+
+
 
     @DeleteMapping("/events/{id}")
     public ResponseEntity<String> deleteEvent(@PathVariable Long id){
         eventService.deleteEvent(id);
-        return ResponseEntity.status(HttpStatus.OK).build();
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 
     @PutMapping("/events/outdated")
@@ -135,5 +158,16 @@ public class EventController {
         }
         return ResponseEntity.status(HttpStatus.OK).body(reviews.stream().map(reviewMapper::convertReviewToDto).toList());
     }
+
+    @GetMapping("/events/{id}/attendanceCode")
+    public ResponseEntity<String> getAttendanceCode(@PathVariable Long id) {
+        return ResponseEntity.status(HttpStatus.OK).body(eventService.getAttendanceCode(id));
+    }
+
+    @PostMapping("/events/{id}/attendanceCode")
+    public ResponseEntity<String> generateAttendanceCode(@PathVariable Long id) {
+        return ResponseEntity.status(HttpStatus.OK).body(eventService.generateAttendanceCode(id));
+    }
+
 
 }

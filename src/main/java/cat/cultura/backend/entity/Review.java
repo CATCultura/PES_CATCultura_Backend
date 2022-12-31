@@ -27,6 +27,13 @@ public class Review {
     private int stars;
     private String date;
 
+    @Column(nullable = false)
+    private int upvotes = 0;
+    @Column(nullable = false)
+    private boolean blocked = false;
+    @Column(nullable = false)
+    private int reports = 0;
+
     public String getReview() {
         return review;
     }
@@ -82,5 +89,45 @@ public class Review {
 
     public void setTitle(String title) {
         this.title = title;
+    }
+
+    public int getUpvotes() {
+        return upvotes;
+    }
+
+    public void setUpvotes(int upvotes) {
+        this.upvotes = upvotes;
+    }
+
+    public void upvote(){
+        ++this.upvotes;
+    }
+
+    public void removeUpvote() {
+        --this.upvotes;
+    }
+
+    public boolean isBlocked() {
+        return blocked;
+    }
+
+    public void setBlocked(boolean blocked) {
+        this.blocked = blocked;
+    }
+
+    public int getReports() {
+        return reports;
+    }
+
+    public void setReports(int reports) {
+        this.reports = reports;
+    }
+
+    public void report(){
+        ++this.reports;
+    }
+
+    public void removeReport() {
+        --this.reports;
     }
 }

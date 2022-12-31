@@ -14,9 +14,7 @@ public class CurrentUser implements UserDetails {
     private List<String> extractAuthorities(Role r) {
         List<String> a = new ArrayList<>();
         switch(r) {
-            case USER -> {
-             a.add("USER");
-            }
+            case USER -> a.add("USER");
             case ADMIN -> {
                 a.add("USER");
                 a.add("ADMIN");
@@ -34,6 +32,7 @@ public class CurrentUser implements UserDetails {
         }
         return a;
     }
+
     private final User user;
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {

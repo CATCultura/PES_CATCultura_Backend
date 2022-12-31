@@ -2,10 +2,8 @@ package cat.cultura.backend.service.user;
 
 import cat.cultura.backend.entity.Request;
 import cat.cultura.backend.entity.User;
-import cat.cultura.backend.exceptions.FriendAlreadyAddedException;
-import cat.cultura.backend.exceptions.RequestAlreadyAddedException;
-import cat.cultura.backend.exceptions.RequestNotFoundException;
-import cat.cultura.backend.exceptions.UserNotFoundException;
+import cat.cultura.backend.exceptions.*;
+import cat.cultura.backend.interceptors.CurrentUserAccessor;
 import cat.cultura.backend.repository.RequestJpaRepository;
 import cat.cultura.backend.repository.UserJpaRepository;
 import cat.cultura.backend.utils.RequestId;
@@ -21,13 +19,18 @@ public class RequestService {
 
     private final RequestJpaRepository requestRepo;
 
-    public RequestService(UserJpaRepository userRepo, RequestJpaRepository requestRepo) {
+    private CurrentUserAccessor currentUserAccessor;
+
+    public RequestService(UserJpaRepository userRepo,
+                          RequestJpaRepository requestRepo,
+                          CurrentUserAccessor currentUserAccessor) {
         this.userRepo = userRepo;
         this.requestRepo = requestRepo;
+        this.currentUserAccessor = currentUserAccessor;
     }
 
     @Transactional(rollbackFor=Exception.class)
-    public void addFriend(Long userId, Long friendId) {
+    public List<User> addFriend(Long userId, Long friendId) {
         User user = userRepo.findById(userId).orElseThrow(UserNotFoundException::new);
         User friend = userRepo.findById(friendId).orElseThrow(UserNotFoundException::new);
 
@@ -45,35 +48,38 @@ public class RequestService {
             requestRepo.delete(r);
             user.addFriend(friend);
         }
+        return user.getFriends();
     }
 
     @Transactional(rollbackFor=Exception.class)
-    public void removeFriend(Long userId, Long friendId) {
+    public List<User> removeFriend(Long userId, Long friendId) {
         User user = userRepo.findById(userId).orElseThrow(UserNotFoundException::new);
         User friend = userRepo.findById(friendId).orElseThrow(UserNotFoundException::new);
+        if (!user.getUsername().equals(currentUserAccessor.getCurrentUsername())) throw new ForbiddenActionException();
         if (user.hasFriend(friend)) user.removeFriend(friend);
         else {
-            Request f1 = requestRepo.findByRequestId(new RequestId(userId,friendId)).orElseThrow(RequestNotFoundException::new);
+            Request f1 = requestRepo.findByRequestId(new RequestId(userId,friendId)).orElse(null);
+            if (f1 == null) {
+                f1 = requestRepo.findByRequestId(new RequestId(friendId,userId)).orElseThrow(RequestNotFoundException::new);
+            }
             requestRepo.delete(f1);
         }
+        return user.getFriends();
     }
 
     public List<User> getRequestsTo(Long userId){
         User user = userRepo.findById(userId).orElseThrow(UserNotFoundException::new);
-        List<User> users = user.getRequestTo();
-        return users;
+        return user.getRequestTo();
     }
 
     public List<User> getRequestFrom(Long userId){
         User user = userRepo.findById(userId).orElseThrow(UserNotFoundException::new);
-        List<User> users = user.getRequestFrom();
-        return users;
+        return user.getRequestFrom();
     }
 
     public List<User> getFriends(Long userId) {
         User user = userRepo.findById(userId).orElseThrow(UserNotFoundException::new);
-        List<User> users = user.getFriends();
-        return users;
+        return user.getFriends();
     }
 
 }

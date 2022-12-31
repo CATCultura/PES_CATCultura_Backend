@@ -4,6 +4,10 @@ import cat.cultura.backend.entity.Role;
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
+import java.util.HashSet;
+import java.util.Objects;
+import java.util.Set;
+
 @JsonIgnoreProperties(ignoreUnknown=true)
 @JsonAutoDetect(fieldVisibility= JsonAutoDetect.Visibility.ANY)
 public class UserDto {
@@ -15,10 +19,24 @@ public class UserDto {
 
     private Role role = Role.USER;
 
+    private Set<String> tags = new HashSet<>();
+
     private String password;
 
     public String getPassword() {
         return password;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof UserDto userDto)) return false;
+        return points == userDto.points && id.equals(userDto.id) && username.equals(userDto.username) && nameAndSurname.equals(userDto.nameAndSurname) && Objects.equals(email, userDto.email) && creationDate.equals(userDto.creationDate) && role == userDto.role && Objects.equals(tags, userDto.tags) && Objects.equals(password, userDto.password);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, username, nameAndSurname, email, creationDate, role, tags, password, points);
     }
 
     public void setPassword(String password) {
@@ -26,11 +44,6 @@ public class UserDto {
     }
 
     private int points;
-
-    //    private List<Event> favourites = new ArrayList<>();
-//    private List<Trophy> trophies = new ArrayList<>();
-//    private List<Event> attendance = new ArrayList<>();
-//    private List<User> friends = new ArrayList<>();
 
     public Long getId() {
         return id;
@@ -88,36 +101,13 @@ public class UserDto {
         this.role = role;
     }
 
-//    public List<Event> getFavourites() {
-//        return favourites;
-//    }
-//
-//    public void setFavourites(List<Event> favourites) {
-//        this.favourites = favourites;
-//    }
-//
-//    public List<Trophy> getTrophies() {
-//        return trophies;
-//    }
-//
-//    public void setTrophies(List<Trophy> trophies) {
-//        this.trophies = trophies;
-//    }
-//
-//    public List<Event> getAttendance() {
-//        return attendance;
-//    }
-//
-//    public void setAttendance(List<Event> attendance) {
-//        this.attendance = attendance;
-//    }
-//
-//    public List<User> getFriends() {
-//        return friends;
-//    }
-//
-//    public void setFriends(List<User> friends) {
-//        this.friends = friends;
-//    }
+    public Set<String> getTags() {
+        return tags;
+    }
+
+    public void setTags(Set<String> tags) {
+        this.tags = tags;
+    }
+
 
 }

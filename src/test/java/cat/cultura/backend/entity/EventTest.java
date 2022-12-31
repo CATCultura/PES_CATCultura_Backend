@@ -5,7 +5,9 @@ import org.junit.jupiter.api.Test;
 import org.springframework.test.context.ActiveProfiles;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @ActiveProfiles("test")
 class EventTest {
@@ -122,7 +124,6 @@ class EventTest {
 
         Assertions.assertNotEquals(ev1.hashCode(), ev2.hashCode());
     }
-
 
 
 }

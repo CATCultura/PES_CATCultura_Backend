@@ -12,7 +12,6 @@ import java.util.Optional;
 
 @Repository
 public interface EventJpaRepository extends JpaRepository<Event, Long> {
-
     Optional<Event> findByCodi(Long codi);
 
     @Query("select m from Event m where " +

@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import javax.persistence.*;
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -15,10 +16,15 @@ public class Route {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long routeId;
 
-    @ElementCollection
-    @CollectionTable(name="RouteEvents", joinColumns=@JoinColumn(name="id"))
-    @Column(name="route_events")
-    private List<Event> routeEvents;
+    private String name;
+
+    private String description;
+
+    private String createdAt;
+
+    @ManyToMany
+    @JoinColumn(name = "events")
+    private List<Event> routeEvents = new ArrayList<>();
 
     public Long getRouteId() {
         return routeId;
@@ -35,4 +41,34 @@ public class Route {
     public void setRouteEvents(List<Event> events) {
         this.routeEvents = events;
     }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public String getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(String createdAt) {
+        this.createdAt = createdAt;
+    }
+
+    public void addEvents(List<Event> ev) {
+        this.routeEvents.addAll(ev);
+    }
+
+
 }

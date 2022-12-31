@@ -1,9 +1,6 @@
 package cat.cultura.backend.service.user;
 
-import cat.cultura.backend.entity.Event;
-import cat.cultura.backend.entity.Organizer;
-import cat.cultura.backend.entity.Role;
-import cat.cultura.backend.entity.User;
+import cat.cultura.backend.entity.*;
 import cat.cultura.backend.exceptions.UserNotFoundException;
 import cat.cultura.backend.repository.UserJpaRepository;
 import org.springframework.data.domain.Page;
@@ -14,6 +11,7 @@ import org.springframework.stereotype.Service;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Comparator;
 import java.util.List;
 
 @Service
@@ -91,4 +89,45 @@ public class UserService {
         else return result;
     }
 
+    public List<Event> getAttendedEventsById(Long id) {
+        User existingUser = userRepo.findById(id).orElseThrow(() -> new UserNotFoundException("User with id: " + id + " not found"));
+        return existingUser.getAttended();
+    }
+
+    public List<Review> getReportsToOtherUsers(Long userId) {
+        User user = userRepo.findById(userId).orElseThrow(UserNotFoundException::new);
+        return user.getUpvotedReviews();
+    }
+
+    public List<User> report(Long userId, Long reportedUserId) {
+        if(userId == reportedUserId) throw new AssertionError("You can´t report yourself");
+        User user = userRepo.findById(userId).orElseThrow(UserNotFoundException::new);
+        User reportedUser = userRepo.findById(reportedUserId).orElseThrow(UserNotFoundException::new);
+        user.addReportToUser(reportedUser);
+        reportedUser.report();
+        userRepo.save(user);
+        userRepo.save(reportedUser);
+        return user.getReportedUsers();
+    }
+
+    public List<User> quitReport(Long userId, Long reportedUserId) {
+        User user = userRepo.findById(userId).orElseThrow(UserNotFoundException::new);
+        User reportedUser = userRepo.findById(reportedUserId).orElseThrow(UserNotFoundException::new);
+        user.removeReportToUser(reportedUser);
+        reportedUser.removeReport();
+        userRepo.save(user);
+        userRepo.save(reportedUser);
+        return user.getReportedUsers();
+    }
+
+    public List<User> getMostReportedUsers() {
+        List<User> users = userRepo.findReportedUsers();
+        users.sort(Comparator.comparingInt(User::getReports));
+        return users;
+    }
+
+    public List<Event> getOrganizedEvents(Long id) {
+        User u = userRepo.findById(id).orElseThrow(UserNotFoundException::new);
+        return u.getOrganizedEvents();
+    }
 }
