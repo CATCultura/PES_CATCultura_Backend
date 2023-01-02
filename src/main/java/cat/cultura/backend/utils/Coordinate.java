@@ -19,27 +19,23 @@ public class Coordinate {
     //takes Coordinates, a distance in meters and a bearing in degrees and returns the new coordinate.
     public static Coordinate calcEndPoint(Coordinate center , int distance, double  bearing)
     {
-        double R = 6371000; // meters , earth Radius approx
-        double PI = 3.1415926535;
-        double RADIANS = PI/180;
-        double DEGREES = 180/PI;
+        double r = 6371000; // meters , earth Radius approx
+        double pi = 3.1415926535;
+        double radians = pi/180;
+        double degrees = 180/pi;
 
         double lat2;
         double lon2;
 
-        double lat1 = center.getLat() * RADIANS;
-        double lon1 = center.getLon() * RADIANS;
-        double radbear = bearing * RADIANS;
+        double lat1 = center.getLat() * radians;
+        double lon1 = center.getLon() * radians;
+        double radbear = bearing * radians;
 
-        // System.out.println("lat1="+lat1 + ",lon1="+lon1);
+        lat2 = Math.asin( Math.sin(lat1)*Math.cos(distance / r) +
+                Math.cos(lat1)*Math.sin(distance/r)*Math.cos(radbear) );
+        lon2 = lon1 + Math.atan2(Math.sin(radbear)*Math.sin(distance / r)*Math.cos(lat1),
+                Math.cos(distance/r)-Math.sin(lat1)*Math.sin(lat2));
 
-        lat2 = Math.asin( Math.sin(lat1)*Math.cos(distance / R) +
-                Math.cos(lat1)*Math.sin(distance/R)*Math.cos(radbear) );
-        lon2 = lon1 + Math.atan2(Math.sin(radbear)*Math.sin(distance / R)*Math.cos(lat1),
-                Math.cos(distance/R)-Math.sin(lat1)*Math.sin(lat2));
-
-        //System.out.println("lat2="+lat2*DEGREES + ",lon2="+lon2*DEGREES);
-
-        return new Coordinate( lon2*DEGREES, lat2*DEGREES);
+        return new Coordinate( lon2*degrees, lat2*degrees);
     }
 }

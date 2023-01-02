@@ -9,10 +9,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Comparator;
-import java.util.List;
+import java.util.*;
 
 @Service
 public class UserService {
@@ -52,20 +49,19 @@ public class UserService {
     }
 
     public User getUserById(Long id) {
-        return userRepo.findById(id).orElseThrow(() -> new UserNotFoundException("User with id: " + id + " not found"));
+        return userRepo.findById(id).orElseThrow(UserNotFoundException::new);
     }
 
     public User getUserByUsername(String username) {
-        return userRepo.findByUsername(username).orElseThrow(() -> new UserNotFoundException("User with id: " + username + " not found"));
+        return userRepo.findByUsername(username).orElseThrow(UserNotFoundException::new);
     }
 
     public Object getUserByUsername(String username, Role r) {
-        return userRepo.findByUsernameAndRole(username, r).orElseThrow(() -> new UserNotFoundException("User with id: " + username + " not found"));
+        return userRepo.findByUsernameAndRole(username, r).orElseThrow(UserNotFoundException::new);
     }
 
-
     public void deleteUserById(Long id) {
-        User existingUser = userRepo.findById(id).orElseThrow(() -> new UserNotFoundException("User with id: " + id + " not found"));
+        User existingUser = userRepo.findById(id).orElseThrow(UserNotFoundException::new);
         userRepo.delete(existingUser);
     }
 
@@ -74,35 +70,28 @@ public class UserService {
     }
 
     public List<Event> getFavouriteEventsById(Long id) {
-        User existingUser = userRepo.findById(id).orElseThrow(() -> new UserNotFoundException("User with id: " + id + " not found"));
+        User existingUser = userRepo.findById(id).orElseThrow(UserNotFoundException::new);
         return existingUser.getFavourites();
     }
 
     public List<Event> getAttendanceEventsById(Long id){
-        User existingUser = userRepo.findById(id).orElseThrow(() -> new UserNotFoundException("User with id: " + id + " not found"));
+        User existingUser = userRepo.findById(id).orElseThrow(UserNotFoundException::new);
         return existingUser.getAttendance();
     }
 
     public Page<User> getUsersByQuery(Long id, String username, String nameAndSurname, Pageable pageable) {
-        Page<User> result = userRepo.getUsersByQuery(id, username, nameAndSurname, pageable);
-        if(result.isEmpty()) throw new UserNotFoundException("No users found");
-        else return result;
+        return userRepo.getUsersByQuery(id, username, nameAndSurname, pageable);
     }
 
     public List<Event> getAttendedEventsById(Long id) {
-        User existingUser = userRepo.findById(id).orElseThrow(() -> new UserNotFoundException("User with id: " + id + " not found"));
+        User existingUser = userRepo.findById(id).orElseThrow(UserNotFoundException::new);
         return existingUser.getAttended();
     }
 
-    public List<Review> getReportsToOtherUsers(Long userId) {
-        User user = userRepo.findById(userId).orElseThrow(UserNotFoundException::new);
-        return user.getUpvotedReviews();
-    }
-
     public List<User> report(Long userId, Long reportedUserId) {
-        if(userId == reportedUserId) throw new AssertionError("You can´t report yourself");
-        User user = userRepo.findById(userId).orElseThrow(UserNotFoundException::new);
-        User reportedUser = userRepo.findById(reportedUserId).orElseThrow(UserNotFoundException::new);
+        if(Objects.equals(userId,reportedUserId)) throw new AssertionError("You can´t report yourself");
+        User user = userRepo.findById(userId).orElseThrow(() -> new UserNotFoundException(userId));
+        User reportedUser = userRepo.findById(reportedUserId).orElseThrow(() -> new UserNotFoundException(reportedUserId));
         user.addReportToUser(reportedUser);
         reportedUser.report();
         userRepo.save(user);
@@ -111,8 +100,8 @@ public class UserService {
     }
 
     public List<User> quitReport(Long userId, Long reportedUserId) {
-        User user = userRepo.findById(userId).orElseThrow(UserNotFoundException::new);
-        User reportedUser = userRepo.findById(reportedUserId).orElseThrow(UserNotFoundException::new);
+        User user = userRepo.findById(userId).orElseThrow(() -> new UserNotFoundException(userId));
+        User reportedUser = userRepo.findById(reportedUserId).orElseThrow(() -> new UserNotFoundException(reportedUserId));
         user.removeReportToUser(reportedUser);
         reportedUser.removeReport();
         userRepo.save(user);
@@ -127,7 +116,7 @@ public class UserService {
     }
 
     public List<Event> getOrganizedEvents(Long id) {
-        User u = userRepo.findById(id).orElseThrow(UserNotFoundException::new);
-        return u.getOrganizedEvents();
+        User user = userRepo.findById(id).orElseThrow(UserNotFoundException::new);
+        return user.getOrganizedEvents();
     }
 }

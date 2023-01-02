@@ -23,16 +23,16 @@ public class AttendanceService {
     }
 
     public List<Event> addAttendance(Long userId, Long eventId) {
-        User user = userRepo.findById(userId).orElseThrow(() -> new UserNotFoundException("User with id: " + userId + " not found"));
-        Event event = eventRepo.findById(eventId).orElseThrow(() -> new EventNotFoundException("Event with id: " + eventId + "not found"));
+        User user = userRepo.findById(userId).orElseThrow(UserNotFoundException::new);
+        Event event = eventRepo.findById(eventId).orElseThrow(EventNotFoundException::new);
         user.addAttendance(event);
         userRepo.save(user);
         return user.getAttendance();
     }
 
     public List<Event> removeAttendance(Long userId, Long eventId) {
-        User user = userRepo.findById(userId).orElseThrow(() -> new UserNotFoundException("User with id: " + userId + " not found"));
-        Event event = eventRepo.findById(eventId).orElseThrow(() -> new EventNotFoundException("Event with id: " + eventId + "not found"));
+        User user = userRepo.findById(userId).orElseThrow(UserNotFoundException::new);
+        Event event = eventRepo.findById(eventId).orElseThrow(EventNotFoundException::new);
         user.removeAttendance(event);
         userRepo.save(user);
         return user.getAttendance();

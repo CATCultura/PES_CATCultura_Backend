@@ -42,7 +42,7 @@ public class UserTrophyService {
         return user.getTrophies();
     }
 
-    private void achivementManager(Long userId, Trophy trophy) {
+    private void achievementManager(Long userId, Trophy trophy) {
         User user = userRepo.findById(userId).orElseThrow(UserNotFoundException::new);
         List<Trophy> trophies = user.getTrophies();
         if(!trophies.contains(trophy)) {
@@ -59,7 +59,7 @@ public class UserTrophyService {
             trophy.setDescription("You have marked your first Favourite!");
             trophyRepo.save(trophy);
         }
-        achivementManager(userId, trophy);
+        achievementManager(userId, trophy);
     }
 
     public void firstAttendance(Long userId) {
@@ -71,7 +71,7 @@ public class UserTrophyService {
             trophy.setDescription("You have marked your first Attendance!");
             trophyRepo.save(trophy);
         }
-        achivementManager(userId, trophy);
+        achievementManager(userId, trophy);
     }
 
     public void firstReview(Long userId) {
@@ -83,7 +83,7 @@ public class UserTrophyService {
             trophy.setDescription("You have made your first Review!");
             trophyRepo.save(trophy);
         }
-        achivementManager(userId, trophy);
+        achievementManager(userId, trophy);
     }
 
     public void firstRoute(Long userId) {
@@ -95,7 +95,7 @@ public class UserTrophyService {
             trophy.setDescription("You have made your first Route!");
             trophyRepo.save(trophy);
         }
-        achivementManager(userId, trophy);
+        achievementManager(userId, trophy);
     }
 
     public void createAccount(Long userId) {
@@ -107,7 +107,7 @@ public class UserTrophyService {
             trophy.setDescription("You have joined CatCultura!");
             trophyRepo.save(trophy);
         }
-        achivementManager(userId, trophy);
+        achievementManager(userId, trophy);
     }
 
 }
