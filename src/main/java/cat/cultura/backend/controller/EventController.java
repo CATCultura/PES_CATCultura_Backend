@@ -87,7 +87,7 @@ public class EventController {
 
     @GetMapping(value = "/events", params = {"q"})
     public ResponseEntity<List<List<EventDto>>> getEventsByNLQuery(
-            @RequestParam(value = "q", required = true) String query
+            @RequestParam(value = "q") String query
     ) {
         List<List<EventDto>> result = new LinkedList<>();
         logger.info("Request for events that match the query {}.", query);
@@ -103,8 +103,6 @@ public class EventController {
     public ResponseEntity<List<EventDto>> getEventsByQuery(
             @RequestParam(value = "id", required = false) Long id,
             @RequestParam(value = "tag", required = false) String tag,
-//            @RequestParam(value = "q", required = false) String query,
-            @RequestParam(value = "organizer", required = false) Long orgId,
             Pageable pageable
     ) {
         logger.info("Request for events.");
