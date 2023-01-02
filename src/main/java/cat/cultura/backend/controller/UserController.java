@@ -88,6 +88,7 @@ public class UserController {
     public ResponseEntity<LoggedUserDto> addUser(@RequestBody UserDto user) {
         logger.info("Received request for creating new user");
         User userEntity = userMapper.convertUserDtoToEntity(user);
+        userEntity.setId(null);
         User createdUser = userService.createUser(userEntity);
         logger.info("Created user {}", createdUser.getUsername());
         if (user.getTags() != null && !user.getTags().isEmpty())
@@ -115,6 +116,11 @@ public class UserController {
         return ResponseEntity.status(HttpStatus.OK).body(userMapper.convertUserToDto(user));
     }
 
+    /**
+     *
+     * @deprecated
+     */
+    @Deprecated(forRemoval = true)
     @GetMapping("/users/name={name}")
     public ResponseEntity<UserDto> getUserByName(@PathVariable String name) {
         User user = userService.getUserByUsername(name);
