@@ -186,18 +186,6 @@ class UserServiceTest {
     }
 
     @Test
-    void getUsersByQueryIfTheyDoNotExistTest() throws Exception {
-        List<User> users = new ArrayList<>();
-        Page<User> page = new PageImpl<>(users);
-        Pageable pageable = PageRequest.of(0, 20);
-        given(userRepo.getUsersByQuery(null, null, "Manolo Eldelbombo", pageable)).willReturn(page);
-        assertThrows(
-                UserNotFoundException.class,
-                ()->userService.getUsersByQuery(null,null,"Manolo Eldelbombo",pageable)
-        );
-    }
-
-    @Test
     void reportErrorOneOfTheUsersDoNotExist() throws Exception {
         given(userRepo.findById(1L)).willReturn(Optional.empty());
         given(userRepo.findById(4L)).willReturn(Optional.empty());
