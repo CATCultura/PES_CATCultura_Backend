@@ -1,4 +1,4 @@
-package cat.cultura.backend.service;
+package cat.cultura.backend.service.user;
 
 import cat.cultura.backend.entity.Event;
 import cat.cultura.backend.entity.Organizer;
@@ -108,8 +108,7 @@ class UserServiceTest {
 
     @Test
     void getFavouriteEventsByIdIfTheUserDoesNotExistTest() throws Exception {
-        Optional<User> result = Optional.empty();
-        given(userRepo.findById(2L)).willReturn(result);
+        given(userRepo.findById(2L)).willReturn(Optional.empty());
 
         assertThrows(
                 UserNotFoundException.class,
@@ -187,15 +186,74 @@ class UserServiceTest {
     }
 
     @Test
-    void getUsersByQueryIfTheyDoNotExistTest() throws Exception {
-        List<User> users = new ArrayList<>();
-        Page<User> page = new PageImpl<>(users);
-        Pageable pageable = PageRequest.of(0, 20);
-        given(userRepo.getUsersByQuery(null, null, "Manolo Eldelbombo", pageable)).willReturn(page);
+    void reportErrorOneOfTheUsersDoNotExist() throws Exception {
+        given(userRepo.findById(1L)).willReturn(Optional.empty());
+        given(userRepo.findById(4L)).willReturn(Optional.empty());
         assertThrows(
                 UserNotFoundException.class,
-                ()->userService.getUsersByQuery(null,null,"Manolo Eldelbombo",pageable)
+                ()->userService.report(1L,4L)
         );
+    }
+
+    @Test
+    void reportErrorSameUserTest() throws Exception {
+        assertThrows(
+                AssertionError.class,
+                ()->userService.report(1L,1L)
+        );
+    }
+
+    @Test
+    void reportTest() throws Exception {
+        User user1 = new User();
+        User user2 = new User();
+        user1.setId(3L);
+        user2.setId(4L);
+        given(userRepo.findById(3L)).willReturn(Optional.of(user1));
+        given(userRepo.findById(4L)).willReturn(Optional.of(user2));
+        List<User> expectedReportedUsers = new ArrayList<>();
+        expectedReportedUsers.add(user2);
+        List<User> reportedUsers = userService.report(3L,4L);
+        assertEquals(expectedReportedUsers, reportedUsers);
+    }
+
+    @Test
+    void quitReportThatDoesNotExistTest() throws Exception {
+        User user1 = new User();
+        User user2 = new User();
+        user1.setId(3L);
+        user2.setId(4L);
+        given(userRepo.findById(3L)).willReturn(Optional.of(user1));
+        given(userRepo.findById(4L)).willReturn(Optional.of(user2));
+        assertThrows(
+                AssertionError.class,
+                ()->userService.quitReport(3L,4L)
+        );
+    }
+
+    @Test
+    void quitReportTest() throws Exception {
+        User user1 = new User();
+        User user2 = new User();
+        user1.setId(3L);
+        user2.setId(4L);
+        given(userRepo.findById(3L)).willReturn(Optional.of(user1));
+        given(userRepo.findById(4L)).willReturn(Optional.of(user2));
+        List<User> expectedReportedUsers = new ArrayList<>();
+        userService.report(3L,4L);
+        List<User> reportedUsers = userService.quitReport(3L,4L);
+        assertEquals(expectedReportedUsers, reportedUsers);
+    }
+
+    @Test
+    void getMostReportedTest() throws Exception {
+        User user1 = new User();
+        user1.setId(3L);
+        List<User> expectedReportedUsers = new ArrayList<>();
+        expectedReportedUsers.add(user1);
+        given(userRepo.findReportedUsers()).willReturn(expectedReportedUsers);
+        List<User> mostReportedUsers = userService.getMostReportedUsers();
+        assertEquals(expectedReportedUsers, mostReportedUsers);
     }
 
     @Test

@@ -25,17 +25,15 @@ public class TrophyService {
     }
 
     public List<Trophy> getTrophies() {
-        List<Trophy> result = trophyRepo.findAll();
-        if(result.isEmpty()) throw new TrophyNotFoundException("No Trophies found");
-        else return result;
+        return trophyRepo.findAll();
     }
 
     public Trophy getTrophy(Long id) {
-        return trophyRepo.findById(id).orElseThrow(()-> new TrophyNotFoundException("Trophy with id: " + id + " not found"));
+        return trophyRepo.findById(id).orElseThrow(TrophyNotFoundException::new);
     }
 
     public void deleteTrophy(Long id) {
-        Trophy result = trophyRepo.findById(id).orElseThrow(()-> new TrophyNotFoundException("Trophy with id: " + id + " not found"));
+        Trophy result = trophyRepo.findById(id).orElseThrow(TrophyNotFoundException::new);
         trophyRepo.delete(result);
     }
 

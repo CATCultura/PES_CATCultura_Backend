@@ -69,21 +69,19 @@ public class EventService {
     }
 
     public List<Event> getEvents() {
-        List<Event> result = eventRepo.findAll();
-        if(result.isEmpty()) throw new EventNotFoundException("No Events found");
-        else return result;
+        return eventRepo.findAll();
     }
 
     public Event getEventById(Long id) {
-        return eventRepo.findById(id).orElseThrow(()-> new EventNotFoundException("Event with id: " + id + " not found"));
+        return eventRepo.findById(id).orElseThrow(EventNotFoundException::new);
     }
 
     public Event getEventByCodi(Long codi) {
-        return eventRepo.findByCodi(codi).orElseThrow(()-> new EventNotFoundException("Event with code: " + codi + " not found"));
+        return eventRepo.findByCodi(codi).orElseThrow(EventNotFoundException::new);
     }
 
     public void deleteEvent(Long id) {
-        Event event = eventRepo.findById(id).orElseThrow(()-> new EventNotFoundException("Event with id: " + id + " not found"));
+        Event event = eventRepo.findById(id).orElseThrow(EventNotFoundException::new);
         if (event.getOrganizer() == null) throw new ForbiddenActionException();
         if (!Objects.equals(currentUserAccesor.getCurrentUsername(),event.getOrganizer().getUsername())) {
             throw new ForbiddenActionException();
@@ -92,15 +90,12 @@ public class EventService {
     }
 
     public Event updateEvent(Event ev) {
-        Event e = eventRepo.findById(ev.getId()).orElseThrow(EventNotFoundException::new);
-
+        if(eventRepo.findById(ev.getId()).isEmpty()) throw new EventNotFoundException();
         return eventRepo.save(ev);
     }
 
     public Page<Event> getByQuery(Long id, Pageable pageable) {
-        Page<Event> result = eventRepo.getByQuery(id, pageable);
-        if(result.isEmpty()) throw new EventNotFoundException("No events found");
-        else return result;
+        return eventRepo.getByQuery(id, pageable);
     }
 
     public Page<Event> getBySemanticSimilarity(String query) {
@@ -137,12 +132,12 @@ public class EventService {
     }
 
     public String getAttendanceCode(Long eventId) {
-        Event event = eventRepo.findById(eventId).orElseThrow(()-> new EventNotFoundException("Event with id: " + eventId + " not found"));
+        Event event = eventRepo.findById(eventId).orElseThrow(EventNotFoundException::new);
         return event.getAttendanceCode();
     }
 
     public String generateAttendanceCode(Long eventId) {
-        Event event = eventRepo.findById(eventId).orElseThrow(()-> new EventNotFoundException("Event with id: " + eventId + " not found"));
+        Event event = eventRepo.findById(eventId).orElseThrow(EventNotFoundException::new);
         String code = event.generateAttendanceCode();
         eventRepo.save(event);
         return code;
