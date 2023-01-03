@@ -9,14 +9,16 @@ import cat.cultura.backend.remoterequests.SimilarityServiceAdapter;
 import cat.cultura.backend.remoterequests.SimilarityServiceImpl;
 import cat.cultura.backend.repository.EventJpaRepository;
 import cat.cultura.backend.utils.Score;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;
 
@@ -30,6 +32,8 @@ public class EventService {
     private final TagService tagService;
 
     private final CurrentUserAccessor currentUserAccesor;
+
+    private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
     private boolean isUniqueInDB(Event ev) {
         List<Event> sameDenominacioEvents = eventRepo.findByDenominacioLikeIgnoreCaseAllIgnoreCase(ev.getDenominacio());
@@ -55,6 +59,7 @@ public class EventService {
             ev.setTagsAmbits(tagService.persistTags(ev.getTagsAmbits()));
             ev.setTagsCateg(tagService.persistTags(ev.getTagsCateg()));
             ev.setTagsAltresCateg(tagService.persistTags(ev.getTagsAltresCateg()));
+            logger.info("Saving event {}", ev.getDenominacio());
             return eventRepo.save(ev);
         }
         throw new EventAlreadyCreatedException();
@@ -81,39 +86,52 @@ public class EventService {
     }
 
     public void deleteEvent(Long id) {
-        Event event = eventRepo.findById(id).orElseThrow(EventNotFoundException::new);
-        if (event.getOrganizer() == null) throw new ForbiddenActionException();
-        if (!Objects.equals(currentUserAccesor.getCurrentUsername(),event.getOrganizer().getUsername())) {
+
+        Event event = eventRepo.findById(id).orElseThrow(()-> new EventNotFoundException("Event with id: " + id + " not found"));
+        if (event.getOrganizer() == null) {
+            logger.warn("Attempt to delete event {} ({}). Cannot be done because event doesn't have an organizer.",
+                    event.getId(), event.getDenominacio());
             throw new ForbiddenActionException();
         }
+
+        if (!Objects.equals(currentUserAccesor.getCurrentUsername(),event.getOrganizer().getUsername())) {
+            logger.warn("Attempt to delete event {} ({}). Cannot be done because the user trying ({}) isn't the organizer.",
+                    event.getId(), event.getDenominacio(), currentUserAccesor.getCurrentUsername());
+            throw new ForbiddenActionException();
+        }
+        logger.info("Deleting event with {}", id);
         eventRepo.delete(event);
     }
 
     public Event updateEvent(Event ev) {
-        if(eventRepo.findById(ev.getId()).isEmpty()) throw new EventNotFoundException();
-        return eventRepo.save(ev);
+        if (eventRepo.existsById(ev.getId()))
+            return eventRepo.save(ev);
+        throw new EventNotFoundException();
+
     }
 
     public Page<Event> getByQuery(Long id, Pageable pageable) {
         return eventRepo.getByQuery(id, pageable);
     }
 
-    public Page<Event> getBySemanticSimilarity(String query) {
+    public List<List<Event>> getBySemanticSimilarity(String query) {
         List<Score> queryResult;
+        List<List<Event>> results = new LinkedList<>();
+        results.add(new ArrayList<>());
+        results.add(new ArrayList<>());
         try {
              queryResult = similarityService.getMostSimilar(query);
         } catch (IOException e) {
-            return null;
+            return results;
         }
         if (queryResult!= null) {
-            List<Event> results = new ArrayList<>();
             for (Score id : queryResult) {
                 if (id.getSimilarityScore() > 0.5)
-                    eventRepo.findById(id.getEventId()).ifPresent(results::add);
+                    eventRepo.findById(id.getEventId()).ifPresent(results.get(0)::add);
+                else eventRepo.findById(id.getEventId()).ifPresent(results.get(1)::add);
             }
-            return new PageImpl<>(results);
         }
-        return new PageImpl<>(new ArrayList<>());
+        return results;
     }
     public List<Event> updateEvents() {
         List<Event> events = eventRepo.findAll();

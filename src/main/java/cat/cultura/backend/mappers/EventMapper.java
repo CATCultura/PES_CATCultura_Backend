@@ -54,22 +54,28 @@ public class EventMapper {
         List<Tag> result = new ArrayList<>();
         switch (t) {
             case AMBITS -> {
-                for (String s : eventDto.getTagsAmbits()) {
-                    result.add(new TagAmbits(s));
+                if (eventDto.getTagsAmbits() != null) {
+                    for (String s : eventDto.getTagsAmbits()) {
+                        result.add(new TagAmbits(s));
+                    }
+                    return result;
                 }
-                return result;
             }
             case CATEGORIES -> {
-                for (String s : eventDto.getTagsCateg()) {
-                    result.add(new TagCategories(s));
+                if (eventDto.getTagsCateg() != null) {
+                    for (String s : eventDto.getTagsCateg()) {
+                        result.add(new TagCategories(s));
+                    }
+                    return result;
                 }
-                return result;
             }
             case ALTRES_CATEGORIES -> {
-                for (String s : eventDto.getTagsAltresCateg()) {
-                    result.add(new TagAltresCategories(s));
+                if (eventDto.getTagsAltresCateg() != null) {
+                    for (String s : eventDto.getTagsAltresCateg()) {
+                        result.add(new TagAltresCategories(s));
+                    }
+                    return result;
                 }
-                return result;
             }
 
         }
