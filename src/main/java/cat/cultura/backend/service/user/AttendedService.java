@@ -24,16 +24,16 @@ public class AttendedService {
     }
 
     public List<Event> removeAttended(Long userId, Long eventId) {
-        User user = userRepo.findById(userId).orElseThrow(() -> new UserNotFoundException("User with id: " + userId + " not found"));
-        Event event = eventRepo.findById(eventId).orElseThrow(() -> new EventNotFoundException("Event with id: " + eventId + "not found"));
+        User user = userRepo.findById(userId).orElseThrow(UserNotFoundException::new);
+        Event event = eventRepo.findById(eventId).orElseThrow(EventNotFoundException::new);
         user.removeAttended(event);
         userRepo.save(user);
         return user.getAttended();
     }
 
     public List<Event> confirmAttendance(Long userId, Long eventId, String code) {
-        User user = userRepo.findById(userId).orElseThrow(() -> new UserNotFoundException("User with id: " + userId + " not found"));
-        Event event = eventRepo.findById(eventId).orElseThrow(() -> new EventNotFoundException("Event with id: " + eventId + "not found"));
+        User user = userRepo.findById(userId).orElseThrow(UserNotFoundException::new);
+        Event event = eventRepo.findById(eventId).orElseThrow(EventNotFoundException::new);
         if(!Objects.equals(event.getAttendanceCode(), code)) throw new AssertionError("Incorrect Code");
         user.addAttended(event);
         user.addPoints(10);

@@ -74,26 +74,26 @@ public class EventService {
     }
 
     public List<Event> getEvents() {
-        List<Event> result = eventRepo.findAll();
-        if(result.isEmpty()) throw new EventNotFoundException("No Events found");
-        else return result;
+        return eventRepo.findAll();
     }
 
     public Event getEventById(Long id) {
-        return eventRepo.findById(id).orElseThrow(()-> new EventNotFoundException("Event with id: " + id + " not found"));
+        return eventRepo.findById(id).orElseThrow(EventNotFoundException::new);
     }
 
     public Event getEventByCodi(Long codi) {
-        return eventRepo.findByCodi(codi).orElseThrow(()-> new EventNotFoundException("Event with code: " + codi + " not found"));
+        return eventRepo.findByCodi(codi).orElseThrow(EventNotFoundException::new);
     }
 
     public void deleteEvent(Long id) {
+
         Event event = eventRepo.findById(id).orElseThrow(()-> new EventNotFoundException("Event with id: " + id + " not found"));
         if (event.getOrganizer() == null) {
             logger.warn("Attempt to delete event {} ({}). Cannot be done because event doesn't have an organizer.",
                     event.getId(), event.getDenominacio());
             throw new ForbiddenActionException();
         }
+
         if (!Objects.equals(currentUserAccesor.getCurrentUsername(),event.getOrganizer().getUsername())) {
             logger.warn("Attempt to delete event {} ({}). Cannot be done because the user trying ({}) isn't the organizer.",
                     event.getId(), event.getDenominacio(), currentUserAccesor.getCurrentUsername());
@@ -107,12 +107,11 @@ public class EventService {
         if (eventRepo.existsById(ev.getId()))
             return eventRepo.save(ev);
         throw new EventNotFoundException();
+
     }
 
     public Page<Event> getByQuery(Long id, Pageable pageable) {
-        Page<Event> result = eventRepo.getByQuery(id, pageable);
-        if(result.isEmpty()) throw new EventNotFoundException("No events found");
-        else return result;
+        return eventRepo.getByQuery(id, pageable);
     }
 
     public List<List<Event>> getBySemanticSimilarity(String query) {
@@ -151,12 +150,12 @@ public class EventService {
     }
 
     public String getAttendanceCode(Long eventId) {
-        Event event = eventRepo.findById(eventId).orElseThrow(()-> new EventNotFoundException("Event with id: " + eventId + " not found"));
+        Event event = eventRepo.findById(eventId).orElseThrow(EventNotFoundException::new);
         return event.getAttendanceCode();
     }
 
     public String generateAttendanceCode(Long eventId) {
-        Event event = eventRepo.findById(eventId).orElseThrow(()-> new EventNotFoundException("Event with id: " + eventId + " not found"));
+        Event event = eventRepo.findById(eventId).orElseThrow(EventNotFoundException::new);
         String code = event.generateAttendanceCode();
         eventRepo.save(event);
         return code;

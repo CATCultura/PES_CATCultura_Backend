@@ -122,7 +122,6 @@ public class ReviewService {
     }
 
     public List<Review> getBlockedReviews() {
-        List<Review> reviews = reviewRepo.findBlockedReviews();
-        return reviews;
+        return reviewRepo.findBlockedReviews();
     }
 }

@@ -25,8 +25,8 @@ public class FavouriteService {
 
     @Transactional(rollbackFor=Exception.class)
     public List<Event> addFavourite(Long userId, Long eventId) {
-        User user = userRepo.findById(userId).orElseThrow(() -> new UserNotFoundException("User with id: " + userId + "not found"));
-        Event event = eventRepo.findById(eventId).orElseThrow(() -> new EventNotFoundException("Event with id: " + eventId + "not found"));
+        User user = userRepo.findById(userId).orElseThrow(UserNotFoundException::new);
+        Event event = eventRepo.findById(eventId).orElseThrow(EventNotFoundException::new);
         user.addFavourite(event);
         userRepo.save(user);
         return user.getFavourites();
@@ -34,8 +34,8 @@ public class FavouriteService {
 
     @Transactional(rollbackFor=Exception.class)
     public List<Event> removeFavourite(Long userId, Long eventId) {
-        User user = userRepo.findById(userId).orElseThrow(() -> new UserNotFoundException("User with id: " + userId + "not found"));
-        Event event = eventRepo.findById(eventId).orElseThrow(() -> new EventNotFoundException("Event with id: " + eventId + "not found"));
+        User user = userRepo.findById(userId).orElseThrow(UserNotFoundException::new);
+        Event event = eventRepo.findById(eventId).orElseThrow(EventNotFoundException::new);
         user.removeFavourite(event);
         userRepo.save(user);
         return user.getFavourites();

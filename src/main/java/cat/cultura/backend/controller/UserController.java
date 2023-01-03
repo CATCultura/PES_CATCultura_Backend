@@ -354,12 +354,11 @@ public class UserController {
             @RequestParam(required = false) List<Long> discardedEvents
     ) {
         List<Event> events;
-        if(discardedEvents == null) discardedEvents = new ArrayList<>();
         if(userId != null) {
-            events = routeDataService.getUserAdjustedRouteInADayAndLocation(lat, lon, radius, day, userId, discardedEvents);
+            events = routeDataService.getRouteInADayAndLocation(lat, lon, radius, day, userId, discardedEvents);
             userTrophyService.firstRoute(userId);
         } else {
-            events = routeDataService.getRouteInADayAndLocation(lat, lon, radius, day, discardedEvents);
+            events = routeDataService.getRouteInADayAndLocation(lat, lon, radius, day, null, null);
         }
         return ResponseEntity.status(HttpStatus.OK).body(events.stream().map(eventMapper::convertEventToDto).toList());
     }
@@ -511,7 +510,7 @@ public class UserController {
             return ResponseEntity.status(HttpStatus.OK).body(reviews.stream().map(Review::getId).toList());
         }
     }
-    @PostMapping("/users/{userId}/reviewReports/{reviewId}")
+    @PostMapping("/users/{userId}/reviews/{reviewId}/reports")
     public ResponseEntity<List<Long>> report(@PathVariable Long userId, @PathVariable Long reviewId) {
         if(!isCurrentUser(userId)) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
@@ -526,7 +525,7 @@ public class UserController {
         }
     }
 
-    @DeleteMapping("/users/{userId}/reviewReports/{reviewId}")
+    @DeleteMapping("/users/{userId}/reviews/{reviewId}/reports")
     public ResponseEntity<List<Long>> quitReport(@PathVariable Long userId, @PathVariable Long reviewId) {
         if(!isCurrentUser(userId)) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
@@ -541,7 +540,7 @@ public class UserController {
         }
     }
 
-    @PostMapping("/users/{userId}/userReports/{reportedUserId}")
+    @PostMapping("/users/{userId}/users/{reportedUserId}/reports")
     public ResponseEntity<List<Long>> reportUser(@PathVariable Long userId, @PathVariable Long reportedUserId) {
         if(!isCurrentUser(userId)) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
@@ -556,7 +555,7 @@ public class UserController {
         }
     }
 
-    @DeleteMapping("/users/{userId}/userReports/{reportedUserId}")
+    @DeleteMapping("/users/{userId}/users/{reportedUserId}/reports")
     public ResponseEntity<List<Long>> quitReportToUser(@PathVariable Long userId, @PathVariable Long reportedUserId) {
         if(!isCurrentUser(userId)) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
