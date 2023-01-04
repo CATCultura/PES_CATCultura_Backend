@@ -56,9 +56,19 @@ public class UserMapper {
         for (Review r : user.getUpvotedReviews()) {
             userDto.addUpvotedReviews(r.getId());
         }
+        for (Review r : user.getReportedReviews()) {
+            userDto.addReportedReviews(r.getId());
+        }
         for (Trophy t : user.getTrophies()) {
             userDto.addTrophy(t.getId());
         }
+        for (Request r : user.getRequestsReceived()) {
+            userDto.getReceivedRequestsIds().add(r.getRequester().getId());
+        }
+        for (Request r : user.getRequestsSent()) {
+            userDto.getSentRequestsIds().add(r.getFriend().getId());
+        }
+
         return userDto;
     }
 

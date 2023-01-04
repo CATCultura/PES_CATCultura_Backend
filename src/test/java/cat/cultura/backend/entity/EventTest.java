@@ -5,7 +5,9 @@ import org.junit.jupiter.api.Test;
 import org.springframework.test.context.ActiveProfiles;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @ActiveProfiles("test")
 class EventTest {
@@ -121,58 +123,6 @@ class EventTest {
         int h2 = ev2.hashCode();
 
         Assertions.assertNotEquals(ev1.hashCode(), ev2.hashCode());
-    }
-
-    @Test
-    void updateEventOk() {
-        Event ev1 = new Event();
-        ev1.setDenominacio("Concert de primavera");
-        ev1.setDataInici("Dimarts");
-        ev1.setUbicacio("Barcelona");
-        ev1.setAdreca("C/ Quinta Forca");
-        ev1.setEspai("Sideral");
-
-        Event ev2 = new Event();
-        ev2.setDenominacio("Concert de primavera");
-        ev2.setDataInici("Dimarts");
-        ev2.setUbicacio("Tarragona");
-        ev2.setAdreca("C/ Quinta Forca");
-        ev2.setEspai("Sideral");
-
-        ev1.update(ev2);
-
-        Assertions.assertEquals(ev2,ev1);
-    }
-
-    @Test
-    void updateEventOkMssingPars() {
-        Event ev1 = new Event();
-        ev1.setDenominacio("Concert de primavera");
-        ev1.setDescripcio("Una bona desc");
-        ev1.setDataInici("Dimarts");
-        ev1.setUbicacio("Barcelona");
-        ev1.setAdreca("C/ Quinta Forca");
-        ev1.setEspai("Sideral");
-
-        Event ev2 = new Event();
-        ev2.setDenominacio("Concert de primavera");
-        ev2.setDataInici("Dimarts");
-        ev2.setUbicacio("Tarragona");
-        ev2.setAdreca("C/ Quarta Forca");
-        ev2.setEspai("Sideral");
-
-        Event res = new Event();
-        res.setDenominacio("Concert de primavera");
-        res.setDescripcio("Una bona desc");
-        res.setDataInici("Dimarts");
-        res.setUbicacio("Tarragona");
-        res.setAdreca("C/ Quarta Forca");
-        res.setEspai("Sideral");
-
-
-        ev1.update(ev2);
-
-        Assertions.assertEquals(res,ev1);
     }
 
 

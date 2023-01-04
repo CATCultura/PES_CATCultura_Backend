@@ -8,6 +8,8 @@ import cat.cultura.backend.service.*;
 import cat.cultura.backend.service.user.*;
 import cat.cultura.backend.interceptors.CurrentUser;
 import org.modelmapper.ModelMapper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -69,9 +71,12 @@ public class UserController {
     @Autowired
     private UserMapper userMapper;
 
+    private final Logger logger = LoggerFactory.getLogger(this.getClass());
+
     @GetMapping("/login")
     public ResponseEntity<LoggedUserDto> authenticate() {
         CurrentUser currentUser = (CurrentUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        logger.info("Received login request from {}", currentUser.getUsername());
         User u = userService.getUserByUsername(currentUser.getUsername());
         LoggedUserDto loggedUserDto = userMapper.convertUserToLoggedUserDto(u);
         return new ResponseEntity<>(loggedUserDto,HttpStatus.OK);
@@ -81,8 +86,11 @@ public class UserController {
     //Post, Get, Put, and Delete for all UserDto properties (see class UserDto)
     @PostMapping("/users")
     public ResponseEntity<LoggedUserDto> addUser(@RequestBody UserDto user) {
+        logger.info("Received request for creating new user");
         User userEntity = userMapper.convertUserDtoToEntity(user);
+        userEntity.setId(null);
         User createdUser = userService.createUser(userEntity);
+        logger.info("Created user {}", createdUser.getUsername());
         if (user.getTags() != null && !user.getTags().isEmpty())
             userTagService.addTags(createdUser.getId(),user.getTags().stream().toList());
         userTrophyService.createAccount(createdUser.getId());
@@ -96,24 +104,39 @@ public class UserController {
             @RequestParam(value = "name-and-surname", required = false) String nameAndSurname,
             Pageable pageable
     ) {
+        logger.info("Received request for users");
         Page<User> users = userService.getUsersByQuery(id, username, nameAndSurname, pageable);
         return ResponseEntity.status(HttpStatus.OK).body(users.stream().map(userMapper::convertUserToDto).toList());
     }
 
     @GetMapping("/users/{id}")
     public ResponseEntity<UserDto> getUserById(@PathVariable Long id) {
+        logger.info("Received request for user with id {}", id);
         User user = userService.getUserById(id);
         return ResponseEntity.status(HttpStatus.OK).body(userMapper.convertUserToDto(user));
     }
 
+    /**
+     *
+     * @deprecated
+     */
+    @Deprecated(forRemoval = true)
     @GetMapping("/users/name={name}")
     public ResponseEntity<UserDto> getUserByName(@PathVariable String name) {
         User user = userService.getUserByUsername(name);
         return ResponseEntity.status(HttpStatus.OK).body(userMapper.convertUserToDto(user));
     }
 
+    @GetMapping("/users/{id}/events")
+    public ResponseEntity<List<EventDto>> getEventsByOrganizer(@PathVariable Long id) {
+        logger.info("Received request the events organized by user with id {}", id);
+        List<Event> organizedEvents = userService.getOrganizedEvents(id);
+        return ResponseEntity.status(HttpStatus.OK).body(organizedEvents.stream().map(eventMapper::convertEventToDto).toList());
+    }
+
     @PutMapping("/users")
     public ResponseEntity<UserDto> updateUser(@RequestBody UserDto us) {
+        logger.info("Received request for editing user with username {}", us.getUsername());
         User userEntity = userMapper.convertUserDtoToEntity(us);
         User user = userService.updateUser(userEntity);
         return ResponseEntity.status(HttpStatus.CREATED).body(userMapper.convertUserToDto(user));
@@ -121,6 +144,7 @@ public class UserController {
 
     @DeleteMapping("/users/{id}")
     public ResponseEntity<String> deleteUser(@PathVariable Long id){
+        logger.info("Received request for deleting user with id {}", id);
         userService.deleteUserById(id);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
@@ -295,13 +319,15 @@ public class UserController {
     }
 
     @GetMapping("users/{id}/friends")
-    public ResponseEntity<List<UserDto>> getFriend(@PathVariable Long id, @RequestParam String status) {
+    public ResponseEntity<List<UserDto>> getFriend(@PathVariable Long id,
+                                                   @RequestParam String status) {
         List<User> users = new ArrayList<>();
         if(Objects.equals(status, "requested")) users = requestService.getRequestsTo(id);
         else if(Objects.equals(status, "received")) users = requestService.getRequestFrom(id);
         else if(Objects.equals(status, "accepted")) users = requestService.getFriends(id);
         return ResponseEntity.status(HttpStatus.OK).body(users.stream().map(userMapper::convertUserToDto).toList());
     }
+
 
     @DeleteMapping("/users/{id}/friends/{friendId}")
     public ResponseEntity<List<Long>> removeFriend(@PathVariable Long id, @PathVariable Long friendId) {
@@ -325,14 +351,14 @@ public class UserController {
             @RequestParam int radius,
             @RequestParam String day,
             @RequestParam(required = false) Long userId,
-            @RequestBody List<Long> discardedEvents
+            @RequestParam(required = false) List<Long> discardedEvents
     ) {
         List<Event> events;
         if(userId != null) {
-            events = routeDataService.getUserAdjustedRouteInADayAndLocation(lat, lon, radius, day, userId, discardedEvents);
+            events = routeDataService.getRouteInADayAndLocation(lat, lon, radius, day, userId, discardedEvents);
             userTrophyService.firstRoute(userId);
         } else {
-            events = routeDataService.getRouteInADayAndLocation(lat, lon, radius, day, discardedEvents);
+            events = routeDataService.getRouteInADayAndLocation(lat, lon, radius, day, null, null);
         }
         return ResponseEntity.status(HttpStatus.OK).body(events.stream().map(eventMapper::convertEventToDto).toList());
     }
@@ -482,6 +508,65 @@ public class UserController {
                 return ResponseEntity.status(HttpStatus.CONFLICT).build();
             }
             return ResponseEntity.status(HttpStatus.OK).body(reviews.stream().map(Review::getId).toList());
+        }
+    }
+    @PostMapping("/users/{userId}/reviews/{reviewId}/reports")
+    public ResponseEntity<List<Long>> report(@PathVariable Long userId, @PathVariable Long reviewId) {
+        if(!isCurrentUser(userId)) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        } else {
+            List<Review> reviews;
+            try {
+                reviews = reviewService.report(userId,reviewId);
+            } catch (AssertionError as) {
+                return ResponseEntity.status(HttpStatus.CONFLICT).build();
+            }
+            return ResponseEntity.status(HttpStatus.OK).body(reviews.stream().map(Review::getId).toList());
+        }
+    }
+
+    @DeleteMapping("/users/{userId}/reviews/{reviewId}/reports")
+    public ResponseEntity<List<Long>> quitReport(@PathVariable Long userId, @PathVariable Long reviewId) {
+        if(!isCurrentUser(userId)) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        } else {
+            List<Review> reviews;
+            try {
+                reviews = reviewService.quitReport(userId,reviewId);
+            } catch (AssertionError as) {
+                return ResponseEntity.status(HttpStatus.CONFLICT).build();
+            }
+            return ResponseEntity.status(HttpStatus.OK).body(reviews.stream().map(Review::getId).toList());
+        }
+    }
+
+    @PostMapping("/users/{userId}/users/{reportedUserId}/reports")
+    public ResponseEntity<List<Long>> reportUser(@PathVariable Long userId, @PathVariable Long reportedUserId) {
+        if(!isCurrentUser(userId)) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        } else {
+            List<User> users;
+            try {
+                users = userService.report(userId,reportedUserId);
+            } catch (AssertionError as) {
+                return ResponseEntity.status(HttpStatus.CONFLICT).build();
+            }
+            return ResponseEntity.status(HttpStatus.OK).body(users.stream().map(User::getId).toList());
+        }
+    }
+
+    @DeleteMapping("/users/{userId}/users/{reportedUserId}/reports")
+    public ResponseEntity<List<Long>> quitReportToUser(@PathVariable Long userId, @PathVariable Long reportedUserId) {
+        if(!isCurrentUser(userId)) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        } else {
+            List<User> users;
+            try {
+                users = userService.quitReport(userId,reportedUserId);
+            } catch (AssertionError as) {
+                return ResponseEntity.status(HttpStatus.CONFLICT).build();
+            }
+            return ResponseEntity.status(HttpStatus.OK).body(users.stream().map(User::getId).toList());
         }
     }
 

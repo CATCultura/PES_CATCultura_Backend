@@ -22,29 +22,17 @@ public class RouteDataService {
         this.userRepo = userRepo;
     }
 
-    private List<Event> getFilteredEvents(double lat, double lon, int radius, String day, List<Long> discardedEvents) {
-        List<Event> events = getRouteByQuery(lat, lon, radius, day);
-        if(!discardedEvents.isEmpty()) events = events.stream().filter(event -> !discardedEvents.contains(event.getId())).toList();
-        return new ArrayList<>(events);
-    }
-
-    public List<Event> getRouteInADayAndLocation(double lat, double lon, int radius, String day, List<Long> discardedEvents) {
-        List<Event> events = getFilteredEvents(lat,lon,radius,day,discardedEvents);
-        int n = events.size();
-        List<Event> result = new ArrayList<>();
-        if(n > 2) result = events.subList(0,3);
-        else if(n > 1) result = events.subList(0,2);
-        else if(n == 1) result = events.subList(0,1);
-        return orderEvents(lat,lon,result);
-    }
-
-    public List<Event> getUserAdjustedRouteInADayAndLocation(double lat, double lon, int radius, String day, Long userId, List<Long> discardedEvents) {
-        User user = userRepo.findById(userId).orElseThrow(() -> new UserNotFoundException("User with id: " + userId + "not found"));
-        List<Event> events = getFilteredEvents(lat,lon,radius,day,discardedEvents);
+    public List<Event> getRouteInADayAndLocation(double lat, double lon, int radius, String day, Long userId, List<Long> dEvents) {
+        List<Coordinate> c = getCoordinates(lat,lon,radius);
+        List<Event> events = eventRepo.geByDayAndLocation(day, c.get(0).getLon(), c.get(1).getLon(), c.get(2).getLat(), c.get(3).getLat());
+        if(dEvents!=null) events = new ArrayList<>(events.stream().filter(event -> !dEvents.contains(event.getId())).toList());
         int n = events.size();
         List<Event> result = new ArrayList<>();
         if(n > 2) {
-            events.sort(new SortByNumberOfMatches(user));
+            if(userId!=null) {
+                User user = userRepo.findById(userId).orElseThrow(UserNotFoundException::new);
+                events.sort(new SortByNumberOfMatches(user));
+            }
             result = events.subList(0,3);
         }
         else if(n > 1) result = events.subList(0,2);
@@ -52,13 +40,14 @@ public class RouteDataService {
         return orderEvents(lat,lon,result);
     }
 
-    private List<Event> getRouteByQuery(double lat, double lon, int radius, String day) {
+    private List<Coordinate> getCoordinates(double lat, double lon, int radius) {
         Coordinate x = new Coordinate(lon,lat);
-        Coordinate up = Coordinate.calcEndPoint(x,radius,90);
-        Coordinate down = Coordinate.calcEndPoint(x,radius,270);
-        Coordinate left = Coordinate.calcEndPoint(x,radius,180);
-        Coordinate right = Coordinate.calcEndPoint(x,radius,0);
-        return eventRepo.getEventsByDayAndLocation(day, up.getLon(), down.getLon(), left.getLat(), right.getLat());
+        List<Coordinate> c = new ArrayList<>();
+        c.add(Coordinate.calcEndPoint(x,radius,90));
+        c.add(Coordinate.calcEndPoint(x,radius,270));
+        c.add(Coordinate.calcEndPoint(x,radius,180));
+        c.add(Coordinate.calcEndPoint(x,radius,0));
+        return c;
     }
 
     class SortByNumberOfMatches implements Comparator<Event> {

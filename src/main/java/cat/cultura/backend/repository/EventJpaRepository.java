@@ -12,7 +12,6 @@ import java.util.Optional;
 
 @Repository
 public interface EventJpaRepository extends JpaRepository<Event, Long> {
-
     Optional<Event> findByCodi(Long codi);
 
     @Query("select m from Event m where " +
@@ -28,7 +27,7 @@ public interface EventJpaRepository extends JpaRepository<Event, Long> {
             "(m.longitud <= ?2 and m.longitud >= ?3) and " +
             "(m.latitud >= ?4 and m.latitud <= ?5) "
     )
-    List<Event> getEventsByDayAndLocation(String day1, double lon, double lon1, double lat2, double lat3);
+    List<Event> geByDayAndLocation(String day1, double lon, double lon1, double lat2, double lat3);
 
     @Query("select m from Event m where " +
             "(m.outdated = true) ")

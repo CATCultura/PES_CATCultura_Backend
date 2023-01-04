@@ -40,7 +40,7 @@ public class SecurityConfig {
                         .antMatchers(HttpMethod.GET, "/tags").permitAll().and().authorizeHttpRequests()
                         .antMatchers(HttpMethod.POST,"/users").permitAll().and().authorizeHttpRequests()
                         .antMatchers(HttpMethod.POST, EVENTENDPOINT).hasAuthority(organizer).and().authorizeHttpRequests()
-                        .antMatchers(HttpMethod.PUT, CONCRETEEVENT).hasAuthority(organizer).and().authorizeHttpRequests()
+                        .antMatchers(HttpMethod.PUT, EVENTENDPOINT).hasAuthority(organizer).and().authorizeHttpRequests()
                         .antMatchers(HttpMethod.DELETE, CONCRETEEVENT).hasAuthority(organizer).and().authorizeHttpRequests()
 //                .antMatchers(HttpMethod.DELETE, "/events/2").hasAuthority(organizer).and().authorizeHttpRequests()
                         .antMatchers(HttpMethod.GET, "/allevents").hasAuthority(service).and().authorizeHttpRequests()

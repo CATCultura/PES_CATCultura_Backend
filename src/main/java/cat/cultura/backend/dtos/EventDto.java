@@ -43,6 +43,8 @@ public class EventDto {
 
     private String emailOrganitzador;
 
+
+
     public Long getIdOrganitzador() {
         return idOrganitzador;
     }

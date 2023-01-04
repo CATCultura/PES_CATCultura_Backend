@@ -8,6 +8,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
 import java.util.Optional;
 
 @Repository
@@ -18,6 +19,9 @@ public interface UserJpaRepository extends JpaRepository<User, Long>{
     User findByUserHash(String userHash);
 
     Optional<Object> findByUsernameAndRole(String username, Role role);
+    @Query("select m from User m where " +
+            "(m.reports > 0) ")
+    List<User> findReportedUsers();
 
 
     @Query("select m from User m where " +

@@ -45,10 +45,10 @@ pipeline {
                 withMaven {
                     sh 'mvn clean package'
                 }
-                sh 'sudo docker kill $(sudo docker ps -q -f ancestor=backend)'
-                sh 'sudo docker rmi backend -f'
-                sh 'sudo docker build -t backend .'
-                sh 'sudo docker run -d -p 8081:8081 backend'
+                sh 'sudo docker kill $(sudo docker ps -q -f ancestor=backend-staging)'
+                sh 'sudo docker rmi backend-staging -f'
+                sh 'sudo docker build -t backend-staging .'
+                sh 'sudo docker run -d -p 8081:8081 backend-staging'
             }
 
         }
