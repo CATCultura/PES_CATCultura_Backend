@@ -109,8 +109,8 @@ public class EventController {
         Page<Event> events;
         if (tag != null) {
             logger.info("Request for events with tag {}.", tag);
-            events = new PageImpl<>(tagService.getTagByName(tag).getEventList().stream().toList().subList(pageable.getPageNumber()*pageable.getPageSize(),
-                    (pageable.getPageNumber()+1)*pageable.getPageSize()),pageable, pageable.getPageSize());
+            List<Event> tagEvents = tagService.getTagByName(tag).getEventList().stream().toList();
+            events = new PageImpl<>(tagEvents);
         }
         else {
             events = eventService.getByQuery(id, pageable);
