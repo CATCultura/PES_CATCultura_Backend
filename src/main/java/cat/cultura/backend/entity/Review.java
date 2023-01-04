@@ -29,8 +29,10 @@ public class Review {
 
     @Column(nullable = false)
     private int upvotes = 0;
+
     @Column(nullable = false)
     private boolean blocked = false;
+
     @Column(nullable = false)
     private int reports = 0;
 

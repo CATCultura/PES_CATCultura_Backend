@@ -120,12 +120,12 @@ public class User {
     @Column(name="Routes")
     private List<Route> routes = new ArrayList<>();
 
-    @OneToMany
+    @ManyToMany
     @CollectionTable(name="upvotedReviews", joinColumns=@JoinColumn(name="id"))
     @Column(name="Review")
     private List<Review> upvotedReviews = new ArrayList<>();
 
-    @OneToMany
+    @ManyToMany
     @CollectionTable(name="reportedReviews", joinColumns=@JoinColumn(name="id"))
     @Column(name="reportedReviews")
     private List<Review> reportedReviews = new ArrayList<>();

@@ -152,8 +152,6 @@ public class EventController {
         return ResponseEntity.status(HttpStatus.ACCEPTED).body(null);
     }
 
-
-
     @DeleteMapping("/events/{id}")
     public ResponseEntity<String> deleteEvent(@PathVariable Long id){
         logger.info("Received request for deleting event with id {}", id);
@@ -174,7 +172,7 @@ public class EventController {
     }
 
     @GetMapping("/events/{id}/reviews")
-    public ResponseEntity<List<ReviewDto>> getEventsByQuery(@PathVariable Long id) {
+    public ResponseEntity<List<ReviewDto>> getEventReviews(@PathVariable Long id) {
         List<Review> reviews;
         try {
             reviews = reviewService.getReviewsByEvent(id);
