@@ -51,10 +51,11 @@ public class UserTrophyService {
         }
     }
     public void firstFavourite(Long userId) {
-        Trophy trophy = trophyRepo.findByName("Mark a event as Favourite").orElse(null);
+        String name = "Mark an event as Favourite";
+        Trophy trophy = trophyRepo.findByName(name).orElse(null);
         if(trophy == null) {
             trophy = new Trophy();
-            trophy.setName("Mark an event as Favourite");
+            trophy.setName(name);
             trophy.setPoints(10);
             trophy.setDescription("You have marked your first Favourite!");
             trophyRepo.save(trophy);
@@ -63,10 +64,11 @@ public class UserTrophyService {
     }
 
     public void firstAttendance(Long userId) {
-        Trophy trophy = trophyRepo.findByName("Mark the attendance of an event").orElse(null);
+        String name = "Mark the attendance of an event";
+        Trophy trophy = trophyRepo.findByName(name).orElse(null);
         if(trophy == null) {
             trophy = new Trophy();
-            trophy.setName("Mark the attendance of an event");
+            trophy.setName(name);
             trophy.setPoints(10);
             trophy.setDescription("You have marked your first Attendance!");
             trophyRepo.save(trophy);
@@ -75,10 +77,11 @@ public class UserTrophyService {
     }
 
     public void firstReview(Long userId) {
-        Trophy trophy = trophyRepo.findByName("Make a Review").orElse(null);
+        String name = "Make a Review";
+        Trophy trophy = trophyRepo.findByName(name).orElse(null);
         if(trophy == null) {
             trophy = new Trophy();
-            trophy.setName("Make a Review");
+            trophy.setName(name);
             trophy.setPoints(10);
             trophy.setDescription("You have made your first Review!");
             trophyRepo.save(trophy);
@@ -87,10 +90,11 @@ public class UserTrophyService {
     }
 
     public void firstRoute(Long userId) {
-        Trophy trophy = trophyRepo.findByName("Make a Route").orElse(null);
+        String name = "Make a Route";
+        Trophy trophy = trophyRepo.findByName(name).orElse(null);
         if(trophy == null) {
             trophy = new Trophy();
-            trophy.setName("Make a Route");
+            trophy.setName(name);
             trophy.setPoints(10);
             trophy.setDescription("You have made your first Route!");
             trophyRepo.save(trophy);
@@ -99,10 +103,11 @@ public class UserTrophyService {
     }
 
     public void createAccount(Long userId) {
-        Trophy trophy = trophyRepo.findByName("Create an Account").orElse(null);
+        String name = "Create an Account";
+        Trophy trophy = trophyRepo.findByName(name).orElse(null);
         if(trophy == null) {
             trophy = new Trophy();
-            trophy.setName("Create an Account");
+            trophy.setName(name);
             trophy.setPoints(10);
             trophy.setDescription("You have joined CatCultura!");
             trophyRepo.save(trophy);
