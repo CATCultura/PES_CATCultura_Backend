@@ -42,6 +42,7 @@ public class SecurityConfig {
                         .antMatchers(HttpMethod.POST, EVENTENDPOINT).hasAuthority(organizer).and().authorizeHttpRequests()
                         .antMatchers(HttpMethod.PUT, EVENTENDPOINT).hasAuthority(organizer).and().authorizeHttpRequests()
                         .antMatchers(HttpMethod.DELETE, CONCRETEEVENT).hasAuthority(organizer).and().authorizeHttpRequests()
+                        .antMatchers(HttpMethod.GET,"/users/*/events").permitAll().and().authorizeHttpRequests()
 //                .antMatchers(HttpMethod.DELETE, "/events/2").hasAuthority(organizer).and().authorizeHttpRequests()
                         .antMatchers(HttpMethod.GET, "/allevents").hasAuthority(service).and().authorizeHttpRequests()
                         .antMatchers(HttpMethod.POST,"/insert").hasAuthority(service).and().authorizeHttpRequests()
