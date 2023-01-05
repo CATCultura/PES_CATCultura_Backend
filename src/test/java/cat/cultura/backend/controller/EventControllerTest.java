@@ -134,9 +134,9 @@ class EventControllerTest {
         List<Event> l2 = new ArrayList<>();
         l2.add(e2);
 
-        List<List<Event>> returnList = new LinkedList<>();
-        returnList.add(l1);
-        returnList.add(l2);
+        Map<String,List<Event>> returnList = new HashMap<>();
+        returnList.put("Similar",l1);
+        returnList.put("Not similar", l2);
 
         given(eventService.getBySemanticSimilarity("whatever")).willReturn(returnList);
 

@@ -17,10 +17,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
 @Service
 public class EventService {
@@ -114,11 +111,11 @@ public class EventService {
         return eventRepo.getByQuery(id, pageable);
     }
 
-    public List<List<Event>> getBySemanticSimilarity(String query) {
+    public Map<String,List<Event>> getBySemanticSimilarity(String query) {
         List<Score> queryResult;
-        List<List<Event>> results = new LinkedList<>();
-        results.add(new ArrayList<>());
-        results.add(new ArrayList<>());
+        Map<String,List<Event>>  results = new HashMap<>();
+        results.put("Similar", new ArrayList<>());
+        results.put("Not similar", new ArrayList<>());
         try {
              queryResult = similarityService.getMostSimilar(query);
         } catch (IOException e) {
@@ -127,8 +124,8 @@ public class EventService {
         if (queryResult!= null) {
             for (Score id : queryResult) {
                 if (id.getSimilarityScore() > 0.5)
-                    eventRepo.findById(id.getEventId()).ifPresent(results.get(0)::add);
-                else eventRepo.findById(id.getEventId()).ifPresent(results.get(1)::add);
+                    eventRepo.findById(id.getEventId()).ifPresent(results.get("Similar")::add);
+                else eventRepo.findById(id.getEventId()).ifPresent(results.get("Not similar")::add);
             }
         }
         return results;
