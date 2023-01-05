@@ -31,6 +31,8 @@ import java.util.*;
 @RestController
 public class EventController {
 
+    public static final String SIMILAR = "Similar";
+    public static final String NOT_SIMILAR = "Not similar";
     @Autowired
     private EventService eventService;
 
@@ -86,14 +88,14 @@ public class EventController {
     }
 
     @GetMapping(value = "/events", params = {"q"})
-    public ResponseEntity<List<List<EventDto>>> getEventsByNLQuery(
+    public ResponseEntity<Map<String,List<EventDto>>> getEventsByNLQuery(
             @RequestParam(value = "q") String query
     ) {
-        List<List<EventDto>> result = new LinkedList<>();
+        Map<String,List<EventDto>> result = new HashMap<>();
         logger.info("Request for events that match the query {}.", query);
-        List<List<Event>> events = eventService.getBySemanticSimilarity(query);
-        result.add(events.get(0).stream().map(eventMapper::convertEventToDto).toList());
-        result.add(events.get(1).stream().map(eventMapper::convertEventToDto).toList());
+        Map<String,List<Event>> events = eventService.getBySemanticSimilarity(query);
+        result.put(SIMILAR, events.get(SIMILAR).stream().map(eventMapper::convertEventToDto).toList());
+        result.put(NOT_SIMILAR,events.get(NOT_SIMILAR).stream().map(eventMapper::convertEventToDto).toList());
         return ResponseEntity.status(HttpStatus.OK).body(result);
 
     }
@@ -109,8 +111,8 @@ public class EventController {
         Page<Event> events;
         if (tag != null) {
             logger.info("Request for events with tag {}.", tag);
-            events = new PageImpl<>(tagService.getTagByName(tag).getEventList().stream().toList().subList(pageable.getPageNumber()*pageable.getPageSize(),
-                    (pageable.getPageNumber()+1)*pageable.getPageSize()),pageable, pageable.getPageSize());
+            List<Event> tagEvents = tagService.getTagByName(tag).getEventList().stream().toList();
+            events = new PageImpl<>(tagEvents);
         }
         else {
             events = eventService.getByQuery(id, pageable);

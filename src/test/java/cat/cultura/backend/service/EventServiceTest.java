@@ -229,17 +229,17 @@ class EventServiceTest {
         given(eventJpaRepository.findById(123L)).willReturn(Optional.of(ev1));
         given(eventJpaRepository.findById(456L)).willReturn(Optional.of(ev2));
 
-        List<List<Event>> aux = new LinkedList<>();
+        Map<String,List<Event>> aux = new HashMap<>();
         List<Event> closeMatch = new ArrayList<>();
         closeMatch.add(ev1);
         List<Event> fuzzyMatch = new ArrayList<>();
         fuzzyMatch.add(ev2);
 
-        aux.add(closeMatch);
-        aux.add(fuzzyMatch);
+        aux.put("Similar",closeMatch);
+        aux.put("Not similar",fuzzyMatch);
 
 
-        List<List<Event>> result = eventService.getBySemanticSimilarity("whatever");
+        Map<String,List<Event>> result = eventService.getBySemanticSimilarity("whatever");
 
         Assertions.assertEquals(aux, result);
     }
@@ -260,17 +260,17 @@ class EventServiceTest {
         given(eventJpaRepository.findById(123L)).willReturn(Optional.of(ev1));
         given(eventJpaRepository.findById(456L)).willReturn(Optional.of(ev2));
 
-        List<List<Event>> aux = new LinkedList<>();
+        Map<String,List<Event>> aux = new HashMap<>();
         List<Event> closeMatch = new ArrayList<>();
 
         List<Event> fuzzyMatch = new ArrayList<>();
         fuzzyMatch.add(ev1);
         fuzzyMatch.add(ev2);
 
-        aux.add(closeMatch);
-        aux.add(fuzzyMatch);
+        aux.put("Similar",closeMatch);
+        aux.put("Not similar",fuzzyMatch);
 
-        List<List<Event>> result = eventService.getBySemanticSimilarity("whatever");
+        Map<String,List<Event>> result = eventService.getBySemanticSimilarity("whatever");
 
         Assertions.assertEquals(aux, result);
     }

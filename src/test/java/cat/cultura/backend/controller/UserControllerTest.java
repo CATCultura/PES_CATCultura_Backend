@@ -1,7 +1,9 @@
 package cat.cultura.backend.controller;
 
 import cat.cultura.backend.dtos.UserDto;
+import cat.cultura.backend.entity.Event;
 import cat.cultura.backend.entity.User;
+import cat.cultura.backend.service.EventService;
 import cat.cultura.backend.service.user.FavouriteService;
 import cat.cultura.backend.service.user.RequestService;
 import cat.cultura.backend.service.user.UserService;
@@ -50,6 +52,7 @@ class UserControllerTest {
 
     @MockBean
     private FavouriteService favouriteService;
+
 
     @MockBean
     private RequestService requestService;
@@ -131,6 +134,24 @@ class UserControllerTest {
         // when
         MockHttpServletResponse response = mvc.perform(
                         get("/users").accept(MediaType.APPLICATION_JSON).header(HttpHeaders.AUTHORIZATION,"somthg"))
+                .andReturn().getResponse();
+
+        // then
+        Assertions.assertEquals(HttpStatus.OK.value(),response.getStatus());
+    }
+
+    @Test
+    void canRetrieveEventsOfOrgAnonymous() throws Exception {
+        // given
+        Event event = new Event();
+        event.setId(2L);
+        List<Event> eventList = new ArrayList<>();
+
+        Pageable pageable = PageRequest.of(0, 20);
+        given(userService.getOrganizedEvents(123L)).willReturn(eventList);
+        // when
+        MockHttpServletResponse response = mvc.perform(
+                        get("/users/123/events").accept(MediaType.APPLICATION_JSON))
                 .andReturn().getResponse();
 
         // then
