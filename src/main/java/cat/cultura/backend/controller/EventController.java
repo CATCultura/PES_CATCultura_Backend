@@ -31,6 +31,8 @@ import java.util.*;
 @RestController
 public class EventController {
 
+    public static final String SIMILAR = "Similar";
+    public static final String NOT_SIMILAR = "Not similar";
     @Autowired
     private EventService eventService;
 
@@ -86,14 +88,14 @@ public class EventController {
     }
 
     @GetMapping(value = "/events", params = {"q"})
-    public ResponseEntity<List<List<EventDto>>> getEventsByNLQuery(
+    public ResponseEntity<Map<String,List<EventDto>>> getEventsByNLQuery(
             @RequestParam(value = "q") String query
     ) {
-        List<List<EventDto>> result = new LinkedList<>();
+        Map<String,List<EventDto>> result = new HashMap<>();
         logger.info("Request for events that match the query {}.", query);
-        List<List<Event>> events = eventService.getBySemanticSimilarity(query);
-        result.add(events.get(0).stream().map(eventMapper::convertEventToDto).toList());
-        result.add(events.get(1).stream().map(eventMapper::convertEventToDto).toList());
+        Map<String,List<Event>> events = eventService.getBySemanticSimilarity(query);
+        result.put(SIMILAR, events.get(SIMILAR).stream().map(eventMapper::convertEventToDto).toList());
+        result.put(NOT_SIMILAR,events.get(NOT_SIMILAR).stream().map(eventMapper::convertEventToDto).toList());
         return ResponseEntity.status(HttpStatus.OK).body(result);
 
     }
