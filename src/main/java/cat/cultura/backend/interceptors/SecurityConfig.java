@@ -36,6 +36,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests()
                         .antMatchers(HttpMethod.GET, EVENTENDPOINT).permitAll().and().authorizeHttpRequests()
                         .antMatchers(HttpMethod.GET, CONCRETEEVENT).permitAll().and().authorizeHttpRequests()
+                        .antMatchers(HttpMethod.GET, "/routes/*").permitAll().and().authorizeHttpRequests()
                         .antMatchers(HttpMethod.GET, "/chat").permitAll().and().authorizeHttpRequests()
                         .antMatchers(HttpMethod.GET, "/tags").permitAll().and().authorizeHttpRequests()
                         .antMatchers(HttpMethod.POST,"/users").permitAll().and().authorizeHttpRequests()
