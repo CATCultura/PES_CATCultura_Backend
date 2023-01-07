@@ -92,6 +92,7 @@ public class UserController {
     public ResponseEntity<LoggedUserDto> addUser(@RequestBody UserDto user) {
         logger.info("Received request for creating new user");
         User userEntity = userMapper.convertUserDtoToEntity(user);
+        if (user.getRole() == null) userEntity.setRole(Role.USER);
         userEntity.setId(null);
         User createdUser = userService.createUser(userEntity);
         logger.info("Created user {}", createdUser.getUsername());
