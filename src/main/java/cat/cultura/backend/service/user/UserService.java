@@ -1,12 +1,19 @@
 package cat.cultura.backend.service.user;
 
-import cat.cultura.backend.entity.*;
+import cat.cultura.backend.entity.Event;
+import cat.cultura.backend.entity.Organizer;
+import cat.cultura.backend.entity.Role;
+import cat.cultura.backend.entity.User;
+import cat.cultura.backend.exceptions.ForbiddenActionException;
 import cat.cultura.backend.exceptions.UserNotFoundException;
+import cat.cultura.backend.interceptors.CurrentUserAccessor;
 import cat.cultura.backend.repository.UserJpaRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -15,10 +22,13 @@ import java.util.*;
 public class UserService {
 
 
-    private BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+    @Autowired
+    private PasswordEncoder passwordEncoder;
     private final UserJpaRepository userRepo;
+    private CurrentUserAccessor currentUserAccessor;
 
-    public UserService(UserJpaRepository userRepo) {
+    public UserService(UserJpaRepository userRepo, CurrentUserAccessor currentUserAccessor) {
+        this.currentUserAccessor = currentUserAccessor;
         this.userRepo = userRepo;
     }
 
@@ -118,5 +128,13 @@ public class UserService {
     public List<Event> getOrganizedEvents(Long id) {
         User user = userRepo.findById(id).orElseThrow(UserNotFoundException::new);
         return user.getOrganizedEvents();
+    }
+
+    @Transactional(rollbackFor = Exception.class)
+    public void changePassword(Long id, String s) {
+        User u = userRepo.findById(id).orElseThrow(UserNotFoundException::new);
+        if (!currentUserAccessor.getCurrentUsername().equals(u.getUsername()))
+            throw new ForbiddenActionException();
+        u.setPassword(passwordEncoder.encode(s));
     }
 }
