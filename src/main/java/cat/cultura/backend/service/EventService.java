@@ -174,4 +174,9 @@ public class EventService {
         }
         event.setCancelado(true);
     }
+
+    public List<Event> getEventsByTag(String tag) {
+        return tagService.getTagByName(tag).getEventList().
+                stream().filter(event -> !event.isOutdated()).toList();
+    }
 }

@@ -3,12 +3,15 @@ package cat.cultura.backend.service;
 
 import cat.cultura.backend.entity.Event;
 import cat.cultura.backend.entity.Organizer;
+import cat.cultura.backend.entity.tag.Tag;
+import cat.cultura.backend.entity.tag.TagAmbits;
 import cat.cultura.backend.exceptions.EventAlreadyCreatedException;
 import cat.cultura.backend.exceptions.ForbiddenActionException;
 import cat.cultura.backend.interceptors.CurrentUserAccessor;
 import cat.cultura.backend.remoterequests.SimilarityServiceImpl;
 import cat.cultura.backend.repository.EventJpaRepository;
 import cat.cultura.backend.service.EventService;
+import cat.cultura.backend.service.user.UserTagService;
 import cat.cultura.backend.utils.Score;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -35,6 +38,10 @@ class EventServiceTest {
 
     @MockBean
     SimilarityServiceImpl similarityService;
+
+    @MockBean
+    TagService tagService;
+
 
     @MockBean
     CurrentUserAccessor currentUserAccessor;
@@ -313,6 +320,41 @@ class EventServiceTest {
 
         Assertions.assertThrows(ForbiddenActionException.class, () -> eventService.cancelEvent(123L));
 
+    }
+
+    @Test
+    void outdatedEventOut(){
+        Event e1 = new Event();
+        e1.setId(123L);
+        e1.setDenominacio("Concert de primavera");
+        e1.setDataInici("Dimarts");
+        e1.setUbicacio("Barcelona");
+        e1.setAdreca("C/ Quinta Forca");
+        e1.setEspai("Sideral");
+        e1.setOutdated(true);
+
+        Event e2 = new Event();
+        e2.setId(456L);
+        e2.setDenominacio("Concert de tardor");
+        e2.setDataInici("Dimarts");
+        e2.setUbicacio("Barcelona");
+        e2.setAdreca("C/ Quinta Forca");
+        e2.setEspai("Sideral");
+        e2.setOutdated(false);
+
+        Set<Event> tagEvents = new HashSet<>();
+        tagEvents.add(e1);
+        tagEvents.add(e2);
+
+        Tag t = new TagAmbits("nadal");
+        t.setEventList(tagEvents);
+        List<Event> expected = new ArrayList<>();
+        expected.add(e2);
+
+        given(tagService.getTagByName("nadal")).willReturn(t);
+        List<Event> res = eventService.getEventsByTag("nadal");
+        Assertions.assertEquals(expected,res);
+        Assertions.assertFalse(res.contains(e1));
     }
 
 }
