@@ -112,9 +112,9 @@ public class EventService {
         return eventRepo.getByQuery(id, pageable);
     }
     public List<Event> getCloseEvents(Double lat, Double lon) {
-        List<Coordinate> c = Coordinate.getQuadrantCoordinates(lon,lat,10000);
+        List<Coordinate> c = Coordinate.getQuadrantCoordinates(lon,lat,1500);
         List<Event> events = eventRepo.getByLocation(c.get(0).getLon(), c.get(1).getLon(), c.get(2).getLat(), c.get(3).getLat());
-        if(events.size() > 20) return events.subList(0,21);
+        if(events.size() > 40) return events.subList(0,41);
         else return events;
     }
 
