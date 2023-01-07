@@ -102,7 +102,6 @@ public class EventController {
 
     }
 
-
     @GetMapping("/events")
     public ResponseEntity<List<EventDto>> getEventsByQuery(
             @RequestParam(value = "id", required = false) Long id,
@@ -125,6 +124,15 @@ public class EventController {
         }
         if (events == null)
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+        return ResponseEntity.status(HttpStatus.OK).body(events.stream().map(eventMapper::convertEventToDto).toList());
+    }
+
+    @GetMapping("/events/closeToMe")
+    public ResponseEntity<List<EventDto>> getCloseEvents(
+            @RequestParam(value = "lat") Double lat,
+            @RequestParam(value = "lon") Double lon
+    ) {
+        List<Event> events = eventService.getCloseEvents(lat,lon);
         return ResponseEntity.status(HttpStatus.OK).body(events.stream().map(eventMapper::convertEventToDto).toList());
     }
 

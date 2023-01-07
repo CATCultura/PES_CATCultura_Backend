@@ -31,7 +31,7 @@ public class ModerationController {
     private UserMapper userMapper;
 
     @PostMapping("reviews/{reviewId}/block")
-    public ResponseEntity<ReviewDto> block(@PathVariable Long reviewId) {
+    public ResponseEntity<ReviewDto> blockReview(@PathVariable Long reviewId) {
             Review review;
             try {
                 review = reviewService.blockReview(reviewId);
@@ -42,7 +42,7 @@ public class ModerationController {
     }
 
     @DeleteMapping("reviews/{reviewId}/block")
-    public ResponseEntity<ReviewDto> unBlock(@PathVariable Long reviewId) {
+    public ResponseEntity<ReviewDto> unblockReview(@PathVariable Long reviewId) {
             Review review;
             try {
                 review = reviewService.unblockReview(reviewId);
@@ -50,6 +50,28 @@ public class ModerationController {
                 return ResponseEntity.status(HttpStatus.CONFLICT).build();
             }
             return ResponseEntity.status(HttpStatus.OK).body(reviewMapper.convertReviewToDto(review));
+    }
+
+    @PostMapping("users/{userId}/block")
+    public ResponseEntity<UserDto> blockUser(@PathVariable Long userId) {
+        User user;
+        try {
+            user = userService.blockUser(userId);
+        } catch (AssertionError as) {
+            return ResponseEntity.status(HttpStatus.CONFLICT).build();
+        }
+        return ResponseEntity.status(HttpStatus.OK).body(userMapper.convertUserToDto(user));
+    }
+
+    @DeleteMapping("users/{userId}/block")
+    public ResponseEntity<UserDto> unBlockUser(@PathVariable Long userId) {
+        User user;
+        try {
+            user = userService.unblockUser(userId);
+        } catch (AssertionError as) {
+            return ResponseEntity.status(HttpStatus.CONFLICT).build();
+        }
+        return ResponseEntity.status(HttpStatus.OK).body(userMapper.convertUserToDto(user));
     }
 
     @GetMapping("reviews/reported")
@@ -79,6 +101,17 @@ public class ModerationController {
         List<User> users;
         try {
             users = userService.getMostReportedUsers();
+        } catch (AssertionError as) {
+            return ResponseEntity.status(HttpStatus.CONFLICT).build();
+        }
+        return ResponseEntity.status(HttpStatus.OK).body(users.stream().map(userMapper::convertUserToDto).toList());
+    }
+
+    @GetMapping("users/blocked")
+    public ResponseEntity<List<UserDto>> getBlockedUsers() {
+        List<User> users;
+        try {
+            users = userService.getBlockedUsers();
         } catch (AssertionError as) {
             return ResponseEntity.status(HttpStatus.CONFLICT).build();
         }

@@ -1,5 +1,8 @@
 package cat.cultura.backend.utils;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class Coordinate {
     private final double lon;
     private final double lat;
@@ -37,5 +40,15 @@ public class Coordinate {
                 Math.cos(distance/r)-Math.sin(lat1)*Math.sin(lat2));
 
         return new Coordinate( lon2*degrees, lat2*degrees);
+    }
+
+    public static List<Coordinate> getQuadrantCoordinates(double lon, double lat, int radius) {
+        Coordinate x = new Coordinate(lon,lat);
+        List<Coordinate> c = new ArrayList<>();
+        c.add(Coordinate.calcEndPoint(x,radius,90));
+        c.add(Coordinate.calcEndPoint(x,radius,270));
+        c.add(Coordinate.calcEndPoint(x,radius,180));
+        c.add(Coordinate.calcEndPoint(x,radius,0));
+        return c;
     }
 }
