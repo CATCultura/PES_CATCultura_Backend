@@ -372,7 +372,7 @@ public class Event {
     public boolean isPastEvent() {
         SimpleDateFormat formatter= new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'.000'");
         Date date = new Date(System.currentTimeMillis());
-        return dataInici.compareTo(formatter.format(date)) < 0;
+        return dataFi.compareTo(formatter.format(date)) < 0;
     }
 
     @Override

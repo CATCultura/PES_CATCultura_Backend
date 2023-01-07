@@ -3,6 +3,7 @@ package cat.cultura.backend.controller;
 import cat.cultura.backend.dtos.*;
 import cat.cultura.backend.entity.*;
 import cat.cultura.backend.entity.tag.Tag;
+import cat.cultura.backend.interceptors.CurrentUserAccessor;
 import cat.cultura.backend.mappers.*;
 import cat.cultura.backend.service.*;
 import cat.cultura.backend.service.user.*;
@@ -34,6 +35,9 @@ public class UserController {
 
     @Autowired
     private UserTrophyService userTrophyService;
+
+    @Autowired
+    private CurrentUserAccessor currentUserAccessor;
 
     @Autowired
     private RequestService requestService;
@@ -125,6 +129,19 @@ public class UserController {
     public ResponseEntity<UserDto> getUserByName(@PathVariable String name) {
         User user = userService.getUserByUsername(name);
         return ResponseEntity.status(HttpStatus.OK).body(userMapper.convertUserToDto(user));
+    }
+
+    @PutMapping("/users/{id}/password")
+    public ResponseEntity<String> changePassword(@PathVariable Long id, @RequestBody Map<String,String> passwords) {
+        if (passwords == null || passwords.isEmpty())
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Missing request body");
+        String newPassword = "new_password";
+        if (!passwords.containsKey(newPassword))
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Missing new passwords");
+
+        userService.changePassword(id,passwords.get(newPassword));
+
+        return ResponseEntity.status(HttpStatus.OK).body("Changed successfully");
     }
 
     @GetMapping("/users/{id}/events")

@@ -23,7 +23,7 @@ public class RouteDataService {
     }
 
     public List<Event> getRouteInADayAndLocation(double lat, double lon, int radius, String day, Long userId, List<Long> dEvents) {
-        List<Coordinate> c = getCoordinates(lat,lon,radius);
+        List<Coordinate> c = Coordinate.getQuadrantCoordinates(lon,lat,radius);
         List<Event> events = eventRepo.geByDayAndLocation(day, c.get(0).getLon(), c.get(1).getLon(), c.get(2).getLat(), c.get(3).getLat());
         if(dEvents!=null) events = new ArrayList<>(events.stream().filter(event -> !dEvents.contains(event.getId())).toList());
         int n = events.size();
@@ -38,16 +38,6 @@ public class RouteDataService {
         else if(n > 1) result = events.subList(0,2);
         else if(n == 1) result = events.subList(0,1);
         return orderEvents(lat,lon,result);
-    }
-
-    private List<Coordinate> getCoordinates(double lat, double lon, int radius) {
-        Coordinate x = new Coordinate(lon,lat);
-        List<Coordinate> c = new ArrayList<>();
-        c.add(Coordinate.calcEndPoint(x,radius,90));
-        c.add(Coordinate.calcEndPoint(x,radius,270));
-        c.add(Coordinate.calcEndPoint(x,radius,180));
-        c.add(Coordinate.calcEndPoint(x,radius,0));
-        return c;
     }
 
     class SortByNumberOfMatches implements Comparator<Event> {

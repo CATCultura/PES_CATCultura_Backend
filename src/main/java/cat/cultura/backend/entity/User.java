@@ -135,6 +135,9 @@ public class User {
     @Column(name="ReportedUsers")
     private List<User> reportedUsers = new ArrayList<>();
 
+    @Column(nullable = false)
+    private boolean blocked = false;
+
     public void setAttended(List<Event> attended) {
         this.attended = attended;
     }
@@ -638,5 +641,11 @@ public class User {
         // to avoid issues
     }
 
+    public boolean isBlocked() {
+        return blocked;
+    }
 
+    public void setBlocked(boolean blocked) {
+        this.blocked = blocked;
+    }
 }

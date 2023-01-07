@@ -30,6 +30,13 @@ public interface EventJpaRepository extends JpaRepository<Event, Long> {
     List<Event> geByDayAndLocation(String day1, double lon, double lon1, double lat2, double lat3);
 
     @Query("select m from Event m where " +
+            "(m.outdated = false) and " +
+            "(m.longitud <= ?1 and m.longitud >= ?2) and " +
+            "(m.latitud >= ?3 and m.latitud <= ?4) "
+    )
+    List<Event> getByLocation(double lon, double lon1, double lat2, double lat3);
+
+    @Query("select m from Event m where " +
             "(m.outdated = true) ")
     List<Event> getPastEvents();
 

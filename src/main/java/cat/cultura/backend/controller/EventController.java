@@ -12,7 +12,6 @@ import cat.cultura.backend.mappers.EventMapper;
 import cat.cultura.backend.mappers.ReviewMapper;
 import cat.cultura.backend.service.EventService;
 import cat.cultura.backend.service.RouteDataService;
-import cat.cultura.backend.service.TagService;
 import cat.cultura.backend.service.user.ReviewService;
 import cat.cultura.backend.service.user.UserService;
 import cat.cultura.backend.service.user.UserTrophyService;
@@ -27,6 +26,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.*;
+
+import static java.lang.Math.min;
 
 @RestController
 public class EventController {
@@ -56,9 +57,6 @@ public class EventController {
 
     @Autowired
     private ReviewMapper reviewMapper;
-
-    @Autowired
-    private TagService tagService;
 
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
@@ -100,7 +98,6 @@ public class EventController {
 
     }
 
-
     @GetMapping("/events")
     public ResponseEntity<List<EventDto>> getEventsByQuery(
             @RequestParam(value = "id", required = false) Long id,
@@ -111,14 +108,27 @@ public class EventController {
         Page<Event> events;
         if (tag != null) {
             logger.info("Request for events with tag {}.", tag);
-            List<Event> tagEvents = tagService.getTagByName(tag).getEventList().stream().toList();
-            events = new PageImpl<>(tagEvents);
+            List<Event> tagEvents = eventService.getEventsByTag(tag);
+            long start = pageable.getOffset();
+            long end = min(start+ pageable.getPageSize(),tagEvents.size());
+            if (start < end)
+                events = new PageImpl<>(tagEvents.subList((int) start, (int) end));
+            else events = new PageImpl<>(new ArrayList<>());
         }
         else {
             events = eventService.getByQuery(id, pageable);
         }
         if (events == null)
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+        return ResponseEntity.status(HttpStatus.OK).body(events.stream().map(eventMapper::convertEventToDto).toList());
+    }
+
+    @GetMapping("/events/closeToMe")
+    public ResponseEntity<List<EventDto>> getCloseEvents(
+            @RequestParam(value = "lat") Double lat,
+            @RequestParam(value = "lon") Double lon
+    ) {
+        List<Event> events = eventService.getCloseEvents(lat,lon);
         return ResponseEntity.status(HttpStatus.OK).body(events.stream().map(eventMapper::convertEventToDto).toList());
     }
 

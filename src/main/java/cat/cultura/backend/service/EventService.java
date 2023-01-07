@@ -8,6 +8,7 @@ import cat.cultura.backend.interceptors.CurrentUserAccessor;
 import cat.cultura.backend.remoterequests.SimilarityServiceAdapter;
 import cat.cultura.backend.remoterequests.SimilarityServiceImpl;
 import cat.cultura.backend.repository.EventJpaRepository;
+import cat.cultura.backend.utils.Coordinate;
 import cat.cultura.backend.utils.Score;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -110,6 +111,12 @@ public class EventService {
     public Page<Event> getByQuery(Long id, Pageable pageable) {
         return eventRepo.getByQuery(id, pageable);
     }
+    public List<Event> getCloseEvents(Double lat, Double lon) {
+        List<Coordinate> c = Coordinate.getQuadrantCoordinates(lon,lat,1500);
+        List<Event> events = eventRepo.getByLocation(c.get(0).getLon(), c.get(1).getLon(), c.get(2).getLat(), c.get(3).getLat());
+        if(events.size() > 40) return events.subList(0,41);
+        else return events;
+    }
 
     public Map<String,List<Event>> getBySemanticSimilarity(String query) {
         List<Score> queryResult;
@@ -166,5 +173,10 @@ public class EventService {
             throw new ForbiddenActionException();
         }
         event.setCancelado(true);
+    }
+
+    public List<Event> getEventsByTag(String tag) {
+        return tagService.getTagByName(tag).getEventList().
+                stream().filter(event -> !event.isOutdated()).toList();
     }
 }

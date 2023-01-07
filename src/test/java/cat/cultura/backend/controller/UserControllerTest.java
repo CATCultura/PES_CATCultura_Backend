@@ -3,6 +3,7 @@ package cat.cultura.backend.controller;
 import cat.cultura.backend.dtos.UserDto;
 import cat.cultura.backend.entity.Event;
 import cat.cultura.backend.entity.User;
+import cat.cultura.backend.exceptions.ForbiddenActionException;
 import cat.cultura.backend.service.EventService;
 import cat.cultura.backend.service.user.FavouriteService;
 import cat.cultura.backend.service.user.RequestService;
@@ -29,15 +30,12 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
 
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.mockito.Mockito.doThrow;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 
 @AutoConfigureJsonTesters
 @SpringBootTest
@@ -63,7 +61,11 @@ class UserControllerTest {
     private JacksonTester<UserDto> jsonUserDto;
 
     @Autowired
+    private JacksonTester<Map<String,String>> mapJacksonTester;
+
+    @Autowired
     private JacksonTester<List<UserDto>> jsonListUserDto;
+
 
 
     @Test
@@ -156,6 +158,59 @@ class UserControllerTest {
 
         // then
         Assertions.assertEquals(HttpStatus.OK.value(),response.getStatus());
+    }
+
+    @Test
+    @WithMockUser(username = "joan", authorities = { "USER"})
+    void canChangePasswordSameUser() throws Exception {
+        // given
+        Map<String,String> pass = new HashMap<>();
+        pass.put("new_password","1234");
+
+        // when
+        MockHttpServletResponse response = mvc.perform(
+                        put("/users/123/password").contentType(MediaType.APPLICATION_JSON).content(
+                                mapJacksonTester.write(pass).getJson()
+                        )).andReturn().getResponse();
+
+        // then
+        Assertions.assertEquals(HttpStatus.OK.value(),response.getStatus());
+    }
+
+    @Test
+    @WithMockUser(username = "joan", authorities = { "USER"})
+    void cannotChangePasswordMissingParams() throws Exception {
+        // given
+        Map<String,String> pass = new HashMap<>();
+//        pass.put("new_password","1234");
+
+        // when
+        MockHttpServletResponse response = mvc.perform(
+                put("/users/123/password").contentType(MediaType.APPLICATION_JSON).content(
+                        mapJacksonTester.write(pass).getJson()
+                )).andReturn().getResponse();
+
+
+        // then
+        Assertions.assertEquals(HttpStatus.BAD_REQUEST.value(),response.getStatus());
+    }
+
+    @Test
+    @WithMockUser(username = "joan", authorities = { "USER"})
+    void cannotChangePasswordWrongParams() throws Exception {
+        // given
+        Map<String,String> pass = new HashMap<>();
+        pass.put("bla","1234");
+
+        // when
+        MockHttpServletResponse response = mvc.perform(
+                put("/users/123/password").contentType(MediaType.APPLICATION_JSON).content(
+                        mapJacksonTester.write(pass).getJson()
+                )).andReturn().getResponse();
+
+
+        // then
+        Assertions.assertEquals(HttpStatus.BAD_REQUEST.value(),response.getStatus());
     }
 
 //    @Test
