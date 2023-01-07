@@ -137,4 +137,22 @@ public class UserService {
             throw new ForbiddenActionException();
         u.setPassword(passwordEncoder.encode(s));
     }
+
+    public User blockUser(Long userId) {
+        User user = userRepo.findById(userId).orElseThrow(UserNotFoundException::new);
+        user.setBlocked(true);
+        userRepo.save(user);
+        return user;
+    }
+
+    public User unblockUser(Long userId) {
+        User user = userRepo.findById(userId).orElseThrow(UserNotFoundException::new);
+        user.setBlocked(false);
+        userRepo.save(user);
+        return user;
+    }
+
+    public List<User> getBlockedUsers() {
+        return userRepo.findBlockedUsers();
+    }
 }
