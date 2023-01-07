@@ -118,4 +118,27 @@ public class ModerationController {
         return ResponseEntity.status(HttpStatus.OK).body(users.stream().map(userMapper::convertUserToDto).toList());
     }
 
+    @DeleteMapping("users/{userId}/reports")
+    public ResponseEntity<UserDto> deleteUserReports(@PathVariable Long userId) {
+        User user;
+        try {
+            user = userService.deleteReports(userId);
+        } catch (AssertionError as) {
+            return ResponseEntity.status(HttpStatus.CONFLICT).build();
+        }
+        return ResponseEntity.status(HttpStatus.OK).body(userMapper.convertUserToDto(user));
+    }
+
+
+    @DeleteMapping("reviews/{reviewId}/reports")
+    public ResponseEntity<ReviewDto> deleteReviewReports(@PathVariable Long reviewId) {
+        Review review;
+        try {
+            review = reviewService.deleteReports(reviewId);
+        } catch (AssertionError as) {
+            return ResponseEntity.status(HttpStatus.CONFLICT).build();
+        }
+        return ResponseEntity.status(HttpStatus.OK).body(reviewMapper.convertReviewToDto(review));
+    }
+
 }

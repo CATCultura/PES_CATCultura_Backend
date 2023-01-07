@@ -155,4 +155,11 @@ public class UserService {
     public List<User> getBlockedUsers() {
         return userRepo.findBlockedUsers();
     }
+
+    public User deleteReports(Long userId) {
+        User user = userRepo.findById(userId).orElseThrow(UserNotFoundException::new);
+        user.setReports(0);
+        userRepo.save(user);
+        return user;
+    }
 }
