@@ -125,5 +125,20 @@ class EventTest {
         Assertions.assertNotEquals(ev1.hashCode(), ev2.hashCode());
     }
 
+    @Test
+    void pastEventsWorksOk() {
+        Event e = new Event();
+        e.setDataFi("2023-03-19T00:00:00.000");
+
+        Assertions.assertFalse(e.isPastEvent());
+    }
+
+    @Test
+    void pastEventsWorksOkIsPast() {
+        Event e = new Event();
+        e.setDataFi("2023-02-19T00:00:00.000");
+        Assertions.assertFalse(e.isPastEvent());
+    }
+
 
 }
