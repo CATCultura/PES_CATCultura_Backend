@@ -124,4 +124,11 @@ public class ReviewService {
     public List<Review> getBlockedReviews() {
         return reviewRepo.findBlockedReviews();
     }
+
+    public Review deleteReports(Long reviewId) {
+        Review review = reviewRepo.findById(reviewId).orElseThrow(ReviewNotFoundException::new);
+        review.setReports(0);
+        reviewRepo.save(review);
+        return review;
+    }
 }
