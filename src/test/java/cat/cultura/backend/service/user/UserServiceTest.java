@@ -4,7 +4,9 @@ import cat.cultura.backend.entity.Event;
 import cat.cultura.backend.entity.Organizer;
 import cat.cultura.backend.entity.Role;
 import cat.cultura.backend.entity.User;
+import cat.cultura.backend.exceptions.ForbiddenActionException;
 import cat.cultura.backend.exceptions.UserNotFoundException;
+import cat.cultura.backend.interceptors.CurrentUserAccessor;
 import cat.cultura.backend.repository.UserJpaRepository;
 import cat.cultura.backend.service.user.UserService;
 import org.junit.jupiter.api.Assertions;
@@ -16,20 +18,29 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
 import static org.junit.Assert.*;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 
 @SpringBootTest
 class UserServiceTest {
     @Autowired
     private UserService userService;
+
+    @MockBean
+    private PasswordEncoder passwordEncoder;
     @MockBean
     private UserJpaRepository userRepo;
+
+    @MockBean
+    private CurrentUserAccessor currentUserAccessor;
 
     @Test
     void createUserTest() throws Exception {
@@ -320,6 +331,38 @@ class UserServiceTest {
         for (User u : actualResult) {
             Assertions.assertEquals(u.getUserHash(), h);
         }
+    }
+
+    @Test
+    void cannotChangeOtherUserPass() {
+        User u = new User("Joan");
+        u.setId(123L);
+        u.setPassword("blabla");
+
+        given(userRepo.findById(123L)).willReturn(Optional.of(u));
+        given(currentUserAccessor.getCurrentUsername()).willReturn("Pere");
+
+        Assertions.assertThrows(ForbiddenActionException.class,()->userService.changePassword(123L,"bro"));
+
+    }
+
+    @Test
+    void canChangeUserPassOk() {
+        User u = new User("Joan");
+        u.setId(123L);
+        u.setPassword("blabla");
+
+        given(userRepo.findById(123L)).willReturn(Optional.of(u));
+        given(currentUserAccessor.getCurrentUsername()).willReturn("Joan");
+
+
+        given(passwordEncoder.encode(any())).willReturn("bro");
+
+        userService.changePassword(123L,"bro");
+
+        Assertions.assertEquals("bro",u.getPassword());
+
+
     }
 
 }

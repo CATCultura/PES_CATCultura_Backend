@@ -28,6 +28,8 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.*;
 
+import static java.lang.Math.min;
+
 @RestController
 public class EventController {
 
@@ -112,7 +114,11 @@ public class EventController {
         if (tag != null) {
             logger.info("Request for events with tag {}.", tag);
             List<Event> tagEvents = tagService.getTagByName(tag).getEventList().stream().toList();
-            events = new PageImpl<>(tagEvents);
+            long start = pageable.getOffset();
+            long end = min(start+ pageable.getPageSize(),tagEvents.size());
+            if (start < end)
+                events = new PageImpl<>(tagEvents.subList((int) start, (int) end));
+            else events = new PageImpl<>(new ArrayList<>());
         }
         else {
             events = eventService.getByQuery(id, pageable);
