@@ -187,10 +187,16 @@ public class EventController {
     }
 
     @GetMapping("/events/{id}/attendanceCode")
-    public ResponseEntity<String> getAttendanceCode(@PathVariable Long id) {
-        return ResponseEntity.status(HttpStatus.OK).body(eventService.getAttendanceCode(id));
+    public ResponseEntity<Map<String,String>> getAttendanceCode(@PathVariable Long id) {
+        Map<String,String> result = new HashMap<>();
+        result.put("code", eventService.getAttendanceCode(id));
+        return ResponseEntity.status(HttpStatus.OK).body(result);
     }
 
+    /**
+     * @deprecated
+     */
+    @Deprecated
     @PostMapping("/events/{id}/attendanceCode")
     public ResponseEntity<String> generateAttendanceCode(@PathVariable Long id) {
         return ResponseEntity.status(HttpStatus.OK).body(eventService.generateAttendanceCode(id));

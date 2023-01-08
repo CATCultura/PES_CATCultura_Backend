@@ -133,16 +133,22 @@ public class UserController {
     }
 
     @PutMapping("/users/{id}/password")
-    public ResponseEntity<String> changePassword(@PathVariable Long id, @RequestBody Map<String,String> passwords) {
-        if (passwords == null || passwords.isEmpty())
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Missing request body");
+    public ResponseEntity<Map<String,String>> changePassword(@PathVariable Long id, @RequestBody Map<String,String> passwords) {
+        Map<String, String> res = new HashMap<>();
+        String status = "status";
+        if (passwords == null || passwords.isEmpty()) {
+            res.put(status, "Missing request body");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(res);
+        }
         String newPassword = "new_password";
-        if (!passwords.containsKey(newPassword))
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Missing new passwords");
+        if (!passwords.containsKey(newPassword)) {
+            res.put(status, "Missing new passwords");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(res);
+        }
 
         userService.changePassword(id,passwords.get(newPassword));
-
-        return ResponseEntity.status(HttpStatus.OK).body("Changed successfully");
+        res.put(status, "Changed successfully");
+        return ResponseEntity.status(HttpStatus.OK).body(res);
     }
 
     @GetMapping("/users/{id}/events")

@@ -357,6 +357,8 @@ public class Event {
     }
 
     public String getAttendanceCode() {
+        if (attendanceCode == null)
+            attendanceCode = RandomString.generate();
         return attendanceCode;
     }
 
@@ -365,7 +367,8 @@ public class Event {
     }
 
     public String generateAttendanceCode() {
-        attendanceCode = RandomString.generate();
+        if (attendanceCode == null)
+            attendanceCode = RandomString.generate();
         return attendanceCode;
     }
 
