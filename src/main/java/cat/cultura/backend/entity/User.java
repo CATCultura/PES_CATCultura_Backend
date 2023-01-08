@@ -30,7 +30,7 @@ public class User {
     @Column(name="username", unique = true, nullable = false)
     private String username;
 
-    @Column(name="role")
+    @Column(name="role", nullable = false)
     private Role role = Role.USER;
     @Lob
     @Column(name="user_hash", unique = true)

@@ -22,14 +22,17 @@ import java.util.*;
 public class UserService {
 
 
-    @Autowired
-    private PasswordEncoder passwordEncoder;
+
+    private final PasswordEncoder passwordEncoder;
     private final UserJpaRepository userRepo;
     private CurrentUserAccessor currentUserAccessor;
 
-    public UserService(UserJpaRepository userRepo, CurrentUserAccessor currentUserAccessor) {
+    public UserService(UserJpaRepository userRepo,
+                       CurrentUserAccessor currentUserAccessor,
+                        PasswordEncoder passwordEncoder) {
         this.currentUserAccessor = currentUserAccessor;
         this.userRepo = userRepo;
+        this.passwordEncoder=passwordEncoder;
     }
 
     public User createUser(User user) {

@@ -153,6 +153,7 @@ public class EventService {
         return eventRepo.getPastEvents();
     }
 
+    @Transactional(rollbackFor = Exception.class)
     public String getAttendanceCode(Long eventId) {
         Event event = eventRepo.findById(eventId).orElseThrow(EventNotFoundException::new);
         return event.getAttendanceCode();
