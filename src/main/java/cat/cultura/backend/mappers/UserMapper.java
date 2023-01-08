@@ -59,6 +59,9 @@ public class UserMapper {
         for (Review r : user.getReportedReviews()) {
             userDto.addReportedReviews(r.getId());
         }
+        for (User u : user.getReportedUsers()) {
+            userDto.addReportedUsers(u.getId());
+        }
         for (Trophy t : user.getTrophies()) {
             userDto.addTrophy(t.getId());
         }
