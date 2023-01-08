@@ -29,6 +29,7 @@ public class SecurityConfig {
 
     private final String service = Role.SERVICE.toString();
 
+    private final String attendanceCodeEndpoint = "/events/*/attendanceCode";
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
@@ -41,6 +42,7 @@ public class SecurityConfig {
                         .antMatchers(HttpMethod.GET, "/tags").permitAll().and().authorizeHttpRequests()
                         .antMatchers(HttpMethod.POST,"/users").permitAll().and().authorizeHttpRequests()
                         .antMatchers(HttpMethod.POST, EVENTENDPOINT).hasAuthority(organizer).and().authorizeHttpRequests()
+                        .antMatchers(HttpMethod.GET, attendanceCodeEndpoint).hasAuthority(organizer).and().authorizeHttpRequests()
                         .antMatchers(HttpMethod.PUT, EVENTENDPOINT).hasAuthority(organizer).and().authorizeHttpRequests()
                         .antMatchers(HttpMethod.DELETE, CONCRETEEVENT).hasAuthority(organizer).and().authorizeHttpRequests()
                         .antMatchers(HttpMethod.GET,"/users/*/events").permitAll().and().authorizeHttpRequests()

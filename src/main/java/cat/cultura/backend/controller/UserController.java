@@ -92,6 +92,7 @@ public class UserController {
     public ResponseEntity<LoggedUserDto> addUser(@RequestBody UserDto user) {
         logger.info("Received request for creating new user");
         User userEntity = userMapper.convertUserDtoToEntity(user);
+        userEntity.setRole(Role.USER);
         userEntity.setId(null);
         User createdUser = userService.createUser(userEntity);
         logger.info("Created user {}", createdUser.getUsername());
@@ -132,16 +133,22 @@ public class UserController {
     }
 
     @PutMapping("/users/{id}/password")
-    public ResponseEntity<String> changePassword(@PathVariable Long id, @RequestBody Map<String,String> passwords) {
-        if (passwords == null || passwords.isEmpty())
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Missing request body");
+    public ResponseEntity<Map<String,String>> changePassword(@PathVariable Long id, @RequestBody Map<String,String> passwords) {
+        Map<String, String> res = new HashMap<>();
+        String status = "status";
+        if (passwords == null || passwords.isEmpty()) {
+            res.put(status, "Missing request body");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(res);
+        }
         String newPassword = "new_password";
-        if (!passwords.containsKey(newPassword))
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Missing new passwords");
+        if (!passwords.containsKey(newPassword)) {
+            res.put(status, "Missing new passwords");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(res);
+        }
 
         userService.changePassword(id,passwords.get(newPassword));
-
-        return ResponseEntity.status(HttpStatus.OK).body("Changed successfully");
+        res.put(status, "Changed successfully");
+        return ResponseEntity.status(HttpStatus.OK).body(res);
     }
 
     @GetMapping("/users/{id}/events")
@@ -169,7 +176,7 @@ public class UserController {
     //Put, Get and Delete for attendance of a user
 
     @PutMapping("/users/{id}/attendance/{eventId}")
-    public ResponseEntity<List<Long>> addAttendance(@PathVariable Long id, @PathVariable Long eventId) {
+    public ResponseEntity<List<EventDto>> addAttendance(@PathVariable Long id, @PathVariable Long eventId) {
         if(!isCurrentUser(id)) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         } else {
@@ -180,7 +187,7 @@ public class UserController {
                 return ResponseEntity.status(HttpStatus.CONFLICT).build();
             }
             userTrophyService.firstAttendance(id);
-            return ResponseEntity.status(HttpStatus.CREATED).body(attendance.stream().map(Event::getId).toList());
+            return ResponseEntity.status(HttpStatus.CREATED).body(attendance.stream().map(eventMapper::convertEventToDto).toList());
         }
     }
 
@@ -191,7 +198,7 @@ public class UserController {
     }
 
     @DeleteMapping("/users/{id}/attendance/{eventId}")
-    public ResponseEntity<List<Long>> removeAttendance(@PathVariable Long id, @PathVariable Long eventId) {
+    public ResponseEntity<List<EventDto>> removeAttendance(@PathVariable Long id, @PathVariable Long eventId) {
         if(!isCurrentUser(id)) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         } else {
@@ -201,7 +208,7 @@ public class UserController {
             } catch (AssertionError as) {
                 return ResponseEntity.status(HttpStatus.CONFLICT).build();
             }
-            return ResponseEntity.status(HttpStatus.OK).body(attendance.stream().map(Event::getId).toList());
+            return ResponseEntity.status(HttpStatus.OK).body(attendance.stream().map(eventMapper::convertEventToDto).toList());
         }
     }
 
@@ -216,7 +223,7 @@ public class UserController {
             } catch (AssertionError as) {
                 return ResponseEntity.status(HttpStatus.CONFLICT).build();
             }
-            return ResponseEntity.status(HttpStatus.OK).body(attended.stream().map(Event::getId).toList());
+            return ResponseEntity.status(HttpStatus.CREATED).body(attended.stream().map(Event::getId).toList());
         }
     }
 
@@ -244,7 +251,7 @@ public class UserController {
     //Put, Get and Delete for favourites of a user
 
     @PutMapping("/users/{id}/favourites/{eventId}")
-    public ResponseEntity<List<Long>> addFavourites(@PathVariable Long id, @PathVariable Long eventId) {
+    public ResponseEntity<List<EventDto>> addFavourites(@PathVariable Long id, @PathVariable Long eventId) {
         if(!isCurrentUser(id)) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         } else {
@@ -255,7 +262,7 @@ public class UserController {
                 return ResponseEntity.status(HttpStatus.CONFLICT).build();
             }
             userTrophyService.firstFavourite(id);
-            return ResponseEntity.status(HttpStatus.CREATED).body(favourites.stream().map(Event::getId).toList());
+            return ResponseEntity.status(HttpStatus.CREATED).body(favourites.stream().map(eventMapper::convertEventToDto).toList());
         }
     }
 
@@ -266,7 +273,7 @@ public class UserController {
     }
 
     @DeleteMapping("/users/{id}/favourites/{eventId}")
-    public ResponseEntity<List<Long>> removeFavourites(@PathVariable Long id, @PathVariable Long eventId) {
+    public ResponseEntity<List<EventDto>> removeFavourites(@PathVariable Long id, @PathVariable Long eventId) {
         if(!isCurrentUser(id)) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         } else {
@@ -276,7 +283,7 @@ public class UserController {
             } catch (AssertionError as) {
                 return ResponseEntity.status(HttpStatus.CONFLICT).build();
             }
-            return ResponseEntity.status(HttpStatus.OK).body(favourites.stream().map(Event::getId).toList());
+            return ResponseEntity.status(HttpStatus.OK).body(favourites.stream().map(eventMapper::convertEventToDto).toList());
         }
     }
 

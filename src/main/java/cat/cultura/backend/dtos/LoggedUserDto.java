@@ -34,6 +34,8 @@ public class LoggedUserDto extends UserDto {
 
     private List<Long> reportedReviewIds = new ArrayList<>();
 
+    private List<Long> reportedUserIds = new ArrayList<>();
+
     public String getUserHash() {
         return userHash;
     }
@@ -66,6 +68,9 @@ public class LoggedUserDto extends UserDto {
     }
     public void addReportedReviews(Long reviewID) {
         reportedReviewIds.add(reviewID);
+    }
+    public void addReportedUsers(Long userID) {
+        reportedUserIds.add(userID);
     }
 
     public List<Long> getTrophiesReceived() {
@@ -130,5 +135,21 @@ public class LoggedUserDto extends UserDto {
 
     public void setSentRequestsIds(List<Long> sentRequestsIds) {
         this.sentRequestsIds = sentRequestsIds;
+    }
+
+    public List<Long> getReportedReviewIds() {
+        return reportedReviewIds;
+    }
+
+    public void setReportedReviewIds(List<Long> reportedReviewIds) {
+        this.reportedReviewIds = reportedReviewIds;
+    }
+
+    public List<Long> getReportedUserIds() {
+        return reportedUserIds;
+    }
+
+    public void setReportedUserIds(List<Long> reportedUserIds) {
+        this.reportedUserIds = reportedUserIds;
     }
 }

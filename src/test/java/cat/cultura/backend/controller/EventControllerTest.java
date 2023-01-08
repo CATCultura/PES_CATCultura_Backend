@@ -442,4 +442,38 @@ class EventControllerTest {
         Assertions.assertEquals(HttpStatus.CONFLICT.value(), response.getStatus());
     }
 
+    @Test
+    @WithMockUser(username = "admin", authorities = { "USER"})
+    void canNotGetAttendanceCodeUSER() throws Exception {
+//        Map<String, Object> event = new HashMap<>();
+//        event.put("denominacio", "titol");
+//        event.put("dataInici", "ahir");
+//        event.put("adreca", "C/Pixa");
+
+        // when
+        MockHttpServletResponse response = mvc.perform(
+                get("/events/234/attendanceCode").contentType(MediaType.APPLICATION_JSON)).andReturn().getResponse();
+
+        // then
+        Assertions.assertEquals(HttpStatus.FORBIDDEN.value(), response.getStatus());
+    }
+
+    @Test
+    @WithMockUser(username = "admin", authorities = { "ORGANIZER"})
+    void canGetAttendanceCodeOrg() throws Exception {
+//        Map<String, Object> event = new HashMap<>();
+//        event.put("denominacio", "titol");
+//        event.put("dataInici", "ahir");
+//        event.put("adreca", "C/Pixa");
+
+        given(eventService.getAttendanceCode(234L)).willReturn("holakase");
+
+        // when
+        MockHttpServletResponse response = mvc.perform(
+                get("/events/234/attendanceCode").contentType(MediaType.APPLICATION_JSON)).andReturn().getResponse();
+
+        // then
+        Assertions.assertEquals(HttpStatus.OK.value(), response.getStatus());
+    }
+
 }
