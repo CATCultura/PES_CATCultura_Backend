@@ -169,7 +169,7 @@ public class UserController {
     //Put, Get and Delete for attendance of a user
 
     @PutMapping("/users/{id}/attendance/{eventId}")
-    public ResponseEntity<List<Long>> addAttendance(@PathVariable Long id, @PathVariable Long eventId) {
+    public ResponseEntity<List<EventDto>> addAttendance(@PathVariable Long id, @PathVariable Long eventId) {
         if(!isCurrentUser(id)) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         } else {
@@ -180,7 +180,7 @@ public class UserController {
                 return ResponseEntity.status(HttpStatus.CONFLICT).build();
             }
             userTrophyService.firstAttendance(id);
-            return ResponseEntity.status(HttpStatus.CREATED).body(attendance.stream().map(Event::getId).toList());
+            return ResponseEntity.status(HttpStatus.CREATED).body(attendance.stream().map(eventMapper::convertEventToDto).toList());
         }
     }
 
@@ -191,7 +191,7 @@ public class UserController {
     }
 
     @DeleteMapping("/users/{id}/attendance/{eventId}")
-    public ResponseEntity<List<Long>> removeAttendance(@PathVariable Long id, @PathVariable Long eventId) {
+    public ResponseEntity<List<EventDto>> removeAttendance(@PathVariable Long id, @PathVariable Long eventId) {
         if(!isCurrentUser(id)) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         } else {
@@ -201,7 +201,7 @@ public class UserController {
             } catch (AssertionError as) {
                 return ResponseEntity.status(HttpStatus.CONFLICT).build();
             }
-            return ResponseEntity.status(HttpStatus.OK).body(attendance.stream().map(Event::getId).toList());
+            return ResponseEntity.status(HttpStatus.OK).body(attendance.stream().map(eventMapper::convertEventToDto).toList());
         }
     }
 
@@ -216,7 +216,7 @@ public class UserController {
             } catch (AssertionError as) {
                 return ResponseEntity.status(HttpStatus.CONFLICT).build();
             }
-            return ResponseEntity.status(HttpStatus.OK).body(attended.stream().map(Event::getId).toList());
+            return ResponseEntity.status(HttpStatus.CREATED).body(attended.stream().map(Event::getId).toList());
         }
     }
 
@@ -244,7 +244,7 @@ public class UserController {
     //Put, Get and Delete for favourites of a user
 
     @PutMapping("/users/{id}/favourites/{eventId}")
-    public ResponseEntity<List<Long>> addFavourites(@PathVariable Long id, @PathVariable Long eventId) {
+    public ResponseEntity<List<EventDto>> addFavourites(@PathVariable Long id, @PathVariable Long eventId) {
         if(!isCurrentUser(id)) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         } else {
@@ -255,7 +255,7 @@ public class UserController {
                 return ResponseEntity.status(HttpStatus.CONFLICT).build();
             }
             userTrophyService.firstFavourite(id);
-            return ResponseEntity.status(HttpStatus.CREATED).body(favourites.stream().map(Event::getId).toList());
+            return ResponseEntity.status(HttpStatus.CREATED).body(favourites.stream().map(eventMapper::convertEventToDto).toList());
         }
     }
 
@@ -266,7 +266,7 @@ public class UserController {
     }
 
     @DeleteMapping("/users/{id}/favourites/{eventId}")
-    public ResponseEntity<List<Long>> removeFavourites(@PathVariable Long id, @PathVariable Long eventId) {
+    public ResponseEntity<List<EventDto>> removeFavourites(@PathVariable Long id, @PathVariable Long eventId) {
         if(!isCurrentUser(id)) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         } else {
@@ -276,7 +276,7 @@ public class UserController {
             } catch (AssertionError as) {
                 return ResponseEntity.status(HttpStatus.CONFLICT).build();
             }
-            return ResponseEntity.status(HttpStatus.OK).body(favourites.stream().map(Event::getId).toList());
+            return ResponseEntity.status(HttpStatus.OK).body(favourites.stream().map(eventMapper::convertEventToDto).toList());
         }
     }
 
