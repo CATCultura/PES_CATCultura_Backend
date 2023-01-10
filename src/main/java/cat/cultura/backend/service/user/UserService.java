@@ -8,7 +8,6 @@ import cat.cultura.backend.exceptions.ForbiddenActionException;
 import cat.cultura.backend.exceptions.UserNotFoundException;
 import cat.cultura.backend.interceptors.CurrentUserAccessor;
 import cat.cultura.backend.repository.UserJpaRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -119,6 +118,11 @@ public class UserService {
         reportedUser.removeReport();
         userRepo.save(user);
         userRepo.save(reportedUser);
+        return user.getReportedUsers();
+    }
+
+    public List<User> getReportedUsers(Long userId) {
+        User user = userRepo.findById(userId).orElseThrow(() -> new UserNotFoundException(userId));
         return user.getReportedUsers();
     }
 
