@@ -121,17 +121,6 @@ public class UserController {
         return ResponseEntity.status(HttpStatus.OK).body(userMapper.convertUserToDto(user));
     }
 
-    /**
-     *
-     * @deprecated
-     */
-    @Deprecated(forRemoval = true)
-    @GetMapping("/users/name={name}")
-    public ResponseEntity<UserDto> getUserByName(@PathVariable String name) {
-        User user = userService.getUserByUsername(name);
-        return ResponseEntity.status(HttpStatus.OK).body(userMapper.convertUserToDto(user));
-    }
-
     @PutMapping("/users/{id}/password")
     public ResponseEntity<Map<String,String>> changePassword(@PathVariable Long id, @RequestBody Map<String,String> passwords) {
         Map<String, String> res = new HashMap<>();
@@ -587,6 +576,21 @@ public class UserController {
             List<User> users;
             try {
                 users = userService.quitReport(userId,reportedUserId);
+            } catch (AssertionError as) {
+                return ResponseEntity.status(HttpStatus.CONFLICT).build();
+            }
+            return ResponseEntity.status(HttpStatus.OK).body(users.stream().map(User::getId).toList());
+        }
+    }
+
+    @GetMapping("/users/{userId}/reports")
+    public ResponseEntity<List<Long>> getReports(@PathVariable Long userId) {
+        List<User> users;
+        if(!isCurrentUser(userId)) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        } else {
+            try {
+                users = userService.getReportedUsers(userId);
             } catch (AssertionError as) {
                 return ResponseEntity.status(HttpStatus.CONFLICT).build();
             }
